@@ -20,7 +20,7 @@
    MUST equal VERSION in sw.js. They are separate files with no shared module,
    so this is a hand-kept pair — `.publish/stage.ps1` refuses to stage a build
    where the two disagree, which is what keeps it honest. Bump both together. */
-const BUILD = 'v29';
+const BUILD = 'v30';
 
 /* ---------------------------------------------------------------- data --- */
 
@@ -1975,9 +1975,24 @@ function viewWho() {
    list afterwards. One field, one button, matching the app's no-PIN rule.
 */
 function viewSetup() {
-  return emptyState('Set up the system first',
-    'This phone has no depot on it yet. Start by creating the admin — the hidden account that sets up the crew, the vans, the workshops and the draw rules. The admin never checks a van and never countersigns; it only gets the depot going, and it stays out of every crew list once it has.',
-    { label: 'Set up admin', action: 'openAdminModal' });
+  /* No top bar, no tabs — this is the whole screen, so it centres itself in the
+     viewport rather than sitting under chrome that is not there. The build
+     stamp rides at the foot: on every other screen it lives in the header's
+     left gutter, but the header is gone here, and "which build did this phone
+     bootstrap on?" is exactly the question a blank first-run screen should be
+     able to answer. The admin modal is rendered HERE, not off the topbar,
+     because the topbar element is hidden (display:none) on this screen and a
+     fixed child of it would not paint. */
+  return `
+    <div class="setup-gate">
+      <div class="empty">
+        ${monoLabel('Set up the system first')}
+        ${note('This phone has no depot on it yet. Start by creating the admin — the hidden account that sets up the crew, the vans, the workshops and the draw rules. The admin never checks a van and never countersigns; it only gets the depot going, and it stays out of every crew list once it has.', 'is-faint')}
+        <button class="btn-add" data-a="openAdminModal">Set up admin</button>
+      </div>
+      <span class="setup-build" aria-hidden="true">${esc(BUILD)}</span>
+    </div>
+    ${adminModal()}`;
 }
 
 /* The one modal in the app. Everything else that overlays a screen is a bottom
@@ -2473,16 +2488,13 @@ function renderTopbar(screen) {
   const title = typeof def.title === 'function' ? def.title() : def.title;
 
   /* The setup screen has no signer, no tabs and nothing to explain — nobody
-     exists yet. It gets a bare bar with the title only, plus the admin modal it
-     opens. No avatar (there is no identity to show or switch), no help, no
-     Back (it is not a screen you navigated to). */
-  if (screen === 'setup') {
-    return `
-      <div class="topbar-lead"></div>
-      <span class="topbar-title">${esc(title)}</span>
-      <div class="topbar-trail"></div>
-      ${adminModal()}`;
-  }
+     exists yet — so it drops the whole top bar (render() hides the element) and
+     stands on its own, a single centred column. It carries no chrome at all: no
+     title (the screen states its own), no avatar (no identity to show or
+     switch), no help, no Back (it is not a screen you navigated to). The admin
+     modal it opens moves into viewSetup() with it, because a fixed child of a
+     `display:none` bar would not paint. */
+  if (screen === 'setup') return '';
 
   const pending = pendingChecks();
   const sync = pending.length
@@ -2862,7 +2874,14 @@ function render() {
   const scroller = document.getElementById('screen');
   const keepScroll = scroller.scrollTop;
 
-  document.getElementById('topbar').innerHTML = renderTopbar(screen);
+  /* The setup gate drops the top bar entirely, the same way it drops the tabs
+     below: with no signer and nothing to explain there is no chrome to show, so
+     the screen stands alone and centres itself. `hidden` collapses the grid row
+     outright (see `.topbar[hidden]` in the CSS). The bar's own modal moves into
+     viewSetup() for this screen — a fixed child of a hidden bar would not paint. */
+  const topbar = document.getElementById('topbar');
+  topbar.hidden = screen === 'setup';
+  topbar.innerHTML = renderTopbar(screen);
   scroller.className = cls('screen', transition);
   scroller.innerHTML = def.view();
 

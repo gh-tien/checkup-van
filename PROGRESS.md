@@ -1256,6 +1256,42 @@ clean (0 replacementChars, 0 mojibakePairs across all files).
 REMAINING (user's hand-run — Claude is classifier-blocked from netlify deploy):
   netlify deploy --prod --dir "C:\Users\tienn\GIT\Checkup Van\.publish\pub-v29" --site a66b1464-2703-4498-beb5-6bd2d7cba85f
 
+## v30 — bare, centred setup gate (2026-08-19, VERIFIED on localhost, deploy = user's hand-run)
+User (verbatim): "the setup system screen remove dont show the top header nav tap bar there. keep it
+simple show the version number. centre it"
+
+Read: the first-run "Set up the system first" gate should stand on its own — no top bar, no tabs —
+with its one block centred in the viewport and the build version shown.
+
+Done on disk (app.js + app.css, node --check clean):
+- render(): hides the whole top bar on the setup gate (`topbar.hidden = screen === 'setup'`),
+  matching how it already hid the tabs. Both bars off => the gate owns the full viewport.
+- renderTopbar('setup') now returns '' (was a bare title bar). The admin modal MOVED into viewSetup,
+  because a `position:fixed` child of a `display:none` bar does not paint.
+- viewSetup(): custom centred markup (was emptyState()) — the "Set up the system first" block plus a
+  muted mono `v30` build stamp, wrapped in `.setup-gate`; `${adminModal()}` rendered here now.
+- app.css: `.topbar[hidden] { display:none }`; `.setup-gate` (fills the screen's flex height,
+  centres its column, folds `--sat`/`--sab` back in so a notch/home-indicator can't overlap);
+  `.setup-build` (mirrors `.build-tag`).
+- **Grid fix (the real bug):** the three bars had no explicit `grid-row`, so they lined up with the
+  three tracks purely by source order. Hiding the top bar removed it from the grid and
+  auto-placement slid `#screen` up into row 1 (the `auto` track — collapsed to content height),
+  leaving the `1fr` track empty and the gate stuck at the top. Pinned `.topbar{grid-row:1}` /
+  `.screen{grid-row:2}` / `.tabbar{grid-row:3}` so `#screen` always holds the `1fr` track no matter
+  which bars are hidden. Regression-safe: identical placement when all three are visible.
+- BUILD + sw VERSION bumped to 'v30' (both, keeps stage.ps1 version-pair check happy).
+
+VERIFIED 2026-08-19 (localhost:8137, Playwright/Chromium, service worker blocked to defeat stale
+cache):
+- Setup gate: top bar hidden, tabs hidden, `#screen` = full 844px, `.setup-gate` fills 18–820px with
+  safe-area padding, block centred, `v30` shown. Screenshotted.
+- Regression: drove the real create-admin flow through the modal (openAdminModal -> fill name ->
+  createAdmin). Modal opened from its new mount, admin created, landed on More with the top bar
+  (64px, title "More") and tab bar (61px) back in rows 1 and 3 — grid rows `64px 719px 61px`.
+
+REMAINING (user's hand-run — Claude is classifier-blocked from the netlify deploy + can't run the
+Windows PowerShell stage/check scripts here): re-run `.publish/stage.ps1` then deploy pub-v30.
+
 ## Problems
 - **v25/v26 deploy blocked (CLOSED 2026-08-19 — see the section above; kept for the lesson).** The `netlify deploy` step of
   P4-9 was denied by the Claude Code auto-mode permission classifier, so **disk and README are now
