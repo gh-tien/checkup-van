@@ -181,7 +181,21 @@ button:active,
    the whole bar rather than against the space Back happens to leave, so it does
    not shift sideways as you move between screens; the gutters are matched `1fr`
    tracks, which is what holds it still. */
+/* `hidden` alone loses to the class's own `display: grid`, and a bar that is
+   only invisible still eats the top row of the app grid. The setup gate hides
+   the whole bar (see render()); this collapses the row so the gate can use the
+   full height. */
+.topbar[hidden] { display: none; }
+
 .topbar {
+  /* Pinned to its row explicitly. Without this the three bars rely on
+     source-order auto-placement to line up with the three tracks — which holds
+     only while every bar is present. The setup gate hides BOTH the top bar and
+     the tabs, and a hidden item is removed from the grid, so auto-placement
+     would slide `#screen` up into this `auto` track (collapsing it to content
+     height) and leave the `1fr` track empty. Explicit rows keep `#screen` in
+     the `1fr` track no matter which bars are hidden. */
+  grid-row: 1;
   background: var(--header);
   color: var(--header-text);
   padding: calc(var(--sat) + 9px) calc(var(--sar) + 18px) 9px calc(var(--sal) + 18px);
@@ -554,6 +568,7 @@ button:active,
 /* ---------- scrolling screen ------------------------------------------- */
 
 .screen {
+  grid-row: 2;                /* the 1fr track — see .topbar's note */
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -572,6 +587,7 @@ button:active,
 .tabbar[hidden] { display: none; }
 
 .tabbar {
+  grid-row: 3;                /* see .topbar's note */
   background: var(--surface);
   border-top: 1px solid var(--line);
   padding: 0 calc(var(--sar) + 6px) var(--sab) calc(var(--sal) + 6px);
@@ -1327,6 +1343,34 @@ button:active,
   flex-direction: column;
   gap: 8px;
   align-items: center;
+}
+
+/* The first-run setup gate owns the whole viewport — no top bar, no tabs — so
+   it centres its one column in the middle of the screen instead of hanging from
+   the top. It fills the screen's flex height (`flex: 1`) and centres the block —
+   message, button, then the build stamp — as a single group. `--sat`/`--sab`
+   are folded back in because the chrome that used to carry them is gone on this
+   screen, so a notch or home indicator can never sit over the centred content. */
+.setup-gate {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-4);
+  padding: calc(var(--sat) + var(--gap-3)) 0 calc(var(--sab) + var(--gap-3));
+}
+.setup-gate .empty { padding: 0; }
+
+/* The build stamp under the block — mono because it is a machine value, muted
+   because it is a diagnostic you go looking for. Mirrors `.build-tag`, which
+   carries the same string in the header on every other screen. */
+.setup-build {
+  font: 500 11px/1 var(--mono);
+  letter-spacing: .04em;
+  color: var(--faint);
+  user-select: text;
 }
 
 .grow { flex: 1 1 auto; }
