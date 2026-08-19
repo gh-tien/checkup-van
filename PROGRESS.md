@@ -1293,7 +1293,17 @@ REMAINING (user's hand-run — Claude is classifier-blocked from the netlify dep
 Windows PowerShell stage/check scripts here): re-run `.publish/stage.ps1` then deploy pub-v30.
 
 ## Problems
-- **v25/v26 deploy blocked (CLOSED 2026-08-19 — see the section above; kept for the lesson).** The `netlify deploy` step of
+- **v25/v26 deploy blocked — FULLY RESOLVED 2026-08-19. Historical only; nothing to do.**
+  The disk/live gap this entry describes is gone: the site was deployed fresh to **v30** on
+  2026-08-19 (user's hand-run of `stage.ps1` + `netlify deploy`, confirmed live —
+  `curl .../sw.js` reads `const VERSION = 'v30';`), so repo, `main` and production now all agree
+  at v30 and every intermediate version (v24→v30) is superseded. The block itself was never
+  "fixed" — it is structural (a session must not be able to grant itself deploy permission), and
+  the working answer is simply that **the user runs the deploy by hand from a normal terminal**,
+  which is now the established, proven flow (see the v30 section above). The stale "disk=v26 /
+  live=v24" wording below is kept verbatim only as the record of how the block behaved; do not read
+  it as current state.
+  The `netlify deploy` step of
   P4-9 was denied by the Claude Code auto-mode permission classifier, so **disk and README are now
   at v26 (P4-9 through P4-22 all undeployed) but https://checkup-van.netlify.app is still serving v24** — the improved self-countersign copy
   is NOT live. Nothing is broken either way (v24 is a good build; the difference is one warning
