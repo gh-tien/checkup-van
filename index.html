@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=5">
+<title>Spot-Check</title>
+<meta name="description" content="Fleet spot-check countersigning for depot managers.">
+
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light">
+
+<!-- iOS standalone -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Spot-Check">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fustat:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<div id="app" class="app">
+  <header id="topbar" class="topbar"></header>
+  <main id="screen" class="screen" tabindex="-1"></main>
+  <nav id="tabbar" class="tabbar" aria-label="Sections"></nav>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- store.js first: app.js reads window.Store at boot. photos.js owns the
+     IndexedDB blob layer (window.Photos); both load before app.js. -->
+<script src="store.js"></script>
+<script src="photos.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

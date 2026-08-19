@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fustat:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>html,body{margin:0;height:100%;background:#EDF1F3;font-family:Fustat,system-ui,sans-serif;color:#1C2226;-webkit-text-size-adjust:100%}*{box-sizing:border-box}a{color:#1C2226}a:hover{color:#A03428}</style></helmet>
+
+<div style="min-height:100dvh;display:flex;justify-content:center">
+<div style="width:100%;max-width:1280px;min-height:100dvh;background:#F7F8F9;display:flex;flex-direction:column;border-left:1px solid rgba(0,0,0,.08);border-right:1px solid rgba(0,0,0,.08)">
+
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px clamp(14px,3vw,28px);background:#EDF1F3;border-bottom:1px solid #E2E6E9;font:500 11px 'IBM Plex Mono',monospace;color:#5C666E;flex:none"><span>MANAGER · S. PATEL</span><span>{{ syncLine }}</span></div>
+
+<div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:clamp(10px,2vw,22px);padding:clamp(10px,2vw,16px) clamp(14px,3vw,28px);border-bottom:1px solid #E2E6E9;flex:none">
+<span style="font:500 clamp(16px,2.3vw,22px) Fustat,sans-serif;margin-right:auto">Barking depot</span>
+<span onClick="{{ tabQueue }}" style="cursor:pointer;font:500 clamp(13px,1.7vw,16px) Fustat,sans-serif;color:{{ queueColor }};border-bottom:2px solid {{ queueUnderline }};padding-bottom:3px">Queue ({{ pendingCount }})</span>
+<span onClick="{{ tabDefects }}" style="cursor:pointer;font:500 clamp(13px,1.7vw,16px) Fustat,sans-serif;color:{{ defectsColor }};border-bottom:2px solid {{ defectsUnderline }};padding-bottom:3px">Defects ({{ openDefectCount }})</span>
+<span onClick="{{ tabCoverage }}" style="cursor:pointer;font:500 clamp(13px,1.7vw,16px) Fustat,sans-serif;color:{{ coverageColor }};border-bottom:2px solid {{ coverageUnderline }};padding-bottom:3px">Coverage</span>
+<span onClick="{{ tabVans }}" style="cursor:pointer;font:500 clamp(13px,1.7vw,16px) Fustat,sans-serif;color:{{ vansColor }};border-bottom:2px solid {{ vansUnderline }};padding-bottom:3px">Vans ({{ fleetCount }})</span>
+<span onClick="{{ tabList }}" style="cursor:pointer;font:500 clamp(13px,1.7vw,16px) Fustat,sans-serif;color:{{ listColor }};border-bottom:2px solid {{ listUnderline }};padding-bottom:3px">Checklist ({{ liveCount }})</span>
+<span onClick="{{ tabPeople }}" style="cursor:pointer;font:500 clamp(13px,1.7vw,16px) Fustat,sans-serif;color:{{ peopleColor }};border-bottom:2px solid {{ peopleUnderline }};padding-bottom:3px">People ({{ peopleCount }})</span>
+</div>
+
+<div style="flex:1;display:flex;flex-wrap:wrap;align-items:stretch;align-content:flex-start">
+
+<sc-if value="{{ isQueue }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1 1 300px;min-width:0;border-right:1px solid #EDF1F3;padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:9px">
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B;letter-spacing:.06em">AWAITING YOUR COUNTERSIGN — OLDEST FIRST</div>
+<sc-for list="{{ queue }}" as="row" hint-placeholder-count="4">
+<div onClick="{{ row.onSelect }}" style="border:{{ row.borderWidth }} solid {{ row.borderColor }};border-radius:14px;padding:11px;cursor:pointer;display:flex;flex-direction:column;gap:3px;background:{{ row.bg }}">
+<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span style="font:500 clamp(15px,1.9vw,17px) Fustat,sans-serif">{{ row.reg }}</span><span style="font:500 11px 'IBM Plex Mono',monospace;color:{{ row.flagColor }};text-align:right">{{ row.flag }}</span></div>
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B">{{ row.meta }}</div>
+</div>
+</sc-for>
+<div style="border:1.5px dashed #8A6116;border-radius:14px;padding:11px;display:flex;flex-direction:column;gap:3px">
+<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span style="font:500 clamp(15px,1.9vw,17px) Fustat,sans-serif;color:#8A6116">DA15 NBX</span><span style="font:500 11px 'IBM Plex Mono',monospace;color:#8A6116;text-align:right">ON A PHONE</span></div>
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#8A6116">STARTED 06:31 · S. ELLIS · NO SIGNAL SINCE 06:33</div>
+<div style="font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#77828B;text-wrap:pretty">Not yours to countersign yet — it arrives when the phone finds signal.</div>
+</div>
+<div style="font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#77828B;margin-top:4px">{{ queueFootnote }}</div>
+</div>
+
+<div style="flex:2 1 420px;min-width:0;padding:clamp(12px,2vw,18px);display:{{ detailDisplay }};flex-direction:column;gap:12px">
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px"><span style="font:500 clamp(18px,2.4vw,23px) Fustat,sans-serif">{{ sel.reg }} — {{ sel.date }}</span><span style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B">{{ sel.crew }}</span></div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(90px,14vw,150px),1fr));gap:8px">
+<sc-for list="{{ evidence }}" as="ph" hint-placeholder-count="6">
+<div style="aspect-ratio:4/3;background:repeating-linear-gradient(45deg,#E8ECEF 0 6px,#F2F4F6 6px 12px);border:1px solid {{ ph.color }};border-radius:18px;display:flex;align-items:flex-end;padding:5px;font:500 10px 'IBM Plex Mono',monospace;color:{{ ph.color }}">{{ ph.label }}</div>
+</sc-for>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<div style="flex:1 1 110px;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:10px;text-align:center"><div style="font:500 clamp(16px,2.3vw,20px) Fustat,sans-serif">{{ sel.passed }}</div><div style="font:500 10px 'IBM Plex Mono',monospace;color:#77828B">PASSED</div></div>
+<div style="flex:1 1 110px;border:1.5px dashed {{ sel.resultColor }};border-radius:14px;padding:10px;text-align:center"><div style="font:500 clamp(16px,2.3vw,20px) Fustat,sans-serif;color:{{ sel.resultColor }}">{{ sel.failed }}</div><div style="font:500 10px 'IBM Plex Mono',monospace;color:{{ sel.resultColor }}">FAILED</div></div>
+<div style="flex:1 1 110px;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:10px;text-align:center"><div style="font:500 clamp(16px,2.3vw,20px) Fustat,sans-serif">{{ sel.mileage }}</div><div style="font:500 10px 'IBM Plex Mono',monospace;color:#77828B">ODOMETER</div></div>
+</div>
+
+<sc-if value="{{ hasDefect }}" hint-placeholder-val="{{ true }}">
+<div style="border:1px solid #A03428;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:5px">
+<div style="font:500 clamp(15px,1.9vw,17px) Fustat,sans-serif">{{ sel.defectName }}</div>
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#A03428">{{ sel.defectMeta }}</div>
+<div style="font:clamp(13px,1.7vw,16px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty">{{ sel.defectNote }}</div>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<div onClick="{{ cycleAssignee }}" style="flex:1 1 170px;border:1px solid {{ assignColor }};border-radius:14px;padding:10px 12px;cursor:pointer"><div style="font:500 11px 'IBM Plex Mono',monospace;color:{{ assignColor }}">ASSIGN TO *</div><div style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif;color:{{ assignTextColor }}">{{ assignee }}</div></div>
+<div onClick="{{ cycleDue }}" style="flex:1 1 130px;border:1px solid {{ dueColor }};border-radius:14px;padding:10px 12px;cursor:pointer"><div style="font:500 11px 'IBM Plex Mono',monospace;color:{{ dueColor }}">FIX BY *</div><div style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif;color:{{ dueTextColor }}">{{ dueDate }}</div></div>
+</div>
+<div onClick="{{ toggleOffRoad }}" style="display:flex;gap:10px;align-items:center;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px 12px;cursor:pointer"><div style="width:19px;height:19px;flex:none;border:1px solid #E2E6E9;background:{{ offRoadBg }};border-radius:3px"></div><span style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif">Take van off road until fixed</span></div>
+</sc-if>
+
+<sc-if value="{{ sendingBack }}" hint-placeholder-val="{{ false }}">
+<div style="border:2px solid #A03428;border-radius:14px;padding:13px;display:flex;flex-direction:column;gap:11px">
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#A03428;letter-spacing:.06em">SENDING BACK TO {{ sbWho }} — GIVE THEM THE REASON *</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<sc-for list="{{ sbReasons }}" as="r" hint-placeholder-count="5">
+<div onClick="{{ r.onTap }}" style="border:{{ r.width }} solid {{ r.color }};border-radius:18px;padding:10px 11px;display:flex;gap:9px;align-items:center;cursor:pointer;background:{{ r.bg }}"><span style="font:500 12px 'IBM Plex Mono',monospace;color:{{ r.color }};width:11px;flex:none">{{ r.tick }}</span><span style="font:clamp(13px,1.7vw,16px) Fustat,sans-serif;color:{{ r.textColor }};text-wrap:pretty">{{ r.label }}</span></div>
+</sc-for>
+</div>
+<sc-if value="{{ sbOther }}" hint-placeholder-val="{{ false }}">
+<textarea onChange="{{ sbTypeNote }}" placeholder="Tell them what to put right — they only see this line." style="border:1px solid #A03428;border-radius:18px;padding:10px;font:clamp(13px,1.7vw,16px) Fustat,sans-serif;resize:none;min-height:62px;outline:none;color:#1C2226"></textarea>
+</sc-if>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B;letter-spacing:.06em">HOW MUCH DO THEY REDO?</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ sbScopes }}" as="s" hint-placeholder-count="2">
+<div onClick="{{ s.onTap }}" style="flex:1 1 160px;border:{{ s.width }} solid {{ s.color }};border-radius:18px;padding:10px;text-align:center;font:clamp(13px,1.7vw,16px) Fustat,sans-serif;color:{{ s.textColor }};cursor:pointer;background:{{ s.bg }}">{{ s.label }}</div>
+</sc-for>
+</div>
+</div>
+<div onClick="{{ sbToggleHold }}" style="display:flex;gap:10px;align-items:center;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px 12px;cursor:pointer"><div style="width:19px;height:19px;flex:none;border:1px solid #E2E6E9;background:{{ sbHoldBg }};border-radius:3px"></div><span style="font:clamp(13px,1.7vw,16px) Fustat,sans-serif;text-wrap:pretty">Keep {{ sel.reg }} out of the draw until it comes back</span></div>
+<div style="font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#77828B;text-wrap:pretty">{{ sbConsequence }}</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<div onClick="{{ sbCancel }}" style="flex:1 1 120px;border:1px solid #E2E6E9;color:#77828B;border-radius:14px;padding:14px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer">Cancel</div>
+<div onClick="{{ sbConfirm }}" style="flex:2 1 220px;background:{{ sbBg }};color:{{ sbFg }};border-radius:14px;padding:14px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer">{{ sbLabel }}</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ wasReturned }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px solid #A03428;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px">
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#A03428;letter-spacing:.06em">SENT BACK 07:06 · ON {{ sbWho }}'S PHONE NOW</div>
+<div style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif;color:#1C2226;text-wrap:pretty">“{{ rtReason }}”</div>
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B">{{ rtScope }} · {{ rtHold }}</div>
+<div style="font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty">{{ rtNote }}</div>
+</div>
+</sc-if>
+
+<div style="border:1.5px dashed {{ csColor }};border-radius:14px;padding:12px;display:{{ csDisplay }};flex-direction:column;gap:4px;margin-top:auto">
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:{{ csColor }}">{{ csState }}</div>
+<div style="font:clamp(13px,1.7vw,16px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty">{{ csNote }}</div>
+</div>
+<div style="display:{{ actionsDisplay }};flex-wrap:wrap;gap:10px;padding-top:10px">
+<div onClick="{{ sendBack }}" style="flex:1 1 150px;border:1px solid {{ sendBackColor }};color:{{ sendBackColor }};border-radius:14px;padding:14px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer">{{ sendBackLabel }}</div>
+<div onClick="{{ approve }}" style="flex:2 1 220px;background:{{ approveBg }};color:{{ approveFg }};border-radius:14px;padding:14px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer;display:{{ approveDisplay }}">{{ approveLabel }}</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDefects }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1 1 100%;min-width:0;padding:clamp(12px,2vw,18px);display:flex;flex-wrap:wrap;gap:12px;align-content:flex-start">
+<sc-for list="{{ defects }}" as="d" hint-placeholder-count="4">
+<div style="flex:1 1 300px;min-width:0;border:1px solid {{ d.color }};border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:7px">
+<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span style="font:500 clamp(15px,1.9vw,17px) Fustat,sans-serif">{{ d.reg }} — {{ d.name }}</span><span style="font:500 11px 'IBM Plex Mono',monospace;color:{{ d.color }};text-align:right">{{ d.severity }}</span></div>
+<div style="display:flex;gap:9px;align-items:center">
+<div style="width:64px;height:48px;flex:none;background:repeating-linear-gradient(45deg,#E8ECEF 0 6px,#F2F4F6 6px 12px);border:1px solid {{ d.color }};border-radius:4px"></div>
+<div style="min-width:0"><div style="font:clamp(13px,1.7vw,16px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty">{{ d.note }}</div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B">{{ d.meta }}</div></div>
+</div>
+<div onClick="{{ d.onAction }}" style="border:1px solid {{ d.actionColor }};color:{{ d.actionColor }};border-radius:14px;padding:11px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer">{{ d.action }}</div>
+</div>
+</sc-for>
+<div style="flex:1 1 100%;font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#77828B">A defect only closes when someone re-checks the van and photographs the repair.</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isPeople }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1 1 100%;min-width:0;padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px">
+<span style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B;letter-spacing:.06em">TWO ROLES — INSPECTORS CHECK, MANAGERS COUNTERSIGN</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:12px;align-content:flex-start">
+<sc-for list="{{ people }}" as="p" hint-placeholder-count="6">
+<div style="flex:1 1 320px;min-width:0;border:1px solid {{ p.borderColor }};border-radius:14px;padding:11px;background:{{ p.bg }};display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+<input value="{{ p.name }}" onChange="{{ p.onRename }}" style="flex:1 1 130px;min-width:0;border:none;background:transparent;outline:none;font:500 clamp(15px,1.9vw,17px) Fustat,sans-serif;color:{{ p.nameColor }};text-decoration:{{ p.strike }};padding:2px 0">
+<span onClick="{{ p.onRole }}" style="font:500 11px 'IBM Plex Mono',monospace;border:1px solid {{ p.roleBorder }};background:{{ p.roleBg }};color:{{ p.roleFg }};border-radius:18px;padding:7px 9px;cursor:pointer;white-space:nowrap">{{ p.roleLabel }}</span>
+</div>
+<div style="font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty">{{ p.sees }}</div>
+<div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center">
+<span style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B;margin-right:auto">{{ p.signinLabel }}</span>
+<span onClick="{{ p.onActive }}" style="font:500 11px 'IBM Plex Mono',monospace;border:1px solid #E2E6E9;color:#77828B;border-radius:18px;padding:7px 9px;cursor:pointer">{{ p.activeLabel }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+<div onClick="{{ addPerson }}" style="border:1px solid #2E4A5C;border-radius:14px;padding:11px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer;letter-spacing:.06em">+ ADD SOMEONE</div>
+<div style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px;font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty">{{ peopleNote }}</div>
+<div style="font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#77828B;text-wrap:pretty">{{ scopeNote }}</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isCoverage }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1 1 320px;min-width:0;padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<div style="flex:1 1 100px;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px;text-align:center"><div style="font:500 clamp(17px,2.4vw,22px) Fustat,sans-serif">{{ doneThisWeek }}</div><div style="font:500 10px 'IBM Plex Mono',monospace;color:#77828B">DONE THIS WEEK</div></div>
+<div style="flex:1 1 100px;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px;text-align:center"><div style="font:500 clamp(17px,2.4vw,22px) Fustat,sans-serif">{{ avgSince }}</div><div style="font:500 10px 'IBM Plex Mono',monospace;color:#77828B">AVG SINCE LAST</div></div>
+<div style="flex:1 1 100px;border:1.5px dashed #A03428;border-radius:14px;padding:11px;text-align:center"><div style="font:500 clamp(17px,2.4vw,22px) Fustat,sans-serif;color:#A03428">{{ overdueCount }}</div><div style="font:500 10px 'IBM Plex Mono',monospace;color:#A03428">PAST {{ forceDays }} DAYS</div></div>
+</div>
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B;letter-spacing:.06em">EVERY VAN — DAYS SINCE LAST CHECK, OLDEST FIRST</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:5px">
+<sc-for list="{{ vans }}" as="v" hint-placeholder-count="24">
+<div style="height:34px;border:1px solid {{ v.color }};border-radius:3px;display:flex;align-items:center;justify-content:center;font:clamp(9px,1.2vw,11px) Fustat,sans-serif;color:{{ v.color }};background:{{ v.bg }}">{{ v.label }}</div>
+</sc-for>
+</div>
+<div style="font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#77828B">Outlined orange = past 90 days and forced into the next draw. Grey = checked recently, excluded.</div>
+</div>
+<div style="flex:1 1 260px;min-width:0;padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:11px">
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B;letter-spacing:.06em">DRAW RULES</div>
+<div onClick="{{ cycleExclude }}" style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer"><span style="font:clamp(13px,1.7vw,16px) Fustat,sans-serif">Exclude if checked within</span><span style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif;white-space:nowrap">{{ excludeDays }} days</span></div>
+<div onClick="{{ cycleForce }}" style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer"><span style="font:clamp(13px,1.7vw,16px) Fustat,sans-serif">Force any van past</span><span style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif;white-space:nowrap">{{ forceDays }} days</span></div>
+<div onClick="{{ cycleRerolls }}" style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer"><span style="font:clamp(13px,1.7vw,16px) Fustat,sans-serif">Re-rolls per check</span><span style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif">{{ rerolls }}</span></div>
+<div onClick="{{ cycleTarget }}" style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer"><span style="font:clamp(13px,1.7vw,16px) Fustat,sans-serif">Target per week</span><span style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif">{{ target }} checks</span></div>
+<div style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px;font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty">{{ ruleSummary }}</div>
+<div style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:13px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer;margin-top:auto">EXPORT THIS WEEK (CSV + PHOTOS)</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isVans }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1 1 320px;min-width:0;border-right:1px solid #EDF1F3;padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+<span style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B;letter-spacing:.06em">{{ fleetLine }}</span>
+<span onClick="{{ cycleFilter }}" style="font:500 11px 'IBM Plex Mono',monospace;color:#1C2226;cursor:pointer;border-bottom:1px solid #2E4A5C">{{ filterLabel }}</span>
+</div>
+<div onClick="{{ startAdd }}" style="border:1px solid #2E4A5C;border-radius:14px;padding:11px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer;letter-spacing:.06em">+ Add a van</div>
+<sc-for list="{{ fleet }}" as="v" hint-placeholder-count="8">
+<div onClick="{{ v.onSelect }}" style="border:{{ v.borderWidth }} solid {{ v.borderColor }};border-radius:14px;padding:10px 11px;cursor:pointer;display:flex;justify-content:space-between;gap:8px;align-items:baseline;background:{{ v.bg }}">
+<span style="font:500 clamp(15px,1.9vw,17px) Fustat,sans-serif;color:{{ v.regColor }}">{{ v.reg }}</span>
+<span style="font:500 11px 'IBM Plex Mono',monospace;color:{{ v.statusColor }};text-align:right">{{ v.status }}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="flex:1 1 340px;min-width:0;padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:11px">
+<div style="font:500 clamp(18px,2.4vw,23px) Fustat,sans-serif">{{ vanTitle }}</div>
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B">{{ vanSubtitle }}</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<div onClick="{{ cycleReg }}" style="flex:1 1 150px;border:1px solid {{ regFieldColor }};border-radius:14px;padding:10px 12px;cursor:pointer"><div style="font:500 11px 'IBM Plex Mono',monospace;color:{{ regFieldColor }}">REGISTRATION *</div><div style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif;color:{{ regTextColor }}">{{ regField }}</div></div>
+</div>
+<div onClick="{{ cycleModel }}" style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:10px 12px;cursor:pointer"><div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B">MAKE / MODEL</div><div style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif">{{ modelField }}</div></div>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<div onClick="{{ cycleBay }}" style="flex:1 1 140px;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:10px 12px;cursor:pointer"><div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B">PARKING BAY</div><div style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif;color:{{ bayColor }}">{{ bayField }}</div></div>
+<div onClick="{{ cycleMot }}" style="flex:1 1 140px;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:10px 12px;cursor:pointer"><div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B">MOT DUE</div><div style="font:clamp(14px,1.8vw,16px) Fustat,sans-serif;color:{{ motColor }}">{{ motField }}</div></div>
+</div>
+<div style="font:400 clamp(13px,1.7vw,15px)/1.45 Fustat,sans-serif;color:#77828B;text-wrap:pretty">{{ detailNote }}</div>
+
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B;letter-spacing:.06em;margin-top:2px">STATUS — DECIDES IF IT CAN BE DRAWN</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ statusOpts }}" as="s" hint-placeholder-count="3">
+<div onClick="{{ s.onPick }}" style="flex:1 1 110px;border:{{ s.borderWidth }} solid {{ s.color }};color:{{ s.color }};border-radius:14px;padding:11px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer;background:{{ s.bg }}">{{ s.label }}</div>
+</sc-for>
+</div>
+<div style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px;font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty">{{ statusNote }}</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<div style="flex:1 1 110px;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:10px;text-align:center"><div style="font:500 clamp(16px,2.3vw,20px) Fustat,sans-serif">{{ vanLastCheck }}</div><div style="font:500 10px 'IBM Plex Mono',monospace;color:#77828B">LAST CHECKED</div></div>
+<div style="flex:1 1 110px;border:1.5px dashed {{ vanDefectColor }};border-radius:14px;padding:10px;text-align:center"><div style="font:500 clamp(16px,2.3vw,20px) Fustat,sans-serif;color:{{ vanDefectColor }}">{{ vanDefects }}</div><div style="font:500 10px 'IBM Plex Mono',monospace;color:{{ vanDefectColor }}">OPEN DEFECTS</div></div>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:auto;padding-top:10px">
+<div onClick="{{ cancelVan }}" style="flex:1 1 130px;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:14px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer">{{ cancelLabel }}</div>
+<div onClick="{{ saveVan }}" style="flex:2 1 200px;background:{{ saveBg }};color:{{ saveFg }};border-radius:14px;box-shadow:0 6px 16px rgba(46,74,92,.16);padding:14px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer">{{ saveLabel }}</div>
+</div>
+<div style="font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#77828B;text-wrap:pretty">Retiring a van keeps its history and past checks — it just stops being drawn.</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1 1 240px;min-width:0;border-right:1px solid #EDF1F3;padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:8px">
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B;letter-spacing:.06em">SECTIONS — IN THE ORDER THEY'RE WALKED</div>
+<sc-for list="{{ sections }}" as="s" hint-placeholder-count="5">
+<div onClick="{{ s.onPick }}" style="border:{{ s.borderWidth }} solid {{ s.borderColor }};border-radius:14px;padding:9px 10px;cursor:pointer;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:{{ s.bg }}">
+<input value="{{ s.name }}" onChange="{{ s.onRename }}" style="flex:1 1 120px;min-width:0;border:none;background:transparent;outline:none;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;color:{{ s.nameColor }};text-decoration:{{ s.strike }};padding:2px 0">
+<div style="display:flex;gap:5px;flex:none;align-items:center">
+<span onClick="{{ s.onUp }}" style="font:500 13px 'IBM Plex Mono',monospace;border:1px solid #E2E6E9;color:{{ s.upColor }};border-radius:18px;padding:4px 7px;cursor:pointer">↑</span>
+<span onClick="{{ s.onDown }}" style="font:500 13px 'IBM Plex Mono',monospace;border:1px solid #E2E6E9;color:{{ s.downColor }};border-radius:18px;padding:4px 7px;cursor:pointer">↓</span>
+<span onClick="{{ s.onRetire }}" style="font:500 11px 'IBM Plex Mono',monospace;border:1px solid #E2E6E9;color:#77828B;border-radius:18px;padding:5px 7px;cursor:pointer;white-space:nowrap">{{ s.retireLabel }}</span>
+</div>
+<div style="flex:1 1 100%;font:500 11px 'IBM Plex Mono',monospace;color:{{ s.countColor }}">{{ s.count }}</div>
+</div>
+</sc-for>
+<div onClick="{{ addSection }}" style="border:1px solid #2E4A5C;border-radius:14px;padding:10px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer;letter-spacing:.06em">+ ADD A SECTION</div>
+<div style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px;font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty;margin-top:4px">{{ listSummary }}</div>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:{{ dirtyColor }}">{{ dirtyLine }}</div>
+<div onClick="{{ revertList }}" style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:12px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer">DISCARD CHANGES</div>
+<div onClick="{{ publish }}" style="background:{{ publishBg }};color:{{ publishFg }};border-radius:14px;padding:14px;text-align:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer">{{ publishLabel }}</div>
+</div>
+</div>
+
+<div style="flex:2 1 420px;min-width:0;padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px">
+<span style="font:500 clamp(18px,2.4vw,23px) Fustat,sans-serif">{{ secName }}</span>
+<span style="font:500 11px 'IBM Plex Mono',monospace;color:{{ secMetaColor }}">{{ secMeta }}</span>
+</div>
+<div style="display:{{ secRetiredDisplay }};flex-direction:column;gap:4px;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px;background:#faf9f6">
+<div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B">SECTION RETIRED — NOT ON NEW INSPECTIONS</div>
+<div style="font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty">Nobody will be asked these checks again. Restore the section before editing it — anything changed here stays dormant.</div>
+</div>
+
+<sc-for list="{{ items }}" as="it" hint-placeholder-count="6">
+<div style="border:1px solid {{ it.borderColor }};border-radius:14px;padding:10px 11px;display:flex;flex-wrap:wrap;gap:9px;align-items:center;background:{{ it.bg }}">
+<span style="font:500 11px 'IBM Plex Mono',monospace;color:#bbb;width:16px;flex:none">{{ it.num }}</span>
+<input value="{{ it.name }}" onChange="{{ it.onRename }}" style="flex:1 1 180px;min-width:0;border:none;background:transparent;outline:none;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;color:{{ it.nameColor }};text-decoration:{{ it.strike }};padding:2px 0">
+<div style="display:flex;gap:6px;flex:none;align-items:center">
+<span onClick="{{ it.onCrit }}" style="font:500 11px 'IBM Plex Mono',monospace;border:1px solid {{ it.critColor }};color:{{ it.critFg }};background:{{ it.critBg }};border-radius:18px;padding:6px 8px;cursor:pointer;white-space:nowrap">{{ it.critLabel }}</span>
+<span onClick="{{ it.onUp }}" style="font:500 13px 'IBM Plex Mono',monospace;border:1px solid #E2E6E9;color:{{ it.upColor }};border-radius:18px;padding:5px 8px;cursor:pointer">↑</span>
+<span onClick="{{ it.onDown }}" style="font:500 13px 'IBM Plex Mono',monospace;border:1px solid #E2E6E9;color:{{ it.downColor }};border-radius:18px;padding:5px 8px;cursor:pointer">↓</span>
+<span onClick="{{ it.onRetire }}" style="font:500 11px 'IBM Plex Mono',monospace;border:1px solid #E2E6E9;color:{{ it.retireColor }};border-radius:18px;padding:6px 8px;cursor:pointer;white-space:nowrap">{{ it.retireLabel }}</span>
+</div>
+<div style="flex:1 1 100%;display:flex;justify-content:space-between;gap:8px;align-items:baseline">
+<span style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B">{{ it.sub }}</span>
+<span onClick="{{ it.onOpen }}" style="font:500 11px 'IBM Plex Mono',monospace;color:#1C2226;cursor:pointer;border-bottom:1px solid #2E4A5C;white-space:nowrap">{{ it.setupLabel }}</span>
+</div>
+
+<div style="flex:1 1 100%;display:{{ it.detailDisplay }};flex-direction:column;gap:9px;border-top:1px dashed #ddd;padding-top:10px;margin-top:2px">
+<div style="display:flex;gap:7px;flex-wrap:wrap">
+<span onClick="{{ it.setPF }}" style="font:500 11px 'IBM Plex Mono',monospace;border:1px solid {{ it.pfChipBorder }};background:{{ it.pfChipBg }};color:{{ it.pfChipFg }};border-radius:18px;padding:8px 10px;cursor:pointer">PASS / FAIL</span>
+<span onClick="{{ it.setM }}" style="font:500 11px 'IBM Plex Mono',monospace;border:1px solid {{ it.mChipBorder }};background:{{ it.mChipBg }};color:{{ it.mChipFg }};border-radius:18px;padding:8px 10px;cursor:pointer">MEASURED READING</span>
+</div>
+
+<div style="display:{{ it.pfDisplay }};gap:8px;align-items:center;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:8px 10px">
+<span style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B;flex:none">HINT</span>
+<input value="{{ it.hint }}" onChange="{{ it.onHint }}" placeholder="e.g. LOOK UNDER, NOT JUST AROUND" style="flex:1 1 120px;min-width:0;border:none;background:transparent;outline:none;font:500 11px 'IBM Plex Mono',monospace;color:#1C2226;padding:3px 0">
+</div>
+
+<div style="display:{{ it.measDisplay }};flex-wrap:wrap;gap:7px">
+<span onClick="{{ it.cycleUnit }}" style="font:500 11px 'IBM Plex Mono',monospace;background:#fff;border:1px solid #E2E6E9;border-radius:18px;padding:8px 10px;cursor:pointer">UNIT · {{ it.unitLabel }}</span>
+<span onClick="{{ it.cycleParts }}" style="font:500 11px 'IBM Plex Mono',monospace;background:#fff;border:1px solid #E2E6E9;border-radius:18px;padding:8px 10px;cursor:pointer">{{ it.partsLabel }}</span>
+<span onClick="{{ it.cycleDir }}" style="font:500 11px 'IBM Plex Mono',monospace;border:1px solid #A03428;color:#A03428;border-radius:18px;padding:8px 10px;cursor:pointer">{{ it.dirLabel }}</span>
+</div>
+
+<div style="display:{{ it.measDisplay }};flex-wrap:wrap;gap:8px">
+<div style="flex:1 1 150px;border:1px solid #A03428;border-radius:14px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+<div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#A03428">FAIL LIMIT</div><div style="font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;color:#A03428">{{ it.limitValue }}</div></div>
+<div style="display:flex;gap:5px;flex:none"><span onClick="{{ it.limitDown }}" style="font:500 13px 'IBM Plex Mono',monospace;background:#fff;border:1px solid #E2E6E9;border-radius:18px;padding:6px 9px;cursor:pointer">−</span><span onClick="{{ it.limitUp }}" style="font:500 13px 'IBM Plex Mono',monospace;background:#fff;border:1px solid #E2E6E9;border-radius:18px;padding:6px 9px;cursor:pointer">+</span></div>
+</div>
+<div style="flex:1 1 150px;background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+<div><div style="font:500 11px 'IBM Plex Mono',monospace;color:#77828B">WATCH FROM</div><div style="font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif">{{ it.warnValue }}</div></div>
+<div style="display:flex;gap:5px;flex:none"><span onClick="{{ it.warnDown }}" style="font:500 13px 'IBM Plex Mono',monospace;background:#fff;border:1px solid #E2E6E9;border-radius:18px;padding:6px 9px;cursor:pointer">−</span><span onClick="{{ it.warnUp }}" style="font:500 13px 'IBM Plex Mono',monospace;background:#fff;border:1px solid #E2E6E9;border-radius:18px;padding:6px 9px;cursor:pointer">+</span></div>
+</div>
+<div style="flex:1 1 100%;font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty">{{ it.limitNote }}</div>
+</div>
+</div>
+</div>
+</sc-for>
+
+<div onClick="{{ addItem }}" style="display:{{ addItemDisplay }};border:1px solid #2E4A5C;border-radius:14px;padding:11px;justify-content:center;font:500 clamp(14px,1.8vw,16px) Fustat,sans-serif;cursor:pointer;letter-spacing:.06em">+ ADD A CHECK TO {{ secNameUpper }}</div>
+
+<div style="background:#fff;border:1px solid #E2E6E9;border-radius:14px;padding:11px;font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#5C666E;text-wrap:pretty;margin-top:4px">A retired check stops appearing on new inspections but stays on every record sheet that already used it — nothing is deleted.</div>
+<div style="font:clamp(12px,1.7vw,15px) Fustat,sans-serif;color:#77828B;text-wrap:pretty">Limits set here are what the phone judges against. Tread is legally 1.5mm — set it higher if you want the van in earlier, never lower.</div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100,&quot;height&quot;:800}}">
+const INK = "#2E4A5C", RED = "#A03428", MUTED = "#8B959C";
+const ASSIGNEES = ["— pick someone —", "Workshop — Barking", "Workshop — Dagenham", "External tyre fitter"];
+const DUES = ["— pick a date —", "Today", "15 Aug", "20 Aug"];
+
+const CHECKS = [
+  { id: 1, reg: "KX21 HVD", date: "13 Aug", inspector: "D. Owusu", crew: "D. OWUSU + A. FIELDING · 06:15–06:49", flag: "1 MAJOR", passed: 10, failed: 1, mileage: "84,120", defectName: "Tyres & tread — N/S front", defectMeta: "MAJOR · SAFE TO DRIVE: NO", defectNote: "1.4mm tread, below the legal limit. Van should not go out on a job." },
+  { id: 2, reg: "LV70 OXR", date: "12 Aug", inspector: "S. Ellis", crew: "S. ELLIS · 07:02–07:31", flag: "CLEAN", passed: 11, failed: 0, mileage: "61,455", defectName: "", defectMeta: "", defectNote: "" },
+  { id: 3, reg: "YE19 KDN", date: "11 Aug", inspector: "D. Owusu", crew: "D. OWUSU + S. ELLIS · 06:40–07:14", flag: "1 MINOR", passed: 10, failed: 1, mileage: "112,908", defectName: "Windscreen & mirrors — O/S mirror", defectMeta: "MINOR · SAFE TO DRIVE: YES", defectNote: "Offside mirror glass cracked, still usable but needs replacing." },
+  { id: 4, reg: "BN68 ZRT", date: "11 Aug", inspector: "A. Fielding", crew: "A. FIELDING · 06:20–06:52", flag: "CLEAN", passed: 11, failed: 0, mileage: "39,204", defectName: "", defectMeta: "", defectNote: "" }
+];
+
+const OPEN_DEFECTS = [
+  { id: "d1", reg: "YE19 KDN", name: "O/S mirror", severity: "MINOR", note: "Mirror glass cracked — replacement ordered.", meta: "RAISED 11 AUG · WORKSHOP BARKING · DUE 18 AUG", stage: "awaiting" },
+  { id: "d2", reg: "GH68 PLM", name: "Load area racking", severity: "MINOR", note: "Racking bolt loose on the nearside rail.", meta: "RAISED 4 AUG · WORKSHOP BARKING · OVERDUE", stage: "overdue" },
+  { id: "d3", reg: "RV17 WCE", name: "N/S rear light", severity: "MAJOR", note: "Cluster replaced 9 Aug — repair photographed, waiting on your sign-off.", meta: "REPAIRED 9 AUG · RE-CHECKED BY S. ELLIS", stage: "verified" }
+];
+
+const MODELS = ["Ford Transit Custom", "Vauxhall Vivaro", "Mercedes Sprinter", "VW Crafter"];
+const BAYS = ["Not set", "Bay 1", "Bay 4", "Bay 7", "Bay 11", "Bay 14", "Bay 22"];
+const MOTS = ["Not set", "19 Nov 2026", "3 Feb 2027", "28 Mar 2027", "14 Jun 2027"];
+const NEW_REGS = ["— tap to type —", "MX24 TFL", "OV73 BWP", "SN25 GHE"];
+const FLEET = [
+  { id: "v1", reg: "KX21 HVD", model: 0, status: "offroad", last: "13 Aug", defects: 1 },
+  { id: "v2", reg: "LV70 OXR", model: 1, status: "active", last: "12 Aug", defects: 0 },
+  { id: "v3", reg: "YE19 KDN", model: 0, status: "active", last: "11 Aug", defects: 1 },
+  { id: "v4", reg: "BN68 ZRT", model: 2, status: "active", last: "11 Aug", defects: 0 },
+  { id: "v5", reg: "GH68 PLM", model: 1, status: "active", last: "4 Aug", defects: 1 },
+  { id: "v6", reg: "RV17 WCE", model: 3, status: "active", last: "9 Aug", defects: 0 },
+  { id: "v7", reg: "DA15 NBX", model: 0, status: "active", last: "22 May", defects: 0 },
+  { id: "v8", reg: "WP66 EJR", model: 2, status: "retired", last: "2 Mar", defects: 0 },
+  { id: "v9", reg: "TL19 UCD", model: 1, status: "active", last: "30 Jul", defects: 0 }
+];
+
+const LIVE_LIST = [
+  { name: "Engine & fluids", items: [["Engine oil level", 0, ""], ["Engine coolant level", 0, ""], ["Brake fluid level", 1, ""], ["Power steering fluid", 0, ""], ["Leaks / drips underneath", 1, "LOOK UNDER, NOT JUST AROUND"]] },
+  { name: "Lights & electrical", items: [["Headlights — low beam", 1, ""], ["Headlights — high beam", 0, ""], ["Brake lights", 1, "SECOND PERSON WATCHES"], ["Indicators — front & rear", 1, ""], ["Hazard lights", 0, ""], ["Reverse lights", 0, ""], ["Park lights", 0, ""], ["Number plate lights", 0, ""]] },
+  { name: "Wheels & tyres", items: [["Tyre condition & tread", 1, "MEASURED · MM · LIMIT 1.5"], ["Tyre pressure", 1, "MEASURED · KPA · PLACARD 340 / 380"], ["Rims — no cracks or damage", 0, ""], ["Spare tyre present & inflated", 0, ""], ["Wheel nuts secure", 1, ""]] },
+  { name: "Body & safety", items: [["Windscreen — vision clear", 1, "CHIPS IN THE SWEPT AREA COUNT"], ["Wipers operational", 0, ""], ["Mirrors clean & adjusted", 0, ""], ["Seatbelts condition & lock", 1, ""], ["Doors open, close & latch", 0, ""], ["Horn operational", 0, ""], ["Plates present & legible", 0, ""], ["Registration current", 1, "CHECK LABEL / CERTIFICATE"]] },
+  { name: "Cargo & equipment", items: [["Cargo area clean & safe", 0, "NO SHARP EDGES OR PROTRUSIONS"], ["Load restraints available", 0, ""], ["First aid kit", 0, "CONTENTS WITHIN EXPIRY"], ["Faulty equipment labels", 0, ""], ["No loose items in cab", 0, "PROJECTILES IN A HARD STOP"]] }
+];
+const UNITS = ["mm", "kPa", "%", "V", "L"];
+const STEP = { mm: 0.1, kPa: 10, "%": 5, V: 0.5, L: 0.5 };
+const PARTS = ["Single reading", "Front & rear", "Four corners"];
+const MEASURED_CFG = {
+  "Tyre condition & tread": { unit: "mm", parts: 2, limit: 1.5, warn: 2, dir: "below" },
+  "Tyre pressure": { unit: "kPa", parts: 1, limit: 300, warn: 330, dir: "below" }
+};
+const buildList = () => LIVE_LIST.map((s, si) => ({
+  id: "s" + si, name: s.name, retired: false,
+  items: s.items.map((it, ii) => {
+    const m = MEASURED_CFG[it[0]];
+    return { id: "i" + si + "_" + ii, name: it[0], crit: !!it[1], hint: m ? "" : it[2], retired: false, added: false,
+      type: m ? "m" : "pf", unit: m ? m.unit : "mm", parts: m ? m.parts : 0, limit: m ? m.limit : 1, warn: m ? m.warn : 2, dir: m ? m.dir : "below" };
+  })
+}));
+const fmt = (v, unit) => (STEP[unit] < 1 ? Number(v).toFixed(1) : String(Math.round(v)));
+
+const ROLES = ["Inspector", "Manager"];
+const PEOPLE = [
+  { id: "p1", name: "D. Owusu", role: 0, pin: "SET 4 JUL", active: true },
+  { id: "p2", name: "A. Fielding", role: 0, pin: "SET 12 MAY", active: true },
+  { id: "p3", name: "S. Ellis", role: 0, pin: "SET 2 AUG", active: true },
+  { id: "p4", name: "S. Patel", role: 1, pin: "SET 9 JAN", active: true },
+  { id: "p5", name: "M. Ncube", role: 1, pin: "NEVER SET", active: true },
+  { id: "p6", name: "T. Hargreaves", role: 0, pin: "SET 3 MAR", active: false }
+];
+
+const VANS = [142, 118, 103, 96, 91, 78, 74, 71, 66, 64, 59, 55, 52, 48, 45, 41, 38, 35, 31, 28, 24, 21, 18, 16, 14, 12, 9, 7, 5, 3, 2, 1];
+
+class Component extends DCLogic {
+  state = {
+    tab: "queue", selectedId: 1, decisions: {}, sendingBack: false,
+    sbReason: null, sbScope: 0, sbHold: true, sbNote: "", returns: {},
+    assigneeIdx: 0, dueIdx: 0, offRoad: false,
+    defectStages: {}, excludeIdx: 1, forceIdx: 1, rerolls: 1, targetIdx: 1,
+    adds: [], edits: {}, vanSelId: "v1", adding: false, filterIdx: 0,
+    draft: { id: "v1", reg: "KX21 HVD", model: 0, status: "offroad" },
+    list: buildList(), baseline: JSON.stringify(buildList()), secIdx: 0, version: 7, publishedOn: "2 Jul", addCount: 0, openId: null,
+    people: PEOPLE.map(p => ({ ...p })), pplAdds: 0
+  };
+
+  editPeople = (fn) => this.setState(s => { const next = s.people.map(p => ({ ...p })); fn(next); return { people: next }; });
+
+  clone = (l) => l.map(sec => ({ ...sec, items: sec.items.map(i => ({ ...i })) }));
+  editList = (fn) => this.setState(s => { const next = this.clone(s.list); fn(next[s.secIdx].items, next); return { list: next }; });
+  editSecs = (fn) => this.setState(s => { const next = this.clone(s.list); const r = fn(next) || {}; return { list: next, ...r }; });
+
+  filters = ["ALL", "ACTIVE ONLY", "OFF ROAD", "RETIRED"];
+  statusMeta = { active: ["ACTIVE", "#2E4A5C"], offroad: ["OFF ROAD", "#A03428"], retired: ["RETIRED", "#999"] };
+
+  fleetList = () => [...FLEET, ...this.state.adds].map(v => ({ ...v, ...(this.state.edits[v.id] || {}) }));
+  loadVan = (v) => this.setState({ vanSelId: v.id, adding: false, draft: { id: v.id, reg: v.reg, model: v.model, status: v.status, bay: v.bay || 0, mot: v.mot || 0 } });
+  patch = (k, val) => this.setState(s => ({ draft: { ...s.draft, [k]: val } }));
+
+  excludeOpts = [7, 14, 21, 30];
+  forceOpts = [60, 90, 120, 180];
+  targetOpts = [5, 8, 10, 12];
+
+  select = (id) => this.setState({ selectedId: id, sendingBack: false, assigneeIdx: 0, dueIdx: 0, offRoad: false, sbReason: null, sbScope: 0, sbHold: true, sbNote: "" });
+
+  decide = (verdict) => this.setState({ decisions: { ...this.state.decisions, [this.state.selectedId]: verdict }, sendingBack: false });
+
+  reasons = [
+    "Photos too dark or blurred to judge",
+    "Reading doesn't match what the photo shows",
+    "Defect note too thin to raise a job on",
+    "Item marked N/A with no reason given",
+    "Wrong van — reg doesn't match the plate photo",
+    "Something else — I'll write it"
+  ];
+  scopes = ["Just the part I've flagged", "The whole check, from the start"];
+
+  sendBackNow = (reasonText) => this.setState(s => ({
+    decisions: { ...s.decisions, [s.selectedId]: "returned" },
+    returns: { ...s.returns, [s.selectedId]: { reason: reasonText, scope: s.sbScope, hold: s.sbHold } },
+    sendingBack: false
+  }));
+
+  renderVals() {
+    const st = this.state;
+    const scopedChecks = CHECKS;
+    const pending = scopedChecks.filter(c => !st.decisions[c.id]);
+    const sel = scopedChecks.find(c => c.id === st.selectedId) || scopedChecks[0] || CHECKS[0];
+    const decided = st.decisions[sel.id];
+    const hasDefect = !!sel.defectName;
+    const assignee = ASSIGNEES[st.assigneeIdx];
+    const dueDate = DUES[st.dueIdx];
+    const canApprove = !hasDefect || (st.assigneeIdx > 0 && st.dueIdx > 0);
+    const canSend = st.sbReason !== null && (st.sbReason !== 5 || st.sbNote.trim().length > 2);
+    const ret = st.returns[sel.id];
+    const returnedCount = Object.keys(st.decisions).filter(k => st.decisions[k] === "returned").length;
+    const defectStage = (d) => st.defectStages[d.id] || d.stage;
+    const openDefects = OPEN_DEFECTS.filter(d => defectStage(d) !== "closed");
+    const excludeDays = this.excludeOpts[st.excludeIdx];
+    const forceDays = this.forceOpts[st.forceIdx];
+    const target = this.targetOpts[st.targetIdx];
+    const scopedVans = VANS;
+    const eligible = scopedVans.filter(d => d > excludeDays).length;
+
+    const fleet = this.fleetList();
+    const filter = this.filters[st.filterIdx];
+    const shown = fleet.filter(v => filter === "ALL" || (filter === "ACTIVE ONLY" && v.status === "active") || (filter === "OFF ROAD" && v.status === "offroad") || (filter === "RETIRED" && v.status === "retired"));
+    const draft = st.draft;
+    const draftNamed = draft.reg && draft.reg !== NEW_REGS[0];
+    const savedVan = fleet.find(v => v.id === draft.id);
+
+    const tabColor = (t) => st.tab === t ? INK : MUTED;
+    const tabLine = (t) => st.tab === t ? INK : "transparent";
+
+    const secItems = st.list[st.secIdx].items;
+    const liveSecs = st.list.filter(s => !s.retired);
+    const liveCount = liveSecs.reduce((a, s) => a + s.items.filter(i => !i.retired).length, 0);
+    const critCount = liveSecs.reduce((a, s) => a + s.items.filter(i => !i.retired && i.crit).length, 0);
+    const measCount = liveSecs.reduce((a, s) => a + s.items.filter(i => !i.retired && i.type === "m").length, 0);
+    const dirty = JSON.stringify(st.list) !== st.baseline;
+    const baseItems = JSON.parse(st.baseline);
+    const baseIds = {}, baseSecs = {};
+    baseItems.forEach(s => { baseSecs[s.id] = s; s.items.forEach(i => { baseIds[i.id] = i; }); });
+    const FIELDS = ["name", "crit", "retired", "hint", "type", "unit", "parts", "limit", "warn", "dir"];
+    let changes = st.list.reduce((a, s) => a + s.items.filter(i => {
+      const b = baseIds[i.id];
+      return !b || FIELDS.some(f => b[f] !== i[f]);
+    }).length, 0);
+    changes += st.list.filter(s => { const b = baseSecs[s.id]; return !b || b.name !== s.name || b.retired !== s.retired; }).length;
+    const order = (l) => JSON.stringify(l.map(s => [s.id, s.items.map(i => i.id)]));
+    if (order(st.list) !== order(baseItems)) changes += 1;
+    if (dirty && !changes) changes = 1;
+
+    return {
+      isList: st.tab === "list", listColor: tabColor("list"), listUnderline: tabLine("list"),
+      tabList: () => this.setState({ tab: "list" }),
+      liveCount,
+      listSummary: liveCount + " checks live across " + liveSecs.length + " sections — " + critCount + " safety-critical, " + measCount + " measured. A failed safety-critical check takes the van off the road on the spot.",
+      dirtyLine: dirty ? changes + " CHANGE" + (changes === 1 ? "" : "S") + " NOT YET LIVE" : "LIVE SINCE " + st.publishedOn.toUpperCase() + " · v" + st.version,
+      dirtyColor: dirty ? RED : "#777",
+      publishLabel: dirty ? "PUBLISH v" + (st.version + 1) : "NOTHING TO PUBLISH",
+      publishBg: dirty ? INK : "#EDF1F3", publishFg: dirty ? "#fff" : MUTED,
+      publish: () => { if (dirty) this.setState({ baseline: JSON.stringify(st.list), version: st.version + 1, publishedOn: "13 Aug" }); },
+      revertList: () => { if (dirty) this.setState({ list: JSON.parse(st.baseline) }); },
+
+      sections: st.list.map((s, i) => {
+        const on = i === st.secIdx;
+        const live = s.items.filter(x => !x.retired).length;
+        return {
+          name: s.name, count: s.retired ? "RETIRED" : live + " CHECKS",
+          countColor: s.retired ? MUTED : "#777",
+          nameColor: s.retired ? MUTED : INK,
+          strike: s.retired ? "line-through" : "none",
+          borderWidth: on ? "2px" : "1.5px", borderColor: on ? INK : s.retired ? "#e0ded9" : "#ccc",
+          bg: s.retired ? "#faf9f6" : on ? "#faf9f6" : "#fff",
+          upColor: i === 0 ? "#ddd" : INK,
+          downColor: i === st.list.length - 1 ? "#ddd" : INK,
+          retireLabel: s.retired ? "RESTORE" : "RETIRE",
+          onPick: () => this.setState({ secIdx: i, openId: null }),
+          onRename: (e) => { const v = e.target.value; this.editSecs(l => { l[i].name = v; }); },
+          onUp: (e) => { e.stopPropagation(); if (i > 0) this.editSecs(l => { const [m] = l.splice(i, 1); l.splice(i - 1, 0, m); return { secIdx: st.secIdx === i ? i - 1 : st.secIdx === i - 1 ? i : st.secIdx, openId: null }; }); },
+          onDown: (e) => { e.stopPropagation(); if (i < st.list.length - 1) this.editSecs(l => { const [m] = l.splice(i, 1); l.splice(i + 1, 0, m); return { secIdx: st.secIdx === i ? i + 1 : st.secIdx === i + 1 ? i : st.secIdx, openId: null }; }); },
+          onRetire: (e) => { e.stopPropagation(); this.editSecs(l => { l[i].retired = !l[i].retired; }); }
+        };
+      }),
+      addSection: () => {
+        const n = st.addCount + 1;
+        this.editSecs(l => { l.push({ id: "ns" + n, name: "New section " + n, retired: false, items: [] }); return { secIdx: l.length - 1, addCount: n, openId: null }; });
+      },
+      secName: st.list[st.secIdx].name,
+      secNameUpper: st.list[st.secIdx].name.toUpperCase(),
+      secMeta: st.list[st.secIdx].retired
+        ? "RETIRED · " + secItems.length + " CHECKS DORMANT"
+        : secItems.filter(i => !i.retired).length + " LIVE · " + secItems.filter(i => i.crit && !i.retired).length + " SAFETY-CRITICAL",
+      secMetaColor: st.list[st.secIdx].retired ? "#888" : "#777",
+      secRetiredDisplay: st.list[st.secIdx].retired ? "flex" : "none",
+      addItemDisplay: st.list[st.secIdx].retired ? "none" : "flex",
+      items: secItems.map((it, i) => {
+        const meas = it.type === "m";
+        const open = st.openId === it.id;
+        const step = STEP[it.unit];
+        const bump = (k, d) => this.editList(items => {
+          const v = Math.max(0, Math.round((items[i][k] + d * step) * 10) / 10);
+          items[i][k] = v;
+        });
+        const typeLine = meas
+          ? "MEASURED · " + it.unit.toUpperCase() + " · " + PARTS[it.parts].toUpperCase() + " · FAILS " + it.dir.toUpperCase() + " " + fmt(it.limit, it.unit)
+          : "PASS / FAIL / N-A";
+        return {
+          num: it.retired ? "—" : String(secItems.slice(0, i).filter(x => !x.retired).length + 1).padStart(2, "0"),
+          name: it.name,
+          nameColor: it.retired ? MUTED : INK,
+          strike: it.retired ? "line-through" : "none",
+          borderColor: it.retired ? "#e0ded9" : open ? INK : it.crit ? RED : "#ccc",
+          bg: it.retired ? "#faf9f6" : "#fff",
+          critLabel: it.crit ? "SAFETY-CRITICAL" : "ROUTINE",
+          critColor: it.crit ? RED : "#ddd",
+          critFg: it.crit ? "#fff" : "#888",
+          critBg: it.crit ? RED : "#fff",
+          upColor: i === 0 ? "#ddd" : INK,
+          downColor: i === secItems.length - 1 ? "#ddd" : INK,
+          retireLabel: it.retired ? "RESTORE" : "RETIRE",
+          retireColor: it.retired ? INK : "#888",
+          sub: it.added ? "ADDED — LIVE ON THE NEXT PUBLISH" : it.retired ? "RETIRED — STAYS ON PAST RECORDS" : typeLine,
+          setupLabel: open ? "CLOSE" : "SET UP",
+          detailDisplay: open ? "flex" : "none",
+          measDisplay: meas ? "flex" : "none",
+          pfDisplay: meas ? "none" : "flex",
+          pfChipBg: meas ? "#fff" : INK, pfChipFg: meas ? "#888" : "#fff", pfChipBorder: meas ? "#ddd" : INK,
+          mChipBg: meas ? INK : "#fff", mChipFg: meas ? "#fff" : "#888", mChipBorder: meas ? INK : "#ddd",
+          unitLabel: it.unit, partsLabel: PARTS[it.parts],
+          dirLabel: it.dir === "below" ? "FAILS BELOW" : "FAILS ABOVE",
+          limitValue: fmt(it.limit, it.unit) + " " + it.unit,
+          warnValue: fmt(it.warn, it.unit) + " " + it.unit,
+          hint: it.hint,
+          limitNote: it.dir === "below"
+            ? "Under " + fmt(it.limit, it.unit) + it.unit + " fails on the spot. " + fmt(it.warn, it.unit) + it.unit + " and below is flagged as wearing but passes."
+            : "Over " + fmt(it.limit, it.unit) + it.unit + " fails on the spot. " + fmt(it.warn, it.unit) + it.unit + " and above is flagged but passes.",
+          onOpen: () => this.setState({ openId: open ? null : it.id }),
+          onRename: (e) => { const v = e.target.value; this.editList(items => { items[i].name = v; }); },
+          onHint: (e) => { const v = e.target.value; this.editList(items => { items[i].hint = v; }); },
+          onCrit: () => this.editList(items => { items[i].crit = !items[i].crit; }),
+          onRetire: () => this.editList(items => { items[i].retired = !items[i].retired; }),
+          onUp: () => { if (i > 0) this.editList(items => { const [m] = items.splice(i, 1); items.splice(i - 1, 0, m); }); },
+          onDown: () => { if (i < secItems.length - 1) this.editList(items => { const [m] = items.splice(i, 1); items.splice(i + 1, 0, m); }); },
+          setPF: () => this.editList(items => { items[i].type = "pf"; }),
+          setM: () => this.editList(items => { items[i].type = "m"; }),
+          cycleUnit: () => this.editList(items => { items[i].unit = UNITS[(UNITS.indexOf(items[i].unit) + 1) % UNITS.length]; }),
+          cycleParts: () => this.editList(items => { items[i].parts = (items[i].parts + 1) % PARTS.length; }),
+          cycleDir: () => this.editList(items => { items[i].dir = items[i].dir === "below" ? "above" : "below"; }),
+          limitDown: () => bump("limit", -1), limitUp: () => bump("limit", 1),
+          warnDown: () => bump("warn", -1), warnUp: () => bump("warn", 1)
+        };
+      }),
+      addItem: () => {
+        const n = st.addCount + 1;
+        this.setState({ addCount: n });
+        this.editList(items => { items.push({ id: "new" + n, name: "New check " + n, crit: false, hint: "", retired: false, added: true, type: "pf", unit: "mm", parts: 0, limit: 1, warn: 2, dir: "below" }); });
+      },
+
+      syncLine: pending.length ? pending.length + (pending.length === 1 ? " CHECK" : " CHECKS") + " WAITING · LAST SYNC 06:52" : "ALL CLEAR · LAST SYNC 06:52",
+      pendingCount: pending.length,
+      openDefectCount: openDefects.length,
+      isQueue: st.tab === "queue", isDefects: st.tab === "defects", isCoverage: st.tab === "coverage", isVans: st.tab === "vans",
+      vansColor: tabColor("vans"), vansUnderline: tabLine("vans"), tabVans: () => this.setState({ tab: "vans" }),
+      fleetCount: fleet.filter(v => v.status !== "retired").length,
+      fleetLine: shown.length + " SHOWN · " + fleet.filter(v => v.status === "active").length + " IN THE DRAW",
+      filterLabel: filter,
+      cycleFilter: () => this.setState({ filterIdx: (st.filterIdx + 1) % this.filters.length }),
+      startAdd: () => this.setState({ adding: true, vanSelId: null, draft: { id: null, reg: NEW_REGS[0], model: 0, status: "active", bay: 0, mot: 0 } }),
+
+      fleet: shown.map(v => {
+        const isSel = !st.adding && v.id === st.vanSelId;
+        const [label, color] = this.statusMeta[v.status];
+        return {
+          reg: v.reg, status: label, statusColor: color,
+          regColor: v.status === "retired" ? MUTED : INK,
+          borderWidth: isSel ? "2px" : "1.5px",
+          borderColor: isSel ? INK : (v.status === "retired" ? "#e0ded9" : "#ccc"),
+          bg: v.status === "retired" ? "#faf9f6" : "#fff",
+          onSelect: () => this.loadVan(v)
+        };
+      }),
+
+      vanTitle: st.adding ? "New van" : (draft.reg || "—"),
+      vanSubtitle: st.adding ? "IT JOINS THE DRAW AS SOON AS IT'S SAVED" : (savedVan ? "ON THE FLEET · " + this.statusMeta[savedVan.status][0] : ""),
+      regField: draft.reg, regFieldColor: draftNamed ? INK : RED, regTextColor: draftNamed ? INK : MUTED,
+      cycleReg: () => this.patch("reg", NEW_REGS[(NEW_REGS.indexOf(draft.reg) + 1) % NEW_REGS.length] || NEW_REGS[1]),
+      modelField: MODELS[draft.model],
+      cycleModel: () => this.patch("model", (draft.model + 1) % MODELS.length),
+      statusOpts: ["active", "offroad", "retired"].map(s => {
+        const on = draft.status === s;
+        const [label, color] = this.statusMeta[s];
+        return { label, color: on ? "#fff" : color, bg: on ? color : "#fff", borderWidth: on ? "1.5px" : "1.5px", onPick: () => this.patch("status", s) };
+      }),
+      statusNote: draft.status === "active" ? "Eligible for the random draw and counted in coverage." : draft.status === "offroad" ? "Held out of the draw. Anyone opening it sees the off-road banner." : "Kept for history only — never drawn, hidden from coverage.",
+      vanLastCheck: savedVan ? savedVan.last : "—",
+      vanDefects: savedVan ? savedVan.defects : 0,
+      vanDefectColor: savedVan && savedVan.defects ? RED : "#999",
+      cancelLabel: st.adding ? "Cancel" : "Revert",
+      cancelVan: () => st.adding ? this.setState({ adding: false, vanSelId: FLEET[0].id, draft: { id: "v1", reg: FLEET[0].reg, model: FLEET[0].model, status: FLEET[0].status } }) : (savedVan && this.loadVan(savedVan)),
+      bayField: BAYS[draft.bay || 0],
+      bayColor: (draft.bay || 0) ? "#1C2226" : MUTED,
+      cycleBay: () => this.patch("bay", ((draft.bay || 0) + 1) % BAYS.length),
+      motField: MOTS[draft.mot || 0],
+      motColor: (draft.mot || 0) ? "#1C2226" : MUTED,
+      cycleMot: () => this.patch("mot", ((draft.mot || 0) + 1) % MOTS.length),
+      detailNote: (draft.bay || 0) && (draft.mot || 0)
+        ? "Bay and MOT show on the inspector's draw screen, so they know where to walk and what's coming up."
+        : "Bay and MOT are optional, but without them the inspector's draw screen can't say where the van is parked.",
+      saveLabel: !draftNamed ? "Registration required" : st.adding ? "Add to the fleet" : "Save changes",
+      saveBg: draftNamed ? INK : "#EDF1F3", saveFg: draftNamed ? "#fff" : MUTED,
+      saveVan: () => {
+        if (!draftNamed) return;
+        if (st.adding) {
+          const id = "n" + (st.adds.length + 1);
+          const v = { id, reg: draft.reg, model: draft.model, status: draft.status, bay: draft.bay, mot: draft.mot, last: "never", defects: 0 };
+          this.setState({ adds: [...st.adds, v], adding: false, vanSelId: id, draft: { ...draft, id } });
+        } else {
+          this.setState({ edits: { ...st.edits, [draft.id]: { reg: draft.reg, model: draft.model, status: draft.status, bay: draft.bay, mot: draft.mot } } });
+        }
+      },
+
+      queueColor: tabColor("queue"), defectsColor: tabColor("defects"), coverageColor: tabColor("coverage"),
+      queueUnderline: tabLine("queue"), defectsUnderline: tabLine("defects"), coverageUnderline: tabLine("coverage"),
+      tabQueue: () => this.setState({ tab: "queue" }), tabDefects: () => this.setState({ tab: "defects" }), tabCoverage: () => this.setState({ tab: "coverage" }),
+
+      queue: scopedChecks.map(c => {
+        const d = st.decisions[c.id];
+        const isSel = c.id === st.selectedId;
+        return {
+          reg: c.reg,
+          meta: c.date.toUpperCase() + " · " + c.inspector.toUpperCase(),
+          flag: d === "approved" ? "COUNTERSIGNED ✓" : d === "returned" ? "SENT BACK" : c.flag,
+          flagColor: d === "approved" ? "#555" : d === "returned" ? MUTED : (c.failed ? RED : "#555"),
+          borderWidth: isSel ? "2px" : "1.5px",
+          borderColor: isSel ? INK : (d ? "#e0ded9" : "#ccc"),
+          bg: d ? "#faf9f6" : "#fff",
+          onSelect: () => this.select(c.id)
+        };
+      }),
+      detailDisplay: "flex",
+      emptyQueueDisplay: "none",
+      queueFootnote: returnedCount
+        ? returnedCount + (returnedCount === 1 ? " check is" : " checks are") + " back with inspectors — they stay on this list until they're resubmitted and signed."
+        : (pending.length ? "Countersigning is what finishes the record, raises the job and schedules the re-check." : "Queue clear. Nothing waiting on your name."),
+
+      sel: {
+        reg: sel.reg, date: sel.date, crew: sel.crew, inspector: sel.inspector,
+        passed: sel.passed, failed: sel.failed, mileage: sel.mileage,
+        resultColor: sel.failed ? RED : INK,
+        defectName: sel.defectName, defectMeta: sel.defectMeta, defectNote: sel.defectNote
+      },
+      hasDefect,
+      evidence: ["FRONT", "REAR", "O/S", "N/S", "CAB", "ODOMETER", "LOAD", "PLATE"].map((l, i) => ({
+        label: l, color: hasDefect && i === 3 ? RED : "#999"
+      })),
+
+      assignee, dueDate,
+      assignColor: st.assigneeIdx > 0 ? INK : RED,
+      assignTextColor: st.assigneeIdx > 0 ? INK : MUTED,
+      dueColor: st.dueIdx > 0 ? INK : RED,
+      dueTextColor: st.dueIdx > 0 ? INK : MUTED,
+      cycleAssignee: () => this.setState({ assigneeIdx: (st.assigneeIdx + 1) % ASSIGNEES.length }),
+      cycleDue: () => this.setState({ dueIdx: (st.dueIdx + 1) % DUES.length }),
+      offRoadBg: st.offRoad ? INK : "#fff",
+      toggleOffRoad: () => this.setState({ offRoad: !st.offRoad }),
+
+      sendingBack: st.sendingBack,
+      sendBack: () => { if (decided === "returned") return this.setState({ decisions: { ...st.decisions, [sel.id]: null } }); this.setState({ sendingBack: !st.sendingBack }); },
+      sendBackLabel: decided === "returned" ? "Take it back into my queue" : decided === "approved" ? "Countersigned" : "Send back",
+      sendBackColor: decided === "approved" ? "#ccc" : INK,
+      approveDisplay: decided === "returned" ? "none" : "block",
+      actionsDisplay: st.sendingBack ? "none" : "flex",
+      csDisplay: st.sendingBack || decided === "returned" ? "none" : "flex",
+
+      sbWho: sel.inspector,
+      sbOther: st.sbReason === 5,
+      sbTypeNote: (e) => { const v = e.target.value; this.setState({ sbNote: v }); },
+      sbReasons: this.reasons.map((label, i) => {
+        const on = st.sbReason === i;
+        return {
+          label, tick: on ? "✓" : "", onTap: () => this.setState({ sbReason: i }),
+          color: on ? "#A03428" : "#ddd", width: on ? "2px" : "1.5px",
+          bg: on ? "#FBEEEC" : "#fff", textColor: on ? INK : "#555"
+        };
+      }),
+      sbScopes: this.scopes.map((label, i) => {
+        const on = st.sbScope === i;
+        return {
+          label, onTap: () => this.setState({ sbScope: i }),
+          color: on ? INK : "#ddd", width: on ? "2px" : "1.5px",
+          bg: on ? "#F2F4F6" : "#fff", textColor: on ? INK : "#888"
+        };
+      }),
+      sbHoldBg: st.sbHold ? INK : "#fff",
+      sbToggleHold: () => this.setState({ sbHold: !st.sbHold }),
+      sbConsequence: (st.sbScope === 0
+        ? "Only the flagged part reopens — the rest of what " + sel.inspector + " signed stays as it is. "
+        : "Every item and photo gets done again. Their first attempt stays on file, marked superseded. ")
+        + (st.sbHold
+          ? sel.reg + " stays out of the draw, so nobody else gets sent to it."
+          : sel.reg + " goes back in the draw tonight — someone else could be sent to the same van."),
+      sbCancel: () => this.setState({ sendingBack: false }),
+      sbLabel: canSend ? "Send back to " + sel.inspector : "Pick a reason first",
+      sbBg: canSend ? "#A03428" : "#EDF1F3",
+      sbFg: canSend ? "#fff" : MUTED,
+      sbConfirm: () => { if (canSend) this.sendBackNow(st.sbReason === 5 ? st.sbNote.trim() : this.reasons[st.sbReason]); },
+
+      wasReturned: decided === "returned",
+      rtReason: ret ? ret.reason : "",
+      rtScope: ret && ret.scope === 1 ? "WHOLE CHECK REOPENED" : "FLAGGED PART ONLY",
+      rtHold: ret && ret.hold ? sel.reg.toUpperCase() + " HELD OUT OF THE DRAW" : sel.reg.toUpperCase() + " BACK IN THE DRAW",
+      rtNote: "Nothing is countersigned. " + sel.inspector + " gets it back at the top of their phone, with that line on it. The record stays open until they resubmit and you sign it — and it shows as overdue if it sits past tomorrow.",
+
+      approve: () => { if (canApprove) this.decide("approved"); },
+      approveLabel: decided === "approved" ? "COUNTERSIGNED — S. PATEL 07:04" : (hasDefect ? (canApprove ? "Countersign & raise job" : "Assign + due date required") : "Countersign this check"),
+      csState: decided === "approved" ? "COUNTERSIGNED BY S. PATEL · 13 AUG 07:04" : "SIGNED BY " + sel.inspector.toUpperCase() + " · AWAITING YOUR COUNTERSIGN",
+      csColor: decided === "approved" ? "#555" : "#8A6116",
+      csNote: decided === "approved"
+        ? "Your name is on this record beside " + sel.inspector + "'s. It's a finished document now — changes need a new check."
+        : "You're putting your name to " + sel.inspector + "'s work: the photos, the readings, the defect call. Send it back if you can't stand behind it.",
+      approveBg: decided ? "#EDF1F3" : (canApprove ? INK : "#EDF1F3"),
+      approveFg: decided ? "#555" : (canApprove ? "#fff" : MUTED),
+
+      defects: openDefects.map(d => {
+        const stage = defectStage(d);
+        const color = stage === "overdue" ? RED : stage === "verified" ? INK : "#999";
+        return {
+          reg: d.reg, name: d.name, severity: stage === "overdue" ? "OVERDUE · " + d.severity : d.severity,
+          note: d.note, meta: d.meta, color,
+          action: stage === "verified" ? "CLOSE DEFECT — REPAIR VERIFIED" : "CHASE / SCHEDULE RE-CHECK",
+          actionColor: stage === "verified" ? INK : RED,
+          onAction: () => this.setState({ defectStages: { ...st.defectStages, [d.id]: stage === "verified" ? "closed" : "awaiting" } })
+        };
+      }),
+
+      doneThisWeek: 6,
+      overdueCount: scopedVans.filter(d => d > forceDays).length,
+      avgSince: Math.round(scopedVans.reduce((a, d) => a + d, 0) / scopedVans.length) + "d",
+      vans: scopedVans.map(d => ({
+        label: d + "d",
+        color: d > forceDays ? RED : d > excludeDays ? "#666" : "#c8c6c1",
+        bg: d > excludeDays ? "#fff" : "#f5f4f1"
+      })),
+      excludeDays, forceDays, target, rerolls: st.rerolls,
+      cycleExclude: () => this.setState({ excludeIdx: (st.excludeIdx + 1) % this.excludeOpts.length }),
+      cycleForce: () => this.setState({ forceIdx: (st.forceIdx + 1) % this.forceOpts.length }),
+      cycleRerolls: () => this.setState({ rerolls: (st.rerolls + 1) % 3 }),
+      cycleTarget: () => this.setState({ targetIdx: (st.targetIdx + 1) % this.targetOpts.length }),
+      ruleSummary: eligible + " of " + scopedVans.length + " vans can be drawn right now. At " + target + " checks a week every van gets seen roughly every " + Math.max(1, Math.round(scopedVans.length / target)) + " weeks.",
+
+      scopeNote: "One depot, two roles: inspectors check vans, managers countersign. Everyone here sees the same fleet.",
+      isPeople: st.tab === "people", peopleColor: tabColor("people"), peopleUnderline: tabLine("people"),
+      tabPeople: () => this.setState({ tab: "people" }),
+      peopleCount: st.people.filter(p => p.active).length,
+      people: st.people.map((p, idx) => {
+        const i = st.people.indexOf(p);
+        const isMgr = p.role === 1;
+        return {
+          name: p.name,
+          nameColor: p.active ? INK : MUTED,
+          strike: p.active ? "none" : "line-through",
+          borderColor: p.active ? (isMgr ? INK : "#ccc") : "#e0ded9",
+          bg: p.active ? "#fff" : "#faf9f6",
+          roleLabel: ROLES[p.role].toUpperCase(),
+          roleBg: isMgr ? INK : "#fff", roleFg: isMgr ? "#fff" : "#888", roleBorder: isMgr ? INK : "#ddd",
+          signinLabel: "SIGNS IN BY NAME — NO PIN",
+          sees: isMgr
+            ? "Countersigns anyone's check. Edits the checklist and the draw rules."
+            : "Checks vans and re-checks defects. Sees their own checks, not other people's.",
+          activeLabel: p.active ? "SUSPEND" : "REINSTATE",
+          onRole: () => this.editPeople(l => { l[i].role = l[i].role === 1 ? 0 : 1; }),
+            onActive: () => this.editPeople(l => { l[i].active = !l[i].active; }),
+          onRename: (e) => { const v = e.target.value; this.editPeople(l => { l[i].name = v; }); }
+        };
+      }),
+      addPerson: () => {
+        const n = st.pplAdds + 1;
+        this.setState({ pplAdds: n });
+        this.editPeople(l => { l.push({ id: "np" + n, name: "New person " + n, role: 0, pin: "NEVER SET", active: true }); });
+      },
+      peopleNote: "Suspending someone keeps every check they signed. They just can't sign in — and their open defects stay on the depot's list, not theirs."
+    };
+  }
+}
+</script>
+</body>
+</html>

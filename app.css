@@ -1,0 +1,1366 @@
+/* =========================================================================
+   Fleet Spot-Check — mobile app shell
+   Design language carried over from "Fleet Spot-Check Manager v2.dc.html":
+   Fustat + IBM Plex Mono, ink/red palette, 14px cards, 18px pills,
+   dashed borders for "provisional / needs your attention" states.
+   ========================================================================= */
+
+:root {
+  /* surfaces — white shell, white cards, no heavy greys. The shell used to be a
+     faintly blue off-white (#F4F6F7) with white cards floating on it; that tint
+     is gone at the user's request. Cards and rows already carry a --line border
+     and --shadow-card, so they still read as objects on the page rather than
+     dissolving into it — but the separation is now a hairline, not a tone. */
+  --page:      #FFFFFF;
+  --surface:   #FFFFFF;
+  --card:      #FFFFFF;
+  --dormant:   #FAF9F6;
+  /* The one place a fill still has to sit BELOW white: a disabled or already-done
+     button, and a menu row under a thumb. These used --page back when the page
+     was tinted; on a white page that would erase them, so they get their own
+     token — neutral grey, not the old blue. */
+  --sunk:      #F1F2F3;
+
+  /* ink */
+  --text:      #1B2126;
+  /* The one accent. Deep navy rather than green: this app's job is a signature
+     on a record, and navy reads as document-and-authority without ever arguing
+     with the red a defect is drawn in. */
+  --ink:       #1B4D7A;   /* accent, primary action, selected */
+  --ink-wash:  #E9F0F6;   /* faint fill for a selected/active surface */
+  --body:      #58626A;
+  --muted:     #79838B;
+  --faint:     #9AA3AA;
+
+  /* header — light shell, dark ink title, hairline underline. Green is an
+     accent here, never the mood: the header carries no colour of its own. */
+  --header:        #FFFFFF;
+  --header-text:   #1B2126;
+  --header-muted:  #79838B;
+  --header-line:   #E7EBEE;
+
+  /* status */
+  --red:       #A03428;
+  --red-wash:  #FBEEEC;
+  --amber:     #8A6116;
+
+  /* lines */
+  --line:      #E7EBEE;
+  --line-soft: #EEF1F3;
+  --line-dormant: #E0DED9;
+
+  /* radii — a touch rounder, so cards and controls read as app, not document */
+  --r-card: 16px;
+  --r-pill: 20px;
+  --r-chip: 999px;
+
+  /* type */
+  --sans: Fustat, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* soft elevation for cards/docks, kept subtle */
+  --shadow-card: 0 1px 2px rgba(27, 33, 38, .04);
+  --shadow-pop:  0 8px 24px rgba(27, 33, 38, .12);
+
+  /* Header elevation, in two states. At rest the bar is barely lifted — a
+     hairline of shadow instead of a drawn border, which is what stops a mobile
+     header reading as a <div> with a bottom rule. Once content has scrolled
+     under it the shadow deepens, so the bar visibly becomes the thing on top.
+     Both are warm-neutral (the ink hue, heavily diluted), never pure black. */
+  --shadow-header:      0 1px 1px rgba(27, 33, 38, .04), 0 4px 12px -6px rgba(27, 33, 38, .16);
+  --shadow-header-lift: 0 1px 0 rgba(27, 33, 38, .06), 0 10px 20px -8px rgba(27, 33, 38, .26);
+
+  /* spacing scale — one rhythm the whole app breathes on */
+  --gap-1: 6px;
+  --gap-2: 10px;
+  --gap-3: 14px;
+  --gap-4: 18px;
+  --gap-5: 24px;
+
+  /* chrome metrics */
+  /* 64px = the 46px Back button plus the bar's 9px of padding top and bottom —
+     the tallest thing the header ever holds. Set as the floor for EVERY screen,
+     not just the ones with a Back button, so the bar does not step 58 → 64 and
+     shove the whole screen down every time you push into a van and back out. */
+  --topbar-h: 64px;
+  --tabbar-h: 60px;
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+
+  /* the smallest thing a thumb should have to hit */
+  --tap: 46px;
+
+  color-scheme: light;
+}
+
+/* ---------- reset / native feel ---------------------------------------- */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--page);
+  color: var(--text);
+  font-family: var(--sans);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  /* app chrome shouldn't feel like a document */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
+}
+
+input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* one honest pressed state for everything tappable */
+button:active,
+.pressable:active { opacity: .55; }
+
+@media (hover: hover) {
+  button:hover { opacity: .85; }
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- app frame --------------------------------------------------- */
+
+.app {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  /* One white surface end to end — canvas, cards and chrome. What used to be
+     three tones is now one, so the layering is carried entirely by hairlines
+     and the header's shadow. */
+  background: var(--page);
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+@media (min-width: 721px) {
+  .app {
+    border-left: 1px solid rgba(0, 0, 0, .08);
+    border-right: 1px solid rgba(0, 0, 0, .08);
+  }
+}
+
+/* ---------- top bar ----------------------------------------------------- */
+
+/* Three columns: Back on the left, the depot title on the centre line, and the
+   one thing about YOU — the avatar — on the right. The title is centred against
+   the whole bar rather than against the space Back happens to leave, so it does
+   not shift sideways as you move between screens; the gutters are matched `1fr`
+   tracks, which is what holds it still. */
+.topbar {
+  background: var(--header);
+  color: var(--header-text);
+  padding: calc(var(--sat) + 9px) calc(var(--sar) + 18px) 9px calc(var(--sal) + 18px);
+  display: grid;
+  /* Three tracks so the title centres against the BAR, not against what is left
+     of it. The two gutters are equal `1fr`s, so the middle `auto` track — the
+     title, exactly as wide as its own text — lands on the bar's centre line
+     whether or not there is a Back button on the left. `min-content` is the
+     floor rather than a fixed number so neither gutter can shrink below the
+     button it actually holds: an over-long title then eats into itself
+     (ellipsis) instead of sliding under Back or the avatar. */
+  grid-template-columns: minmax(min-content, 1fr) auto minmax(min-content, 1fr);
+  column-gap: var(--gap-3);
+  align-content: center;
+  min-height: calc(var(--topbar-h) + var(--sat));
+
+  /* The bar floats above the scrolling screen rather than being ruled off from
+     it. `position: relative` + z-index is what lets the shadow fall ONTO the
+     screen: they are siblings in the app grid, so without it the screen's own
+     content paints over the shadow. 5, not 2, so it also clears the sticky
+     `.dock` (z-index 3) — the dock lives at the bottom of a detail screen and
+     never reaches the header today, but a stacking order that holds only
+     because of where things happen to sit is one layout change from breaking. */
+  position: relative;
+  z-index: 5;
+  box-shadow: var(--shadow-header);
+  transition: box-shadow .2s ease;
+}
+
+/* Set by the scroll handler once the screen has moved. The deeper shadow is
+   the whole "this is an app" tell: chrome that reacts to content passing under
+   it reads as a layer, chrome that never changes reads as a page banner. */
+.topbar.is-lifted { box-shadow: var(--shadow-header-lift); }
+
+@media (prefers-reduced-motion: reduce) {
+  .topbar { transition: none; }
+}
+
+/* The left gutter. Empty on most screens — it exists so the Back button has a
+   track of its own and the title never has to share one with it. */
+.topbar-lead {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+}
+
+/* The build stamp sitting in that otherwise-empty gutter. Mono because it is a
+   machine value, not prose — the same reasoning as .mono-label — and muted
+   because it is a diagnostic you go looking for, never something competing with
+   the screen title beside it. No background or border: a pill here would read
+   as a control you can tap, and it is not one. */
+.build-tag {
+  font: 500 11px/1 var(--mono);
+  letter-spacing: .04em;
+  color: var(--faint);
+  user-select: text;          /* the one thing you might want to copy into a bug report */
+  white-space: nowrap;
+}
+
+.topbar-title {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  text-align: center;
+  font: 700 22px/1.2 var(--sans);
+  letter-spacing: -.022em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- header avatar ----------------------------------------------- */
+
+/* 40px so it reads as a face rather than a button, with the hit area pushed
+   out to 48px by the ::after below — the thumb target is bigger than the ink,
+   which is the whole trick to a chrome control that is easy to hit but does
+   not shout over the title. */
+.avatar {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-chip);
+  background: var(--ink);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.avatar::after { content: ""; position: absolute; inset: -4px; border-radius: inherit; }
+.avatar-ini { font: 700 14px/1 var(--sans); letter-spacing: .02em; }
+.avatar svg { width: 20px; height: 20px; }
+
+/* Waiting count, notched into the avatar's top-right corner. Amber, not red:
+   red in this app means a defect on a van, and a countersignature that has not
+   happened yet is attention, not damage. The 2px ring is the header's own
+   background rather than white, so the badge reads as punched out of the bar
+   instead of stuck on top of it — and it is what keeps the digits legible
+   where they overlap the navy disc. */
+.avatar-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: var(--r-chip);
+  border: 2px solid var(--header);
+  background: var(--amber);
+  color: #fff;
+  font: 700 10.5px/1 var(--sans);
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- identity menu ----------------------------------------------- */
+
+/* Both of these live inside .topbar, which already holds z-index 5 above the
+   screen and the tab bar — so the menu and its scrim clear the whole app
+   without needing a z-index race of their own. The bar sets no overflow, so
+   the card is free to hang below it.
+
+   The scrim is invisible on purpose. It exists to catch the tap, not to dim
+   the depot: a two-item menu is not a modal, and greying out a screen someone
+   is mid-check on would overstate what is happening. */
+.who-scrim {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+}
+
+.who-menu {
+  position: absolute;
+  /* Hung off the bottom edge of the bar rather than off the avatar's own box —
+     the avatar is optically centred in a row whose height moves with the safe
+     area and the title, and a menu that has to re-derive that arithmetic is a
+     menu that lands on top of the header on some phone. */
+  top: calc(100% + 6px);
+  right: calc(var(--sar) + 18px);
+  z-index: 1;
+  min-width: 232px;
+  max-width: calc(100vw - 36px);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-pop);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Who you are, spelled out — a label, not a target, so it is not tappable and
+   does not sit in the tab order. */
+.who-menu-head {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.who-menu-name { font: 600 16px/1.25 var(--sans); color: var(--text); }
+.who-menu-role { font: 400 13px/1.3 var(--sans); color: var(--muted); }
+
+/* Full-width rows at thumb height — this hangs off a 40px avatar, so the rows
+   have to be far easier to hit than the thing that opened them. */
+.who-menu-item {
+  min-height: var(--tap);
+  padding: 0 16px;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: 600 16px/1.2 var(--sans);
+  color: var(--text);
+  cursor: pointer;
+}
+.who-menu-item + .who-menu-item { border-top: 1px solid var(--line-soft); }
+.who-menu-item:active { background: var(--sunk); }
+.who-menu-item.is-red { color: var(--red); }
+
+/* ---------- header help button + help sheet ------------------------------ */
+
+/* The right-hand gutter, now that it can hold two things. It still occupies
+   grid column 3 exactly as the bare avatar used to, so the title stays centred
+   against the bar and the `minmax(min-content, 1fr)` floor now measures the
+   pair instead of the face alone. The avatar's own grid/justify-self
+   declarations go inert inside a flex parent — harmless, and left in place so
+   the rule still reads as "this is the far-right control". */
+.topbar-trail {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* The quiet one of the pair. It is deliberately NOT a filled disc like the
+   avatar beside it: two solid circles in the corner would read as two accounts,
+   or as a pair of equally weighted actions, when in fact one is who you are and
+   the other is a footnote. So this is a line drawing on nothing — 21px of glyph
+   inside a 44px target, with the right margin pulling it up against the avatar
+   and the padding doing the work of being tappable.
+
+   `--header-muted` is the same grey the bar already uses for anything that is
+   not the title, so it sits a clear step below both the title and the navy
+   disc. It comes to full ink on press, which acknowledges the tap before the
+   sheet has finished rising. */
+.topbar-help {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  margin-right: -6px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--header-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.topbar-help svg { width: 21px; height: 21px; }
+.topbar-help:active { color: var(--header-text); }
+
+/* Unlike .who-scrim this one dims. The sheet is a page of prose over a screen
+   you have stopped working on, and the dimming is what says "read this, then
+   come back" instead of "carry on around me". Tapping it is the close. */
+.sheet-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 33, 38, .34);
+}
+
+/* Bottom-anchored, because the thumb that opened it is at the bottom of a
+   375px phone and a centred dialog puts the Close button back up under the
+   fingernails. Height is whatever the prose needs, capped so a long entry
+   scrolls inside the sheet rather than growing past the top of the screen. */
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  max-height: 82vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px calc(var(--gap-4) + var(--sar)) calc(var(--gap-4) + var(--sab)) calc(var(--gap-4) + var(--sal));
+  background: var(--card);
+  border-radius: var(--r-card) var(--r-card) 0 0;
+  box-shadow: var(--shadow-pop);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  text-align: left;
+}
+
+/* Not a handle — nothing here drags. It is the one mark that says "this came up
+   from the bottom edge and goes back down", which is what stops a panel pinned
+   to the floor reading as part of the screen underneath it. */
+.sheet-grip {
+  width: 36px;
+  height: 4px;
+  margin: 0 auto 6px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.sheet-title {
+  margin: 0;
+  font: 600 18px/1.25 var(--sans);
+  color: var(--text);
+}
+.sheet-p {
+  margin: 0;
+  font: 400 14.5px/1.5 var(--sans);
+  color: var(--body);
+  text-wrap: pretty;
+}
+/* Close is a real button and not only the scrim: tap-outside is invisible, and
+   somebody who has never met a bottom sheet needs a way out they can see. */
+.sheet .btn { margin-top: var(--gap-2); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .sheet-scrim { animation: scrimIn .18s ease both; }
+  .sheet { animation: sheetUp .22s cubic-bezier(.22, .61, .36, 1) both; }
+}
+@keyframes scrimIn { from { opacity: 0; } }
+@keyframes sheetUp { from { transform: translateY(100%); } }
+
+/* ---------- centred modal (the admin dialog) ----------------------------- */
+
+/* The one true modal. A help sheet rises from the thumb and an identity menu
+   hangs off the avatar; this is neither. Creating the admin is a deliberate,
+   one-answer commitment made from a blank first-run screen, so it dims what is
+   behind it (like the sheet) but sits in the CENTRE — there is no thumb it came
+   from to anchor to, and the field wants to be clear of the on-screen keyboard,
+   not tucked under the fingernails. Tapping the scrim is Cancel. */
+.modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  background: rgba(27, 33, 38, .34);
+}
+.modal {
+  position: fixed;
+  z-index: 3;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100vw - 2 * var(--gap-4));
+  max-width: 420px;
+  max-height: calc(100vh - 2 * var(--gap-4));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--gap-4);
+  background: var(--card);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-pop);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  text-align: left;
+}
+.modal-title {
+  margin: 0;
+  font: 600 18px/1.25 var(--sans);
+  color: var(--text);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .modal-scrim { animation: scrimIn .18s ease both; }
+  .modal { animation: modalIn .2s cubic-bezier(.22, .61, .36, 1) both; }
+}
+@keyframes modalIn { from { opacity: 0; transform: translate(-50%, -46%); } }
+
+/* Nobody signed in: hollow and dashed, matching the "provisional / needs your
+   attention" language the rest of the app draws in dashes. An empty seat
+   should look empty, not like a person whose name failed to load. */
+.avatar.is-none {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px dashed var(--ink);
+}
+
+/* back affordance sized for a thumb, visually light */
+.back {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: -10px;
+  padding: 0 10px;
+  height: var(--tap);
+  min-width: var(--tap);
+  font: 500 15px/1 var(--sans);
+  color: var(--header-text);
+  flex: none;
+}
+.back svg { width: 17px; height: 17px; flex: none; }
+
+/* ---------- scrolling screen ------------------------------------------- */
+
+.screen {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: var(--gap-4) calc(var(--sar) + var(--gap-4)) var(--gap-5) calc(var(--sal) + var(--gap-4));
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-3);
+}
+.screen:focus { outline: none; }
+
+/* ---------- bottom tab bar ---------------------------------------------- */
+
+/* `hidden` alone loses to the class's own `display: grid`, and a tab bar that
+   is only invisible still eats a row of the app grid. */
+.tabbar[hidden] { display: none; }
+
+.tabbar {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  padding: 0 calc(var(--sar) + 6px) var(--sab) calc(var(--sal) + 6px);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+.tab {
+  height: var(--tabbar-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--muted);
+  position: relative;
+}
+
+.tab[aria-current="page"] { color: var(--ink); }
+.tab[aria-current="page"] .tab-label { font-weight: 600; }
+.tab:active { opacity: .5; }
+
+.tab svg { width: 23px; height: 23px; flex: none; }
+
+.tab-label {
+  font: 500 11px/1 var(--sans);
+  letter-spacing: 0;
+}
+
+/* count badge on the tab icon */
+.tab-badge {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  margin-left: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--r-chip);
+  background: var(--red);
+  color: #fff;
+  font: 600 10px/16px var(--mono);
+  text-align: center;
+}
+.tab-badge.is-quiet { background: var(--faint); }
+
+/* ---------- primitives -------------------------------------------------- */
+
+/* A section heading, not a stencil. Caps and mono are spent on real data —
+   counts, regs, dates — so a heading is just a heading. */
+.mono-label {
+  font: 600 12.5px/1.35 var(--sans);
+  color: var(--muted);
+  letter-spacing: 0;
+}
+.mono-label.is-red { color: var(--red); }
+.mono-label.is-amber { color: var(--amber); }
+.mono-label.is-ink { color: var(--ink); }
+
+.note {
+  font: 400 14px/1.45 var(--sans);
+  color: var(--body);
+  text-wrap: pretty;
+}
+.note.is-faint { color: var(--muted); }
+.note.is-red { color: var(--red); }
+.note.is-amber { color: var(--amber); }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: var(--gap-3);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+.card.is-flat { background: transparent; box-shadow: none; }
+.card.is-dormant { background: var(--dormant); border-color: var(--line-dormant); }
+.card.is-selected { border: 2px solid var(--ink); padding: 13px; }
+.card.is-red { border-color: var(--red); }
+.card.is-red-strong { border: 2px solid var(--red); padding: 13px; }
+.card.is-dashed-amber { border: 1.5px dashed var(--amber); background: transparent; box-shadow: none; }
+.card.is-dashed-red { border: 1.5px dashed var(--red); background: transparent; box-shadow: none; }
+.card.is-dashed-ink { border: 1.5px dashed var(--ink); background: transparent; box-shadow: none; }
+.card.is-dashed-grey { border: 1.5px dashed #B6BFC5; background: transparent; box-shadow: none; }
+
+/* a row that is itself the tap target */
+.row-tap {
+  width: 100%;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spread {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.reg {
+  font: 600 17px/1.2 var(--sans);
+  letter-spacing: .01em;
+}
+.reg.is-dormant { color: var(--faint); }
+
+.flag {
+  font: 500 11px/1.3 var(--mono);
+  text-align: right;
+  white-space: nowrap;
+  color: var(--body);
+}
+.flag.is-red { color: var(--red); }
+.flag.is-faint { color: var(--faint); }
+.flag.is-amber { color: var(--amber); }
+.flag.is-ink { color: var(--ink); }
+
+.chev {
+  width: 16px; height: 16px;
+  flex: none;
+  color: #C3CBD1;
+}
+
+/* buttons ---------------------------------------------------------------- */
+
+.btn {
+  min-height: 52px;
+  border-radius: var(--r-card);
+  padding: 14px 18px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  font: 500 16px/1.25 var(--sans);
+  border: 1px solid transparent;
+  text-wrap: balance;
+}
+.btn-primary { background: var(--ink); color: #fff; }
+.btn-danger  { background: var(--red); color: #fff; }
+.btn-outline { border-color: var(--ink); color: var(--ink); background: transparent; }
+.btn-outline-red { border-color: var(--red); color: var(--red); background: transparent; }
+.btn-quiet   { border-color: var(--line); color: var(--muted); background: var(--card); }
+.btn-disabled { background: var(--sunk); color: var(--faint); }
+.btn-disabled:active { opacity: 1; }
+.btn-done { background: var(--sunk); color: var(--body); }
+.btn-done:active { opacity: 1; }
+
+.btn-shadow { box-shadow: var(--shadow-pop); }
+
+.btn-add {
+  border: 1px dashed var(--ink);
+  color: var(--ink);
+  background: transparent;
+  font: 500 15px/1.2 var(--sans);
+  min-height: var(--tap);
+  border-radius: var(--r-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px;
+}
+
+/* sticky action dock at the bottom of a detail screen */
+.dock {
+  position: sticky;
+  bottom: calc(var(--gap-5) * -1);
+  margin: var(--gap-1) calc(var(--gap-4) * -1) calc(var(--gap-5) * -1);
+  padding: var(--gap-2) var(--gap-4) calc(var(--gap-5) + 4px);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, var(--page) 22%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  z-index: 3;
+}
+/* A dock that sits at the foot of the screen even when the content above it is
+   short. `.screen` is a flex column, so `auto` eats the slack; the sticky
+   bottom from `.dock` still does the work once the content does overflow. */
+.dock.is-foot { margin-top: auto; }
+
+.dock-row { display: flex; gap: var(--gap-2); }
+.dock-row > .btn { flex: 1 1 0; min-width: 0; }
+.dock-row > .btn.is-wide { flex: 2 1 0; }
+
+/* chips / pills ---------------------------------------------------------- */
+
+.chip {
+  font: 500 14px/1 var(--sans);
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--muted);
+  border-radius: var(--r-pill);
+  /* 44, not 38. A chip is a real button — it cycles a role, retires an item,
+     marks a fail — and it is tapped with a gloved thumb in a depot, so it gets
+     the same target as everything else rather than the size the text wants. */
+  min-height: var(--tap);
+  padding: 10px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.chip.is-on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.chip.is-red { border-color: var(--red); color: var(--red); background: var(--card); }
+.chip.is-red-on { background: var(--red); border-color: var(--red); color: #fff; }
+.chip.is-ghost { background: transparent; }
+
+/* square icon buttons (reorder arrows, steppers) keep a full tap target
+   while staying visually small */
+.icon-btn {
+  width: var(--tap);
+  height: var(--tap);
+  flex: none;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 16px/1 var(--mono);
+}
+.icon-btn[disabled] { color: #D3D9DD; opacity: 1; }
+.icon-btn[disabled]:active { opacity: 1; }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: var(--gap-2); }
+
+/* field: a tappable "cycles through options" control ---------------------- */
+
+.field {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 9px 12px;
+  min-height: var(--tap);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  flex: 1 1 150px;
+  min-width: 0;
+}
+.field.is-required { border-color: var(--red); background: transparent; }
+/* A reading inside the watch band. It still passes, so it is not red — but a
+   tyre at 2.0 mm is the one to book in before it becomes a red one. */
+.field.is-watch { border-color: var(--amber); background: transparent; }
+.field-label { font: 500 12px/1.3 var(--sans); color: var(--muted); }
+.field.is-required .field-label { color: var(--red); }
+.field.is-watch .field-label { color: var(--amber); }
+.field-value { font: 500 16px/1.3 var(--sans); }
+.field-value.is-empty { color: var(--faint); }
+.field-row { display: flex; gap: 8px; }
+
+/* A real input living inside the .field box. 16px is not a style choice —
+   anything smaller makes iOS zoom the page in the moment it takes focus.
+   flex:1 is the thumb fix: the text line is only ~21px tall, so without it the
+   input was a 21px target floating in a 46px card and a thumb landing on the
+   label row focused nothing. Filling the remaining height makes the whole lower
+   half of the card live, which is what it already looks like. */
+.field-input {
+  font: 500 16px/1.3 var(--sans);
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.field-input::placeholder { color: var(--faint); }
+.field-input:focus { outline: none; }
+.field:focus-within { border-color: var(--ink); }
+.field.is-required:focus-within { border-color: var(--red); }
+.field.is-watch:focus-within { border-color: var(--amber); }
+/* An unset date still shows the browser's dd/mm/yyyy — grey it like a placeholder. */
+.field-input.is-empty { color: var(--faint); }
+.field-input[type="date"] { min-height: 21px; }
+.field-input[type="date"]::-webkit-calendar-picker-indicator { margin: 0; opacity: .55; }
+
+/* Pick-one from a list the depot owns. A native <select> is deliberate: iOS
+   gives it a wheel and Android a dialog, both of which beat tapping through
+   an unbounded list one workshop at a time. */
+.field-select {
+  font: 500 16px/1.3 var(--sans);
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0 18px 0 0;
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  /* The arrow is drawn here because appearance:none takes the native one away. */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7B85' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 15px 15px;
+  text-overflow: ellipsis;
+}
+.field-select:focus { outline: none; }
+.field-select.is-empty { color: var(--faint); }
+
+/* stepper field (fail limit / watch from) */
+.stepper {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: var(--r-card);
+  padding: 6px 6px 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 100%;
+}
+.stepper.is-red { border-color: var(--red); background: transparent; }
+.stepper-text { flex: 1 1 auto; min-width: 0; }
+.stepper.is-red .field-label { color: var(--red); }
+.stepper.is-red .field-value { color: var(--red); }
+
+/* segmented answer control (the walk) ------------------------------------ */
+
+/* Pass / Fail / N-A on one row. A selected pass is plain ink, not green:
+   colour is spent on the thing that needs chasing, not on the 90% of a check
+   that is fine. Each button keeps a full tap target — this is answered with a
+   thumb, standing at the front wing of a van. */
+.seg { display: flex; gap: 6px; }
+.seg-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: var(--tap);
+  padding: 10px 6px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--body);
+  border-radius: var(--r-pill);
+  font: 500 15px/1.2 var(--sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.seg-btn.is-on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.seg-btn.is-on.is-fail { background: var(--red); border-color: var(--red); }
+
+/* readings: two up. Front/rear pairs and four corners both stay readable at
+   375px, and a single reading takes the whole row rather than half of one. */
+.read-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.read-grid > .field { flex: none; }
+.read-grid > .field:only-child { grid-column: 1 / -1; }
+
+/* checkbox row ----------------------------------------------------------- */
+
+.check-row {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 10px 12px;
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  font: 400 15px/1.35 var(--sans);
+  text-wrap: pretty;
+}
+.box {
+  width: 22px; height: 22px;
+  flex: none;
+  border: 1.5px solid var(--line);
+  border-radius: 5px;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.box.is-on { background: var(--ink); border-color: var(--ink); }
+.box svg { width: 13px; height: 13px; }
+
+/* inline rename input ---------------------------------------------------- */
+
+.rename {
+  flex: 1 1 120px;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font: 500 16px/1.3 var(--sans);
+  color: var(--text);
+  padding: 6px 0;
+  /* The dashed underline is the whole affordance here, so the box has to be
+     tall enough to hit even though nothing is drawn above or below the text. */
+  min-height: var(--tap);
+  border-bottom: 1px dashed transparent;
+}
+.rename:focus { border-bottom-color: var(--ink); }
+.rename.is-dormant { color: var(--faint); text-decoration: line-through; }
+
+.hint-input {
+  flex: 1 1 120px;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font: 400 14px/1.4 var(--sans);
+  color: var(--text);
+  padding: 6px 0;
+}
+.hint-input::placeholder { color: #B6BFC5; }
+
+.textarea {
+  border: 1px solid var(--red);
+  border-radius: var(--r-pill);
+  padding: 11px 12px;
+  font: 400 16px/1.4 var(--sans);
+  resize: none;
+  min-height: 76px;
+  outline: none;
+  background: var(--card);
+  width: 100%;
+}
+.textarea::placeholder { color: var(--faint); }
+
+/* stat tiles ------------------------------------------------------------- */
+
+.stats { display: flex; gap: var(--gap-2); }
+.stat {
+  flex: 1 1 0;
+  min-width: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--gap-3) 6px;
+  text-align: center;
+}
+.stat.is-alert { border: 1.5px dashed var(--red); background: transparent; box-shadow: none; }
+.stat.is-alert .stat-num, .stat.is-alert .stat-cap { color: var(--red); }
+/* The number is the data, so it keeps its weight; the caption underneath is
+   just a word for it. */
+.stat-num { font: 600 24px/1.15 var(--sans); }
+.stat-cap { font: 500 12px/1.3 var(--sans); color: var(--muted); margin-top: 3px; }
+
+/* evidence grid — all eight walk-around shots at once. It began life as a
+   horizontal snap-scroller, but once the photos became real evidence a manager
+   must review before countersigning, a strip that hid six of eight slots behind
+   an invisible scroll was a liability, not a style. Three across (matching the
+   capture grid) shows every shot on a 375px phone with nothing hidden. */
+
+.evidence {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.shot {
+  aspect-ratio: 4 / 3;
+  background: repeating-linear-gradient(45deg, #E8ECEF 0 6px, #F2F4F6 6px 12px);
+  border: 1px solid #C3CBD1;
+  border-radius: var(--r-pill);
+  display: flex;
+  align-items: flex-end;
+  padding: 7px;
+  /* Sans here too — .shot-tag inherits its tracking from this tile, so leaving
+     the mono letter-spacing on meant the sentence-case tag still read spaced-out. */
+  font: 500 11px/1 var(--sans);
+  color: var(--muted);
+}
+.shot.is-flagged { border-color: var(--red); color: var(--red); border-width: 1.5px; }
+
+/* Real photos ride inside the same tile — the placeholder hatch shows through
+   only until an image is set, so an empty slot still reads as "not photographed". */
+.shot { position: relative; overflow: hidden; }
+.shot img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #E8ECEF;
+  display: block;
+}
+.shot.has-img { padding: 0; border-color: #AEB7BD; }
+.shot-hit { position: absolute; inset: 0; padding: 0; }
+/* The label is a chip, bottom-left. Over a photo it sits on a scrim so it stays
+   legible against anything the camera saw. */
+.shot-tag {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 6px 8px;
+  /* Sans, not mono: the tag names the angle to shoot from — it is a caption,
+     not a reading. Mono here was part of the same all-caps habit the tags
+     themselves have now dropped. */
+  font: 500 11px/1 var(--sans);
+  color: var(--muted);
+  pointer-events: none;
+}
+.shot.is-flagged .shot-tag { color: var(--red); }
+.shot.has-img .shot-tag {
+  left: 0;
+  right: 0;
+  color: #FFF;
+  padding-top: 18px;
+  background: linear-gradient(to top, rgba(20, 26, 30, .74), rgba(20, 26, 30, 0));
+}
+.shot.has-img.is-flagged .shot-tag { color: #FFF; }
+.shot.has-img.is-flagged { border-color: var(--red); border-width: 1.5px; }
+/* The "+" that says an empty tile is tappable (capture grid only). */
+.shot-add {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 300 30px/1 var(--sans);
+  color: var(--muted);
+}
+/* Remove sits top-right with its own full-ish target — a mis-tap deletes a
+   photo the inspector just took, so it is kept clear of the retake area. */
+.shot-x {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: rgba(20, 26, 30, .62);
+  color: #FFF;
+  font: 500 17px/1 var(--sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Capture grid: the eight walk-around shots, laid out to be tapped rather than
+   scrolled. Three across sits comfortably on a 375px phone. */
+.shot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.shot-grid .shot { flex: none; width: auto; }
+
+/* Full-screen look at one photo — the manager judging "too dark to countersign"
+   needs it bigger than a strip thumbnail. Tap anywhere to close. */
+.photo-view {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(12, 16, 19, .92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(16px + var(--sat)) 16px calc(16px + var(--sab));
+  animation: photoIn .14s ease-out;
+}
+.photo-view img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+@keyframes photoIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* signature pad — a finger-drawn countersignature ------------------------
+   The frame is a plain ruled box; the canvas fills it and owns the pointer, so
+   `touch-action: none` stops the screen scrolling out from under a stroke. */
+.sig-frame {
+  position: relative;
+  height: 140px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--card);
+  overflow: hidden;
+}
+.sig-pad {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  display: block;
+}
+/* a signing baseline, low in the box, the way a paper form has one */
+.sig-frame::after {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 34px;
+  border-bottom: 1px dashed var(--line);
+  pointer-events: none;
+}
+.sig-frame.is-signed { height: auto; min-height: 96px; background: var(--card); }
+.sig-frame.is-signed::after { display: none; }
+.sig-img {
+  display: block;
+  width: 100%;
+  max-height: 160px;
+  object-fit: contain;
+  padding: 10px;
+}
+.sig-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  text-align: center;
+  font: 400 13px/1 var(--sans);
+  color: var(--faint);
+  pointer-events: none;
+}
+.sig-clear {
+  font: 500 14px/1 var(--sans);
+  color: var(--ink);
+  padding: 6px 8px;
+  margin: -6px -8px -6px 0;
+}
+
+.thumb-sm {
+  width: 62px;
+  height: 48px;
+  flex: none;
+  border-radius: 5px;
+  background: repeating-linear-gradient(45deg, #E8ECEF 0 6px, #F2F4F6 6px 12px);
+  border: 1px solid var(--line);
+}
+.thumb-sm.is-red { border-color: var(--red); }
+
+/* coverage grid ---------------------------------------------------------- */
+
+.van-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 5px;
+}
+/* A cell is a real button — it opens the van — so the whole UA button look is
+   reset here rather than fought with per-property overrides. */
+.van-cell {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  /* Six to a row on a phone leaves each cell 54 wide, so the height is the only
+     axis with any slack — spend it, because a mis-tap here opens the wrong van. */
+  height: var(--tap);
+  border: 1px solid #C8C6C1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 11px/1 var(--sans);
+  color: #666;
+  background: var(--card);
+}
+.van-cell:active { transform: scale(0.94); }
+.van-cell.is-overdue { border-color: var(--red); color: var(--red); border-width: 1.5px; }
+.van-cell.is-excluded { color: #C8C6C1; background: #F5F4F1; }
+/* Never checked at all. It is already overdue, so it keeps the red — the fill
+   is what says "this one has no history", not a second, softer colour. */
+.van-cell.is-never { background: var(--red); border-color: var(--red); color: #FFF; }
+
+/* section list rows ------------------------------------------------------ */
+
+.list-row {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--gap-2) 12px;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+  min-height: 62px;
+}
+.list-row.is-selected { border: 2px solid var(--ink); padding: 9px 11px; }
+.list-row.is-dormant { background: var(--dormant); border-color: var(--line-dormant); }
+.list-row.is-crit { border-color: var(--red); }
+
+.list-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.list-title { font: 500 16px/1.3 var(--sans); overflow: hidden; text-overflow: ellipsis; }
+.list-title.is-dormant { color: var(--faint); text-decoration: line-through; }
+.list-sub { font: 400 13px/1.35 var(--sans); color: var(--muted); }
+.list-sub.is-red { color: var(--red); }
+
+.num {
+  font: 500 11px/1 var(--mono);
+  color: #B6BFC5;
+  width: 18px;
+  flex: none;
+  text-align: right;
+}
+
+.actions-row { display: flex; gap: 4px; flex: none; align-items: center; }
+
+/* disclosure body inside an item card */
+.setup {
+  border-top: 1px dashed #D8DDE1;
+  padding-top: 11px;
+  margin-top: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+/* menu (More tab) -------------------------------------------------------- */
+
+.menu-item {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--gap-3) var(--gap-3);
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-3);
+  width: 100%;
+}
+.menu-item .list-main { gap: 2px; }
+
+/* misc ------------------------------------------------------------------- */
+
+.divider-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: var(--gap-2);
+}
+
+.empty {
+  padding: 40px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.grow { flex: 1 1 auto; }
+.push-top { margin-top: auto; }
+.stack-sm { display: flex; flex-direction: column; gap: var(--gap-2); }
+.stack { display: flex; flex-direction: column; gap: var(--gap-3); }
+
+/* toast ------------------------------------------------------------------ */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--tabbar-h) + var(--sab) + 16px);
+  transform: translate(-50%, 12px);
+  background: var(--text);
+  color: #fff;
+  font: 500 13.5px/1.35 var(--sans);
+  padding: 11px 16px;
+  border-radius: var(--r-pill);
+  max-width: min(88vw, 420px);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  z-index: 50;
+  box-shadow: 0 8px 24px rgba(28, 34, 38, .22);
+}
+.toast.is-up { opacity: 1; transform: translate(-50%, 0); }
+
+/* screen transition ------------------------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .screen.is-push > * { animation: push .2s cubic-bezier(.22, .61, .36, 1) both; }
+  .screen.is-pop  > * { animation: pop  .2s cubic-bezier(.22, .61, .36, 1) both; }
+}
+@keyframes push { from { opacity: 0; transform: translateX(14px); } }
+@keyframes pop  { from { opacity: 0; transform: translateX(-14px); } }

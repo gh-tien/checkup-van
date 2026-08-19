@@ -1,0 +1,25 @@
+{
+  "name": "Fleet Spot-Check",
+  "short_name": "Spot-Check",
+  "description": "Countersign fleet spot-checks, chase defects and keep the depot's checklist straight.",
+  "id": "/fleet-spot-check/",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "lang": "en-GB",
+  "dir": "ltr",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Countersign queue", "short_name": "Queue", "url": "./#queue", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Open defects", "short_name": "Defects", "url": "./#defects", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

@@ -1,0 +1,14 @@
+# Regenerable staged build outputs (rebuilt by .publish/stage.ps1)
+.publish/pub-*/
+
+# Netlify CLI local state / credentials
+.netlify/
+
+# Tooling & session artifacts
+.playwright-mcp/
+.remember/
+_artifact-preview.html
+
+# OS cruft
+Thumbs.db
+.DS_Store
