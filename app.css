@@ -1361,15 +1361,25 @@ button:active,
   gap: var(--gap-4);
   padding: calc(var(--sat) + var(--gap-3)) 0 calc(var(--sab) + var(--gap-3));
 }
-.setup-gate .empty { padding: 0; }
+.setup-gate .empty { padding: 0; gap: var(--gap-3); }
 
-/* The build stamp under the block — mono because it is a machine value, muted
-   because it is a diagnostic you go looking for. Mirrors `.build-tag`, which
-   carries the same string in the header on every other screen. */
+/* On the first-run gate the header is the whole message now — the explanatory
+   paragraph is gone — so it stands large and inked instead of a small muted
+   caption. */
+.setup-gate .mono-label {
+  font: 600 24px/1.25 var(--sans);
+  color: var(--ink);
+}
+
+/* The build stamp under the block — mono because it is a machine value. On the
+   setup gate it is a headline, not a footnote: a blank first-run screen exists
+   to answer "which build did this phone bootstrap on?", so the version is set
+   large and inked. Mirrors `.build-tag`, which carries the same string in the
+   header on every other screen. */
 .setup-build {
-  font: 500 11px/1 var(--mono);
-  letter-spacing: .04em;
-  color: var(--faint);
+  font: 600 28px/1 var(--mono);
+  letter-spacing: .02em;
+  color: var(--ink);
   user-select: text;
 }
 

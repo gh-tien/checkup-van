@@ -20,7 +20,7 @@
    MUST equal VERSION in sw.js. They are separate files with no shared module,
    so this is a hand-kept pair — `.publish/stage.ps1` refuses to stage a build
    where the two disagree, which is what keeps it honest. Bump both together. */
-const BUILD = 'v30';
+const BUILD = 'v31';
 
 /* ---------------------------------------------------------------- data --- */
 
@@ -1987,7 +1987,6 @@ function viewSetup() {
     <div class="setup-gate">
       <div class="empty">
         ${monoLabel('Set up the system first')}
-        ${note('This phone has no depot on it yet. Start by creating the admin — the hidden account that sets up the crew, the vans, the workshops and the draw rules. The admin never checks a van and never countersigns; it only gets the depot going, and it stays out of every crew list once it has.', 'is-faint')}
         <button class="btn-add" data-a="openAdminModal">Set up admin</button>
       </div>
       <span class="setup-build" aria-hidden="true">${esc(BUILD)}</span>
