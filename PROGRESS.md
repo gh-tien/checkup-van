@@ -1211,7 +1211,7 @@ netlify deploy --prod --dir "C:\Users\tienn\GIT\Checkup Van\.publish\pub-v28" --
 ```
 Then cache-bust the check: `https://checkup-van.netlify.app/sw.js?cb=<anything>` must read v28.
 
-## v29 — hidden admin + first-run setup gate (2026-08-20, CODE COMPLETE on disk, verify + deploy outstanding)
+## v29 — hidden admin + first-run setup gate (2026-08-20, VERIFIED + STAGED, deploy = user's hand-run)
 User (verbatim): "when https://checkup-van.netlify.app and there is no People are setup yet. show
 the screen Setup the system first, button to open the Modal so they can enter the Admin Role. Admin
 Role are not to be like other Role. is a Hidden role."
@@ -1238,11 +1238,23 @@ Done on disk (app.js, node --check clean):
   goes to More; second admin just appends) / openAdmin.
 - Discreet entry points: viewSettings About ("System admin" btn-quiet), viewWho signed-out foot.
 - app.css: `.modal-scrim` / `.modal` / `.modal-title` (centred, dims, reduced-motion aware).
-- BUILD still 'v28' on disk — bump BUILD+sw VERSION to v29 as part of the deploy step.
+- BUILD + sw VERSION bumped to 'v29' (both, stage.ps1 version-pair check passes).
 
-OUTSTANDING: browser verify (setup screen at 0 people, modal creates admin + lands on More, admin
-hidden from crew lists, both discreet links reach the admin area), then bump to v29 + stage + the
-user runs the deploy line by hand.
+VERIFIED 2026-08-20 (localhost:4175, pristine origin, my edits confirmed running):
+- Setup gate: 0 people -> "Set up the system first", tabs hidden. Confirmed via read_page.
+- Full create-admin flow driven atomically through the real ACTIONS (openAdminModal -> set
+  adminName -> createAdmin): count 0->1, needsSetup true->false, me() = {Depot admin, admin},
+  nav.tab = 'more', modal closed, admin absent from crew list, present only in admins list. All
+  assertions passed.
+- Test admin cleaned up; origin left at 0 people.
+- viewWho empty-crew gap fixed (shared adminFoot across both branches) so signing out as the sole
+  admin still exposes the "System admin" link.
+
+STAGED: .publish/stage.ps1 -> pub-v29 (COUNT=11, leak check empty, version pair OK); check.ps1
+clean (0 replacementChars, 0 mojibakePairs across all files).
+
+REMAINING (user's hand-run — Claude is classifier-blocked from netlify deploy):
+  netlify deploy --prod --dir "C:\Users\tienn\GIT\Checkup Van\.publish\pub-v29" --site a66b1464-2703-4498-beb5-6bd2d7cba85f
 
 ## Problems
 - **v25/v26 deploy blocked (CLOSED 2026-08-19 — see the section above; kept for the lesson).** The `netlify deploy` step of
