@@ -1,5 +1,5 @@
 # Task: Ship "Fleet Spot-Check Manager v2" design as a mobile-first PWA
-Status: 23 of 23 complete; phase 4 complete on disk AND in production (v27, verified live 2026-08-19). **v28 (pilot prep: durable storage + build stamp in the header) is code-complete and staged — one deploy outstanding.** See "v28 — pilot prep".   | batch size: 1 (session 0cc2950e dropped repeatedly with ECONNRESET)
+Status: 23 of 23 complete; phase 4 complete. **v30 is live in production AND in source on main (verified 2026-08-20).** v30 = first-run setup-gate refinement (whole-screen centred gate, top bar + tabs dropped on `setup`, admin modal moved into `viewSetup()`, build stamp at the foot) in app.js/app.css/sw.js. Prior: v28 durable storage + header build stamp; v29 hidden admin role + first-run setup gate. Clean to keep building.   | batch size: 1 (session 0cc2950e dropped repeatedly with ECONNRESET)
 Phase 3 opened 2026-08-17 22:56 after a go-live review — items 21-23.
 Session log: phase 1 (port the design) done in 544d56b2; phase 2 (real data + real inputs) opened 2026-08-16 15:24;
   compacted after item 15, resumed same session 2026-08-16 17:16
