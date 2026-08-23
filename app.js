@@ -20,7 +20,7 @@
    MUST equal VERSION in sw.js. They are separate files with no shared module,
    so this is a hand-kept pair — `.publish/stage.ps1` refuses to stage a build
    where the two disagree, which is what keeps it honest. Bump both together. */
-const BUILD = 'v33';
+const BUILD = 'v34';
 
 /* ---------------------------------------------------------------- data --- */
 
@@ -977,11 +977,11 @@ function viewDraw() {
 
   const f = drawFacts(row, pool);
   return `
+    <div class="draw-plate-wrap">
+      <span class="draw-plate-kicker">${f.urgent ? 'OVERDUE — WALK THIS NEXT' : 'THE APP DREW'}</span>
+      <div class="draw-plate">${esc(f.v.reg)}</div>
+    </div>
     <div class="card is-selected">
-      <div class="spread">
-        <span class="reg">${esc(f.v.reg)}</span>
-        <span class="${cls('flag', f.urgent ? 'is-red' : 'is-ink')}">${f.urgent ? 'OVERDUE' : 'DRAWN'}</span>
-      </div>
       ${f.detail ? `<div class="mono-label">${esc(f.detail)}</div>` : ''}
       ${note(f.why, f.urgent ? 'is-red' : '')}
       <button class="btn is-wide btn-primary btn-shadow" data-a="drawStart">Start the check</button>
@@ -2927,6 +2927,10 @@ function viewCaptureReview() {
     <div class="stack-sm">
       <div class="spread"><span style="font:600 21px/1.2 var(--sans)">${esc(van ? van.reg : '—')} — ${esc(dmy(Store.today()))}</span></div>
       <div class="mono-label">${esc((S.cap.inspectorName || '') + (S.cap.secondName ? ' + ' + S.cap.secondName : '') || 'Unsigned')}</div>
+    </div>
+    <div class="verdict ${t.fail ? 'is-fail' : 'is-pass'}">
+      <span class="verdict-title">${t.fail ? (t.fail + (t.fail === 1 ? ' fault found' : ' faults found')) : 'All clear'}</span>
+      <span class="verdict-sub">${t.fail ? 'Defects are raised when a manager countersigns this check' : (van ? esc(van.reg) + ' passed every item walked' : 'Passed every item walked')}</span>
     </div>
     <div class="stats">
       ${stat(t.pass, 'Passed')}
