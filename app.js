@@ -20,7 +20,7 @@
    MUST equal VERSION in sw.js. They are separate files with no shared module,
    so this is a hand-kept pair — `.publish/stage.ps1` refuses to stage a build
    where the two disagree, which is what keeps it honest. Bump both together. */
-const BUILD = 'v31';
+const BUILD = 'v33';
 
 /* ---------------------------------------------------------------- data --- */
 
@@ -125,7 +125,12 @@ const RULES = [
 ];
 
 const FILTERS = ['All', 'Active only', 'Off road', 'Retired'];
+/* The Fleet screen's own chip filters — retired vans live in their own
+   "Removed vehicles" drawer, so they are not one of these. */
+const FLEET_FILTERS = ['All', 'Active', 'Off road'];
 const STATUS_META = { active: ['Active', 'ink'], offroad: ['Off road', 'red'], retired: ['Retired', 'faint'] };
+/* Background/foreground for a status pill, keyed by the tone in STATUS_META. */
+const STATUS_PILL = { ink: ['var(--ink-wash)', 'var(--ink)'], red: ['var(--red-wash)', 'var(--red)'], faint: ['var(--sunk)', 'var(--faint)'] };
 
 const REASONS = [
   'Photos too dark or blurred to judge',
@@ -209,14 +214,21 @@ const freshState = () => ({
      persisted only because everything in S is, and shut again by load(); the
      half-typed admin name rides along the same way and is cleared on load so a
      reload never re-opens onto a stranger's half-typed name. */
-  adminModal: false, adminName: ''
+  adminModal: false, adminName: '',
+  /* Fleet screen: the search box text and whether the "Removed vehicles"
+     (retired) drawer is open. Both are transient view state — load() clears
+     them so a reload never comes back mid-search or with the drawer sprung. */
+  fleetQuery: '', removedOpen: false,
+  /* The document add/edit sheet on a van (Stage 2b), and the full-screen
+     document viewer. null when closed. Gestures — cleared by load(). */
+  docSheet: null, docView: null
 });
 
 let S = freshState();
 
 /* Navigation: one global stack. Switching tabs resets it, so Back always
    walks the trail the user actually took inside the current tab. */
-let nav = { tab: 'queue', stack: [] };
+let nav = { tab: 'home', stack: [] };
 
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); } catch (_) { /* private mode */ }
@@ -245,6 +257,10 @@ function load() {
   S.adminModal = false;
   S.adminName = '';
   S.importSum = null;
+  S.fleetQuery = '';
+  S.removedOpen = false;
+  S.docSheet = null;
+  S.docView = null;
   /* A blob written before the draw existed has no `draw` at all, and a corrupt
      one can have anything. Repair rather than trust: every read below indexes
      into it, and a draw that throws would take the whole home screen with it. */
@@ -285,8 +301,24 @@ const sentence = s => { const t = String(s == null ? '' : s); return t.charAt(0)
 const ICON = {
   back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
   chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+  key: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0113 0"/></svg>',
+  gauge: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14l4-4"/><path d="M4 18a8 8 0 1116 0z"/></svg>',
+  doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg>',
+  camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>',
   tick: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  /* The draw — a die face. Stands for "the app picks the van", the one act the
+     Dashboard leads with. */
+  dice: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg>',
   queue: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h4l1.5 3h7L17 14h4"/><path d="M4.4 5.6A2 2 0 016.3 4.2h11.4a2 2 0 011.9 1.4L21 14v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4z"/></svg>',
+  /* Dashboard tab — the depot-at-a-glance home. Same glyph the old single work
+     tab wore, kept so the muscle memory of "home is bottom-left" survives. */
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h4l1.5 3h7L17 14h4"/><path d="M4.4 5.6A2 2 0 016.3 4.2h11.4a2 2 0 011.9 1.4L21 14v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4z"/></svg>',
+  /* Approvals tab — a clipboard with a tick, the countersign work. */
+  approvals: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/><path d="M8 6H6a1 1 0 00-1 1v13a1 1 0 001 1h12a1 1 0 001-1V7a1 1 0 00-1-1h-2"/><path d="M9 13.5l2 2 4-4"/></svg>',
   defects: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.9 18a2 2 0 001.7 3h16.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
   coverage: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
   vans: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7.5A1.5 1.5 0 013.5 6H14v10H3.5A1.5 1.5 0 012 14.5z"/><path d="M14 9h3.6a2 2 0 011.7 1l2.2 3.4a2 2 0 01.3 1.1V16H14z"/><circle cx="7" cy="18" r="2"/><circle cx="17.5" cy="18" r="2"/></svg>',
@@ -373,6 +405,71 @@ function helpSheet() {
       <button class="btn btn-quiet" data-a="closeHelp">Close</button>
     </div>`;
 }
+/* The add/edit-document bottom sheet, rendered from the top bar so it sits
+   above the screen (and outside the screen's push/pop transform). Only present
+   when S.docSheet is set. */
+function docSheet() {
+  const sh = S.docSheet;
+  if (!sh) return '';
+  const editing = !!sh.id;
+  const named = sh.name.trim().length > 0;
+  return `
+    <div class="sheet-scrim" data-a="closeDocSheet"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="${editing ? 'Edit document' : 'Add a document'}">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <h2 class="sheet-title">${editing ? 'Edit document' : 'Add a document'}</h2>
+      <label class="sheet-field">
+        <span class="field-label">Name *</span>
+        <input class="field-input" data-a="onDocName" data-fk="doc-name" value="${esc(sh.name)}"
+               type="text" maxlength="60" placeholder="e.g. Insurance certificate" aria-label="Document name">
+      </label>
+      <label class="sheet-field">
+        <span class="field-label">Renewal / due date</span>
+        <input class="${cls('field-input', !sh.dueOn && 'is-empty')}" data-a="onDocDate" data-fk="doc-date"
+               value="${esc(sh.dueOn)}" type="date" min="2000-01-01" max="2099-12-31" aria-label="Renewal or due date">
+      </label>
+      <label class="sheet-field">
+        <span class="field-label">Note</span>
+        <textarea class="field-input" data-a="onDocNote" data-fk="doc-note" rows="2"
+                  placeholder="Anything worth recording" aria-label="Note">${esc(sh.note)}</textarea>
+      </label>
+      <div class="doc-attach">
+        ${sh.photoId ? `<img class="doc-thumb" data-photo-id="${esc(sh.photoId)}" alt="Attachment preview">` : ''}
+        <button class="btn btn-quiet" data-a="attachDocPhoto">${sh.photoId ? 'Replace photo' : 'Attach a photo'}</button>
+        ${sh.photoId ? `<button class="btn btn-quiet" data-a="clearDocPhoto">Remove photo</button>` : ''}
+      </div>
+      <button class="btn ${named ? 'btn-primary' : 'btn-disabled'}" data-a="saveDoc" ${named ? '' : 'disabled'}>${editing ? 'Save document' : 'Add document'}</button>
+      ${editing ? `<button class="btn btn-outline-red" data-a="removeDoc" data-id="${esc(sh.id)}">Remove document</button>` : ''}
+      <button class="btn btn-quiet" data-a="closeDocSheet">Cancel</button>
+    </div>`;
+}
+
+/* The read-only document viewer: details, the attachment (tap to enlarge), and
+   the way through to Edit or Remove. */
+function docViewer() {
+  const dv = S.docView;
+  if (!dv) return '';
+  const van = Store.get('vans', dv.vanId);
+  const d = van && Array.isArray(van.docs) ? van.docs.find(x => x.id === dv.docId) : null;
+  if (!d) return '';
+  return `
+    <div class="sheet-scrim" data-a="closeDocView"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="Document">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <h2 class="sheet-title">${esc(d.name)}</h2>
+      ${d.dueOn ? `<div class="mono-label">Due ${esc(dmy(d.dueOn))}</div>` : ''}
+      ${d.note ? `<p class="sheet-p">${esc(d.note)}</p>` : ''}
+      ${d.photoId
+        ? `<img class="doc-view-img" data-photo-id="${esc(d.photoId)}" data-a="viewPhoto" alt="Document attachment">`
+        : note('No photo attached to this document.', 'is-faint')}
+      <div class="dock-row">
+        <button class="btn btn-quiet is-wide" data-a="editDoc" data-id="${esc(d.id)}">Edit</button>
+        <button class="btn btn-outline-red" data-a="removeDoc" data-id="${esc(d.id)}">Remove</button>
+      </div>
+      <button class="btn btn-quiet" data-a="closeDocView">Close</button>
+    </div>`;
+}
+
 /* Two different kinds of nothing, and they need opposite things said to them:
    a depot nobody has set up yet needs a way forward, a depot that is simply
    caught up needs reassurance — not a job it hasn't got. */
@@ -703,14 +800,16 @@ const capTally = () => {
 
 /* ------------------------------------------------------------- screens --- */
 
+/* The five-tab bottom bar of the SpotCheckPhone design. `home` is the role
+   dashboard, `approvals` is the countersign work (what the old single `queue`
+   tab used to carry alongside the draw), `defects` and `vans` are unchanged,
+   `more` is the setup hub. Labels are one word each — all five have to sit at
+   ~75px. */
 const TABS = [
-  /* The id stays `queue` — it is the tab key, the screen key and the target of
-     half a dozen "go here" buttons, and renaming it would ripple through all of
-     them to change nothing anybody sees. The LABEL is what people read, and one
-     word is all a tab has room for at 375px. */
-  { id: 'queue', label: 'Check', icon: 'queue' },
+  { id: 'home', label: 'Dashboard', icon: 'home' },
   { id: 'defects', label: 'Defects', icon: 'defects' },
-  { id: 'vans', label: 'Vans', icon: 'vans' },
+  { id: 'vans', label: 'Fleet', icon: 'vans' },
+  { id: 'approvals', label: 'Approvals', icon: 'approvals' },
   { id: 'more', label: 'More', icon: 'more' }
 ];
 
@@ -872,8 +971,8 @@ function viewDraw() {
      offering to start a check on it would be a lie. */
   if (!row) {
     return emptyState('That draw is over',
-      'The van that came up is no longer in the hat — it has been checked, retired or taken off the road since. Draw again from Vehicles Check.',
-      { label: 'Back to Vehicles Check', action: 'back' });
+      'The van that came up is no longer in the hat — it has been checked, retired or taken off the road since. Draw again from the Dashboard.',
+      { label: 'Back to Dashboard', action: 'back' });
   }
 
   const f = drawFacts(row, pool);
@@ -958,6 +1057,300 @@ function viewQueue() {
           : 'No checks have been submitted yet. One lands here the moment an inspector finishes theirs.', 'is-faint')}`;
 }
 
+/* --- Dashboard (home) --------------------------------------------------- */
+
+/* The role a dashboard is drawn for. Nobody signed in reads as an inspector —
+   the draw still works, and a sign-in nudge sits above it. */
+const currentRole = () => { const p = me(); return p ? p.role : 'inspector'; };
+
+const greeting = () => { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; };
+const firstName = name => String(name || '').trim().split(/\s+/)[0] || '';
+
+/* One inspector's throughput, from the check history — this week, this month,
+   and how many of the defects they raised are still open. */
+function myCheckStats() {
+  const id = me() && me().id;
+  const today = Store.today();
+  const mine = id ? doneChecks().filter(c => c.inspectorId === id) : [];
+  const within = n => mine.filter(c => { const d = dayOf(c.finishedAt); return d && daysBetween(d, today) <= n; }).length;
+  const defects = id ? openDefects().filter(d => { const c = Store.get('checks', d.checkId); return c && c.inspectorId === id; }).length : 0;
+  return { week: within(7), month: within(30), defects };
+}
+
+/* Fleet health for the manager/admin bar: OK vs overdue vs blocked. Overdue is
+   an active van past the force-days mark (or never walked); blocked is anything
+   off the road, which the draw can't reach. */
+function fleetHealth() {
+  const { forceDays } = drawRules();
+  const rows = coverageRows();
+  const total = rows.length;
+  const blocked = coverVans().filter(v => v.status === 'offroad').length;
+  const overdue = rows.filter(r => r.van.status === 'active' && (r.days === null || r.days > forceDays)).length;
+  const ok = Math.max(0, total - blocked - overdue);
+  const pct = n => total ? Math.round(n / total * 100) + '%' : '0%';
+  return { total, ok, overdue, blocked, forceDays, okPct: pct(ok), overduePct: pct(overdue), blockedPct: pct(blocked) };
+}
+
+/* Checks logged in the last seven days, per active inspector, as bar widths
+   relative to the busiest. */
+function inspectorWeek() {
+  const today = Store.today();
+  const crew = peopleList().filter(p => p.active && p.role !== 'admin');
+  const rows = crew.map(p => ({
+    name: firstName(p.name),
+    week: doneChecks().filter(c => c.inspectorId === p.id && (() => { const d = dayOf(c.finishedAt); return d && daysBetween(d, today) <= 7; })()).length
+  }));
+  const max = Math.max(1, ...rows.map(r => r.week));
+  return rows.map(r => ({ ...r, w: Math.round(r.week / max * 100) + '%' }));
+}
+
+/* The blue draw hero. A standing draw (or an empty hat) hands off to
+   drawBlock(), which already says the right thing; otherwise it is the one big
+   button that starts the whole flow. */
+function drawHero() {
+  const pool = drawPool();
+  const standing = pool.rows.filter(r => r.van.id === S.draw.vanId)[0] || null;
+  if (!pool.rows.length || standing) return drawBlock();
+  return `
+    <button class="dash-hero" data-a="drawVan">
+      <span class="dash-hero-icon">${ICON.dice}</span>
+      <span class="dash-hero-text">
+        <span class="dash-hero-title">Start a spot-check</span>
+        <span class="dash-hero-sub">The app draws the vehicle — you check it</span>
+      </span>
+      <span class="dash-hero-chev">${ICON.chev}</span>
+    </button>`;
+}
+
+/* Document reminders: MOT, plus every dated van document (rego, insurance,
+   service), overdue or due within 30 days, worst first. */
+function docReminders() {
+  const today = Store.today();
+  const out = [];
+  fleetList().filter(v => v.status !== 'retired').forEach(v => {
+    if (v.motDue) out.push({ vanId: v.id, reg: v.reg, label: 'MOT', dueOn: v.motDue, days: daysBetween(today, v.motDue) });
+    (Array.isArray(v.docs) ? v.docs : []).forEach(d => {
+      if (d.dueOn) out.push({ vanId: v.id, reg: v.reg, label: d.name, dueOn: d.dueOn, days: daysBetween(today, d.dueOn) });
+    });
+  });
+  return out.filter(r => r.days <= 30).sort((a, b) => a.days - b.days);
+}
+function dashReminders() {
+  const rows = docReminders();
+  if (!rows.length) return '';
+  const item = r => {
+    const overdue = r.days < 0;
+    const pill = overdue ? 'OVERDUE' : (r.days === 0 ? 'TODAY' : r.days + 'd');
+    return `
+      <button class="dash-rem-row" data-a="openVan" data-id="${esc(r.vanId)}">
+        <span class="dash-rem-dot" style="background:${overdue ? 'var(--red)' : 'var(--amber)'}"></span>
+        <span class="dash-rem-main">
+          <span class="dash-rem-title">${esc(r.reg + ' · ' + r.label)}</span>
+          <span class="dash-rem-sub">Due ${esc(dmy(r.dueOn))}</span>
+        </span>
+        <span class="dash-rem-pill" style="background:${overdue ? 'var(--red-wash)' : '#FBF3E0'};color:${overdue ? 'var(--red)' : 'var(--amber)'}">${esc(pill)}</span>
+      </button>`;
+  };
+  return `
+    <div class="card is-flat" style="padding:0;overflow:hidden;border:1px solid var(--line);background:var(--card)">
+      <div class="dash-rem-head">${monoLabel('Document reminders')}<span class="mono-num">${rows.length}</span></div>
+      <div class="dash-rem-list">${rows.map(item).join('')}</div>
+    </div>`;
+}
+
+function dashInspector() {
+  const s = myCheckStats();
+  const od = fleetHealth().overdue;
+  return `
+    <div class="dash-greeting">
+      <span class="dash-greet-line">${esc(greeting())}${me() ? '' : ' — pick who you are'}</span>
+      <span class="dash-greet-name">${esc(me() ? firstName(me().name) : depotName() || 'Depot')}</span>
+    </div>
+    ${drawHero()}
+    <div class="stat-grid">
+      ${stat(s.week, 'This week')}
+      ${stat(s.month, 'This month')}
+      ${stat(s.defects, 'Open defects', s.defects > 0)}
+    </div>
+    <div class="dash-section-label">Your work</div>
+    <button class="metric-row" data-a="tab" data-id="vans">
+      <span class="metric-row-badge${od ? ' is-alert' : ''}">${od}</span>
+      <span class="metric-row-main">
+        <span class="metric-row-title">Vehicles to check</span>
+        <span class="metric-row-sub">${od ? od + (od === 1 ? ' van past its window' : ' vans past their window') : 'All caught up — nothing overdue'}</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>`;
+}
+
+function dashManager() {
+  const pending = pendingChecks().length;
+  const h = fleetHealth();
+  const insp = inspectorWeek();
+  const { targetPerWeek } = drawRules();
+  const thisWeek = insp.reduce((a, r) => a + r.week, 0);
+  const heroBg = pending ? 'var(--ink)' : '#3A7D44';
+  const dirty = S.list && isDirty();
+  return `
+    <button class="dash-approve-hero" data-a="tab" data-id="approvals" style="background:${heroBg}">
+      <span class="dash-hero-icon">${ICON.tick}</span>
+      <span class="dash-hero-text">
+        <span class="dash-hero-title">${pending ? pending + (pending === 1 ? ' check to countersign' : ' checks to countersign') : 'All caught up'}</span>
+        <span class="dash-hero-sub">${pending ? 'Awaiting your signature' : 'Nothing waiting on your signature'}</span>
+      </span>
+      <span class="dash-hero-chev">${ICON.chev}</span>
+    </button>
+    ${dirty ? `
+    <div class="dash-section-label is-red">Needs you</div>
+    <button class="card is-dashed-red" data-a="openChecklist" style="flex-direction:row;align-items:center;gap:12px">
+      <span class="metric-row-badge is-alert">${changeCount()}</span>
+      <span class="metric-row-main">
+        <span class="metric-row-title">Checklist edits not live</span>
+        <span class="metric-row-sub">Publish so inspectors walk the new list</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>` : ''}
+    ${healthCard(h, thisWeek, targetPerWeek)}
+    <div class="card">
+      ${monoLabel('Checks this week by inspector')}
+      ${insp.length ? insp.map(r => `
+        <div class="insp-row">
+          <span class="insp-name">${esc(r.name)}</span>
+          <span class="insp-track"><span class="insp-bar" style="width:${r.w}"></span></span>
+          <span class="insp-count">${r.week}</span>
+        </div>`).join('') : note('No inspectors on the depot yet.', 'is-faint')}
+    </div>
+    <button class="btn btn-outline btn-hero-icon" data-a="drawVan">${ICON.dice}Run a spot-check</button>`;
+}
+
+function healthCard(h, thisWeek, target) {
+  return `
+    <div class="card">
+      <div class="spread">
+        ${monoLabel('Fleet health · ' + h.total + ' vehicles')}
+        ${typeof thisWeek === 'number' ? `<span class="mono-num is-ink">${thisWeek}/${target} this week</span>` : ''}
+      </div>
+      <div class="health-bar">
+        <span class="health-seg" style="width:${h.okPct};background:#3A7D44"></span>
+        <span class="health-seg" style="width:${h.overduePct};background:#5B6670"></span>
+        <span class="health-seg" style="width:${h.blockedPct};background:var(--red)"></span>
+      </div>
+      <div class="health-legend">
+        <span><span class="dot" style="background:#3A7D44"></span>OK ${h.ok}</span>
+        <span><span class="dot" style="background:#5B6670"></span>Overdue ${h.overdue}</span>
+        <span><span class="dot" style="background:var(--red)"></span>Blocked ${h.blocked}</span>
+      </div>
+    </div>`;
+}
+
+function dashAdmin() {
+  const h = fleetHealth();
+  const crew = peopleList().filter(p => p.active && p.role !== 'admin');
+  const mgr = crew.filter(p => p.role === 'manager').length;
+  const ins = crew.filter(p => p.role === 'inspector').length;
+  const dirty = S.list && isDirty();
+  return `
+    <div class="setup-card">
+      <span class="setup-kicker">DEPOT SETUP</span>
+      <span class="setup-name">${esc(depotName() || 'Unnamed depot')}</span>
+      <span class="setup-meta">${h.total} vehicles · ${crew.length} people · checklist v${checklistVersion()}</span>
+    </div>
+    <div class="metric-grid">
+      <button class="metric-tile" data-a="tab" data-id="vans">
+        <span class="metric-tile-num${h.overdue ? ' is-alert' : ''}">${h.overdue}</span>
+        <span class="metric-tile-cap">Coverage gaps</span>
+        <span class="metric-tile-sub">overdue · ${h.blocked} blocked</span>
+      </button>
+      <button class="metric-tile" data-a="openPeople">
+        <span class="metric-tile-num">${crew.length}</span>
+        <span class="metric-tile-cap">People</span>
+        <span class="metric-tile-sub">${mgr} mgr · ${ins} insp</span>
+      </button>
+    </div>
+    <button class="metric-row" data-a="openChecklist">
+      <span class="metric-row-icon">${ICON.tick}</span>
+      <span class="metric-row-main">
+        <span class="metric-row-title">Checklist v${checklistVersion()}</span>
+        <span class="metric-row-sub"${dirty ? ' style="color:var(--red)"' : ''}>${dirty ? changeCount() + ' unpublished change' + (changeCount() === 1 ? '' : 's') : liveSince()}</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>
+    <button class="metric-row" data-a="openSettings">
+      <span class="metric-row-icon">${ICON.settings}</span>
+      <span class="metric-row-main">
+        <span class="metric-row-title">Backup &amp; storage</span>
+        <span class="metric-row-sub">Save, restore or reset this depot</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>
+    <div class="dock-row">
+      <button class="btn btn-outline" data-a="openSettings">Depot config</button>
+      <button class="btn btn-outline" data-a="openPeople">Personnel</button>
+    </div>`;
+}
+
+function viewHome() {
+  /* No fleet is the one setup problem the dashboard surfaces whole: there is
+     nothing to draw and nothing to count. */
+  if (!fleetList().length) {
+    return emptyState('No fleet yet',
+      'Nobody can spot-check a van the depot doesn’t know about. Add the fleet first.',
+      { label: '+ Add a van', action: 'addFirstVan' });
+  }
+  const role = currentRole();
+  const draft = (role !== 'admin') ? capDraftCard() : '';
+  const body = role === 'admin' ? dashAdmin() : role === 'manager' ? dashManager() : dashInspector();
+  return `${draft}${body}${dashReminders()}`;
+}
+
+/* --- Approvals ---------------------------------------------------------- */
+
+/* The countersign work, split into what needs doing and what is done: checks
+   sent back for redo, checks awaiting a signature (plus any still open on a
+   phone), then the recently approved. This is the half the old single work tab
+   carried below the draw. */
+function viewApprovals() {
+  if (!fleetList().length) {
+    return emptyState('No fleet yet',
+      'Checks appear here once there is a fleet to walk and someone has submitted one.',
+      { label: '+ Add a van', action: 'addFirstVan' });
+  }
+
+  const open = queueChecks();
+  const returned = open.filter(c => c.decision === 'sent-back');
+  const pending = open.filter(c => !c.decision);
+  const flying = inFlightChecks();
+  const approved = historyChecks();
+
+  const returnedBlock = returned.length ? `
+    <div class="divider-label">${monoLabel('Sent back — waiting on the inspector', 'is-red')}</div>
+    ${returned.map(c => checkRow(c, false)).join('')}` : '';
+
+  const inFlight = flying.map(c => `
+    <div class="card is-dashed-amber">
+      <div class="spread">
+        <span class="reg" style="color:var(--amber)">${esc(c.reg)}</span>
+        <span class="flag is-amber">ON A PHONE</span>
+      </div>
+      <div class="mono-label is-amber">${esc('Started ' + hhmm(c.startedAt) + ' · ' + c.inspectorName)}</div>
+      ${note('Not yours to countersign yet — it arrives when the phone finds signal.', 'is-faint')}
+    </div>`).join('');
+
+  const waiting = pending.length || flying.length;
+  const pendingBlock = `
+    <div class="divider-label">${monoLabel('Awaiting your countersign' + (waiting ? ' — oldest first' : ''))}</div>
+    ${waiting
+      ? pending.map(c => checkRow(c)).join('') + inFlight
+        + note('Countersigning is what finishes the record, raises the job and schedules the re-check.', 'is-faint')
+      : note('Nothing is waiting on your countersign.', 'is-faint')}`;
+
+  const approvedBlock = approved.length ? `
+    <div class="divider-label">${monoLabel('Recently approved')}</div>
+    ${approved.slice(0, 12).map(c => checkRow(c, false)).join('')}` : '';
+
+  return `${returnedBlock}${pendingBlock}${approvedBlock}`;
+}
+
 /* --- Queue: one check --------------------------------------------------- */
 
 /* Where the defect job is being sent, and by when. Both are picked on the
@@ -1008,7 +1401,7 @@ function assignFields() {
 
 function viewCheck() {
   const sel = selectedCheck();
-  if (!sel) return `<div class="empty">${monoLabel('No check open')}${note('Pick a check from the countersign list on Vehicles Check.', 'is-faint')}</div>`;
+  if (!sel) return `<div class="empty">${monoLabel('No check open')}${note('Pick a check from the countersign list on Approvals.', 'is-faint')}</div>`;
 
   const decided = sel.decision;
   const fails = failedResults(sel);
@@ -1353,47 +1746,105 @@ function viewCoverage() {
 
 /* --- Vans: list --------------------------------------------------------- */
 
+/* A status pill, coloured by the van's status. */
+function statusPill(status) {
+  const [label, tone] = STATUS_META[status];
+  const [bg, fg] = STATUS_PILL[tone];
+  return `<span class="status-pill" style="background:${bg};color:${fg}">${esc(label)}</span>`;
+}
+
+/* One fleet-list row: reg, a sub-line (model + keyholder or last-checked), a
+   status pill and a chevron. */
+function vanRow(v) {
+  const dormant = v.status === 'retired';
+  const sub = [v.model || 'Model not set',
+    v.keyholder ? 'Keyholder ' + v.keyholder : ('last ' + (dmy(v.lastCheckOn) || 'never'))].join(' · ');
+  return `
+    <button class="${cls('card', dormant && 'is-dormant')}" data-a="openVan" data-id="${esc(v.id)}">
+      <div class="row-tap">
+        <div class="list-main">
+          <div class="spread">
+            <span class="${cls('reg', dormant && 'is-dormant')}">${esc(v.reg)}</span>
+            ${statusPill(v.status)}
+          </div>
+          <div class="list-sub">${esc(sub)}</div>
+        </div>
+        <span class="chev">${ICON.chev}</span>
+      </div>
+    </button>`;
+}
+
 function viewVans() {
   const fleet = fleetList();
 
-  /* An empty fleet is not "no results" — the filter chip and the count would
-     both be noise here. One instruction and one button instead. */
+  /* An empty fleet is not "no results" — the search, chips and count would all
+     be noise here. One instruction and one button (plus the FAB) instead. */
   if (!fleet.length) {
     return emptyState('No vans yet',
       'This is the list the draw picks from. Add each van once — reg, model, bay and MOT date.',
       { label: '+ Add a van', action: 'startAdd' });
   }
 
-  const filter = FILTERS[S.filterIdx];
-  const shown = fleet.filter(v => filter === 'All'
-    || (filter === 'Active only' && v.status === 'active')
-    || (filter === 'Off road' && v.status === 'offroad')
-    || (filter === 'Retired' && v.status === 'retired'));
+  const idx = S.filterIdx < FLEET_FILTERS.length ? S.filterIdx : 0;
+  const filter = FLEET_FILTERS[idx];
+  const q = S.fleetQuery.trim().toLowerCase();
+  const matches = v => !q || v.reg.toLowerCase().includes(q) || (v.model || '').toLowerCase().includes(q);
 
-  const rows = shown.map(v => {
-    const [label, tone] = STATUS_META[v.status];
-    return `
-      <button class="${cls('card', v.status === 'retired' && 'is-dormant')}" data-a="openVan" data-id="${esc(v.id)}">
-        <div class="row-tap">
-          <div class="list-main">
-            <div class="spread">
-              <span class="${cls('reg', v.status === 'retired' && 'is-dormant')}">${esc(v.reg)}</span>
-              <span class="flag is-${tone}">${esc(label)}</span>
+  const live = fleet.filter(v => v.status !== 'retired');
+  const retired = fleet.filter(v => v.status === 'retired');
+
+  const shown = live.filter(v =>
+    (filter === 'All' || (filter === 'Active' && v.status === 'active') || (filter === 'Off road' && v.status === 'offroad'))
+    && matches(v));
+  const activeCount = live.filter(v => v.status === 'active').length;
+
+  const chips = FLEET_FILTERS.map((f, i) =>
+    `<button class="chip ${i === idx ? 'is-on' : 'is-ghost'}" data-a="setFilter" data-id="${i}">${esc(f)}</button>`).join('');
+
+  const search = `
+    <div class="search">
+      <span class="search-icon">${ICON.search}</span>
+      <input class="search-input" data-a="onFleetQuery" data-fk="fleet-q" value="${esc(S.fleetQuery)}"
+             type="text" placeholder="Search plate or model…" aria-label="Search fleet">
+      ${q ? `<button class="search-clear" data-a="clearFleetQuery" aria-label="Clear search">${ICON.x}</button>` : ''}
+    </div>`;
+
+  const rows = shown.map(vanRow).join('')
+    || `<div class="empty">${note(q ? 'No vehicles match “' + S.fleetQuery.trim() + '”.' : 'No vehicles match this filter.', 'is-faint')}</div>`;
+
+  /* Removed (retired) vehicles, tucked into a drawer. They keep their history
+     and can be restored to the fleet. */
+  let removed = '';
+  if (retired.length) {
+    const list = S.removedOpen ? `
+      <div class="removed-list">
+        ${retired.map(v => `
+          <div class="removed-row">
+            <div class="list-main">
+              <span class="reg is-dormant">${esc(v.reg)}</span>
+              <div class="list-sub">${esc((v.model || 'Model not set') + (v.retiredOn ? ' · retired ' + dmy(v.retiredOn) : ''))}</div>
             </div>
-            <div class="list-sub">${esc((v.model || 'Model not set') + ' · last ' + (dmy(v.lastCheckOn) || 'never'))}</div>
-          </div>
-          <span class="chev">${ICON.chev}</span>
-        </div>
-      </button>`;
-  }).join('');
+            <button class="chip is-ghost" data-a="restoreVan" data-id="${esc(v.id)}">Restore</button>
+          </div>`).join('')}
+      </div>` : '';
+    removed = `
+      <div class="card is-flat" style="padding:0;overflow:hidden;border:1px solid var(--line);background:var(--card)">
+        <button class="removed-head" data-a="toggleRemoved">
+          <span class="removed-head-title">Removed vehicles</span>
+          <span class="removed-head-meta"><span class="mono-num">${retired.length}</span><span class="removed-chev" style="transform:rotate(${S.removedOpen ? '180deg' : '0deg'})">${ICON.chev}</span></span>
+        </button>
+        ${list}
+      </div>`;
+  }
 
   return `
-    <div class="divider-label">
-      ${monoLabel(shown.length + ' shown · ' + fleet.filter(v => v.status === 'active').length + ' in the draw')}
-      <button class="chip is-ghost" data-a="cycleFilter">${esc(filter)}</button>
+    <div class="fleet-top">
+      ${search}
+      <div class="chip-row">${chips}</div>
+      <span class="fleet-count">${shown.length} shown · ${activeCount} in the draw</span>
     </div>
-    <button class="btn-add" data-a="startAdd">+ Add a van</button>
-    ${rows || `<div class="empty">${note('No vans match this filter.', 'is-faint')}</div>`}`;
+    ${rows}
+    ${removed}`;
 }
 
 /* --- Vans: one van ------------------------------------------------------ */
@@ -1412,6 +1863,54 @@ function vanHistoryBlock(vanId) {
   return `
     <div class="divider-label">${monoLabel(rows.length + (rows.length === 1 ? ' check on record' : ' checks on record') + ' — newest first')}</div>
     ${rows.map(c => checkRow(c, false)).join('')}`;
+}
+
+/* One document row on a van — name, a sub-line (due date + attachment state),
+   opening the viewer. */
+function docRow(d) {
+  const sub = [d.dueOn ? 'Due ' + dmy(d.dueOn) : '', d.photoId ? 'Photo attached' : 'No attachment'].filter(Boolean).join(' · ');
+  return `
+    <button class="card doc-row" data-a="openDocView" data-id="${esc(d.id)}">
+      <span class="doc-icon">${ICON.doc}</span>
+      <span class="doc-main">
+        <span class="doc-name">${esc(d.name)}</span>
+        <span class="doc-sub">${esc(sub || 'Document')}</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>`;
+}
+
+/* The Documents section on a saved van: rego, insurance, service records —
+   each optionally carrying a dated renewal (which feeds the dashboard's
+   reminders) and a photo of the document. */
+function vanDocsBlock(van) {
+  const docs = Array.isArray(van.docs) ? van.docs : [];
+  return `
+    <div class="divider-label">${monoLabel('Documents' + (docs.length ? ' · ' + docs.length : ''))}</div>
+    ${docs.length
+      ? docs.map(docRow).join('')
+      : note('No documents on this vehicle yet — add the rego, insurance or service records.', 'is-faint')}
+    <button class="btn-add" data-a="openDocSheet" data-id="new">+ Add a document</button>`;
+}
+
+/* Open defects on this van, as a compact block that links through to the
+   Defects tab where they are actually worked. */
+function vanJobsBlock(vanId) {
+  const jobs = Store.where('defects', d => d.vanId === vanId && d.stage !== 'closed');
+  if (!jobs.length) return '';
+  return `
+    <div class="divider-label">${monoLabel(jobs.length + (jobs.length === 1 ? ' open job' : ' open jobs'), 'is-red')}</div>
+    <div class="card">
+      ${jobs.map(d => `
+        <div class="job-row">
+          <span class="job-sev" style="color:${d.severity === 'major' ? 'var(--red)' : 'var(--amber)'}">${ICON.defects}</span>
+          <span class="job-main">
+            <span class="job-name">${esc(d.name)}</span>
+            <span class="job-meta">${esc(defectMetaLine(d))}</span>
+          </span>
+        </div>`).join('')}
+      <button class="btn btn-quiet" data-a="tab" data-id="defects">Open the Defects list</button>
+    </div>`;
 }
 
 function viewVan() {
@@ -1473,18 +1972,35 @@ function viewVan() {
                aria-label="MOT due date">
       </label>
     </div>
+    <div class="field-row">
+      <label class="field">
+        <span class="field-label">Keyholder</span>
+        <input class="field-input" data-a="editKeyholder" data-fk="van-keyholder" value="${esc(draft.keyholder)}"
+               type="text" list="keyholder-names" maxlength="40" placeholder="Who holds it" aria-label="Keyholder">
+      </label>
+      <label class="field">
+        <span class="field-label">Odometer (km)</span>
+        <input class="field-input" data-a="editOdo" data-fk="van-odo" value="${esc(draft.odo)}"
+               type="text" inputmode="numeric" maxlength="9" placeholder="e.g. 84210" aria-label="Odometer reading">
+      </label>
+    </div>
     <!-- Suggestions, not a fixed list: a depot can run anything with wheels. -->
     <datalist id="van-models">${MODELS.map(m => `<option value="${esc(m)}"></option>`).join('')}</datalist>
+    <datalist id="keyholder-names">${peopleList().filter(p => p.active && p.role !== 'admin').map(p => `<option value="${esc(p.name)}"></option>`).join('')}</datalist>
     ${note(detailNote, 'is-faint')}
 
     <div class="divider-label">${monoLabel('Status — decides if it can be drawn')}</div>
     <div class="dock-row">${statusBtns}</div>
     <div class="card">${note(statusNote)}</div>
 
+    ${savedVan ? vanDocsBlock(savedVan) : ''}
+
     <div class="stats">
       ${stat(savedVan ? (dmy(savedVan.lastCheckOn) || 'never') : '—', 'Last checked')}
       ${stat(savedVan ? vanDefectCount(savedVan.id) : 0, 'Open defects', !!(savedVan && vanDefectCount(savedVan.id)))}
     </div>
+
+    ${savedVan ? vanJobsBlock(savedVan.id) : ''}
 
     ${note('Retiring a van keeps its history and past checks — it just stops being drawn.', 'is-faint')}
 
@@ -1702,7 +2218,7 @@ function viewSettings() {
     <div class="field-row">${ruleField(RULES[2])}${ruleField(RULES[3])}</div>
     ${badDraft.length
       ? note('Not saved yet — ' + badDraft.map(r => r.label.toLowerCase() + ' must be ' + r.min + '–' + r.max).join(', ') + '. The rule in force is unchanged until it is.', 'is-red')
-      : note('These decide what Vehicles Check can draw. A van is held out of the hat for ' + excludeDays +
+      : note('These decide what the Dashboard draw can pick. A van is held out of the hat for ' + excludeDays +
           (excludeDays === 1 ? ' day' : ' days') + ' after it is walked, and any van past ' + forceDays +
           ' days jumps ahead of everything else until somebody walks it. They apply to every phone in the depot, not just this one.', 'is-faint')}
     <div class="divider-label">${monoLabel('Backup')}</div>
@@ -2173,7 +2689,7 @@ function capBlockedState() {
 function viewCaptureStart() {
   const blocked = capBlockedState();
   if (blocked) return blocked;
-  if (!S.cap) return emptyState('No check open', 'Draw a van from Vehicles Check to start one.', { label: 'Go to Vehicles Check', action: 'tab', id: 'queue' });
+  if (!S.cap) return emptyState('No check open', 'Draw a van from the Dashboard to start one.', { label: 'Go to Dashboard', action: 'tab', id: 'home' });
 
   const c = S.cap;
   const vans = capVans();
@@ -2313,7 +2829,7 @@ function capCard(it) {
 }
 
 function viewCapture() {
-  if (!S.cap) return emptyState('No check open', 'Draw a van from Vehicles Check to start one.', { label: 'Go to Vehicles Check', action: 'tab', id: 'queue' });
+  if (!S.cap) return emptyState('No check open', 'Draw a van from the Dashboard to start one.', { label: 'Go to Dashboard', action: 'tab', id: 'home' });
 
   const secs = capSections();
   const sec = capSection();
@@ -2370,7 +2886,7 @@ function capPhotoGrid() {
 }
 
 function viewCaptureReview() {
-  if (!S.cap) return emptyState('No check open', 'Draw a van from Vehicles Check to start one.', { label: 'Go to Vehicles Check', action: 'tab', id: 'queue' });
+  if (!S.cap) return emptyState('No check open', 'Draw a van from the Dashboard to start one.', { label: 'Go to Dashboard', action: 'tab', id: 'home' });
 
   const t = capTally();
   const fails = capFails();
@@ -2447,7 +2963,11 @@ const SCREENS = {
      screen says where you are; now it has a job — draw a van, walk it — and
      the title says that instead. The depot's name moved to the head of More,
      which is where the depot itself is set up. */
-  queue: { title: 'Vehicles Check', view: viewQueue },
+  /* The role dashboard — depot at a glance, and where the draw now lives. */
+  home: { title: () => depotName() || 'Dashboard', view: viewHome },
+  /* The countersign work: awaiting approval, sent back, and recently approved.
+     This is the half the old single `queue` tab carried alongside the draw. */
+  approvals: { title: 'Approvals', view: viewApprovals },
   history: { title: 'History', view: viewHistory, back: true },
   check: { title: () => (selectedCheck() ? selectedCheck().reg : 'Check'), view: viewCheck, back: true },
   defects: { title: 'Open defects', view: viewDefects },
@@ -2604,7 +3124,9 @@ function renderTopbar(screen) {
     </div>
     ${menu}
     ${helpSheet()}
-    ${adminModal()}`;
+    ${adminModal()}
+    ${docSheet()}
+    ${docViewer()}`;
 }
 
 function renderTabbar() {
@@ -2613,12 +3135,20 @@ function renderTabbar() {
   return TABS.map(t => {
     const on = nav.tab === t.id;
     let badge = '';
-    if (t.id === 'queue' && pending) badge = `<span class="tab-badge">${pending}</span>`;
+    if (t.id === 'approvals' && pending) badge = `<span class="tab-badge">${pending}</span>`;
     if (t.id === 'defects' && defects) badge = `<span class="tab-badge is-quiet">${defects}</span>`;
     return `<button class="tab" data-a="tab" data-id="${t.id}" ${on ? 'aria-current="page"' : ''}>
       ${ICON[t.icon]}${badge}<span class="tab-label">${esc(t.label)}</span>
     </button>`;
   }).join('');
+}
+
+/* The contextual FAB target for a screen, or null for no button. Kept small on
+   purpose: only the screens with one unambiguous "add" get one. More targets
+   arrive with People and the other builders in later stages. */
+function fabConfig(screen) {
+  if (screen === 'vans') return { action: 'startAdd', label: 'Add a vehicle' };
+  return null;
 }
 
 /* An insert that creates a field the user is meant to type into immediately
@@ -2834,6 +3364,37 @@ function onPhotoPicked() {
   }).catch(() => toast('Could not read that photo — try again.'));
 }
 
+/* The document-attachment picker — its own reused file input, same pattern as
+   the walk-around camera. Downscales the same way, so a photographed rego
+   fits localStorage's neighbour, IndexedDB, without bloating it. */
+let docPhotoInput = null;
+function pickDocPhoto() {
+  if (!docPhotoInput) {
+    docPhotoInput = document.createElement('input');
+    docPhotoInput.type = 'file';
+    docPhotoInput.accept = 'image/*';
+    docPhotoInput.setAttribute('capture', 'environment');
+    docPhotoInput.style.display = 'none';
+    docPhotoInput.addEventListener('change', onDocPhotoPicked);
+    document.body.appendChild(docPhotoInput);
+  }
+  docPhotoInput.value = '';
+  docPhotoInput.click();
+}
+function onDocPhotoPicked() {
+  const file = docPhotoInput.files && docPhotoInput.files[0];
+  if (!file || !S.docSheet) return;
+  downscale(file).then(blob => Photos.put(blob)).then(id => {
+    if (!S.docSheet) { Photos.remove(id); return; }   // sheet closed while encoding
+    const prev = S.docSheet.photoId;
+    /* Drop the blob this one replaces — but only if it was itself a fresh,
+       unsaved stage. The document's originally-saved attachment stays until
+       the sheet is saved, so a cancel can fall back to it. */
+    if (prev && prev !== S.docSheet._orig) Photos.remove(prev);
+    set({ docSheet: { ...S.docSheet, photoId: id } });
+  }).catch(() => toast('Could not read that photo — try again.'));
+}
+
 /* Every photo id a discarded walk was holding, so its blobs don't outlive it.
    Call BEFORE cap is nulled. */
 function releaseCapPhotos() {
@@ -2895,6 +3456,22 @@ function render() {
   const gate = screen === 'setup' || (screen === 'whoami' && !me());
   tabbar.hidden = gate;
   tabbar.innerHTML = gate ? '' : renderTabbar();
+
+  /* The floating add button. Contextual and quiet: it appears only on screens
+     with one obvious "make a new thing" action, and never over a gate. */
+  const fab = document.getElementById('fab');
+  const fc = gate ? null : fabConfig(screen);
+  if (fc) {
+    fab.hidden = false;
+    fab.dataset.a = fc.action;
+    if (fc.id) fab.dataset.id = fc.id; else delete fab.dataset.id;
+    fab.setAttribute('aria-label', fc.label);
+    fab.innerHTML = ICON.plus;
+  } else {
+    fab.hidden = true;
+    delete fab.dataset.a;
+    delete fab.dataset.id;
+  }
 
   // A transition means a new screen: start at the top. Otherwise the user is
   // mid-task on the same screen and must not be yanked around.
@@ -3023,7 +3600,16 @@ const nextIn = (list, value) => {
   const i = list.indexOf(value);
   return list[(i < 0 ? 0 : i + 1) % list.length];
 };
-const vanDraft = v => ({ id: v.id, reg: v.reg, model: v.model, status: v.status, bay: v.bay || '', motDue: v.motDue || '' });
+const vanDraft = v => ({
+  id: v.id, reg: v.reg, model: v.model, status: v.status, bay: v.bay || '', motDue: v.motDue || '',
+  /* Keyholder and odometer are the design's van-record additions: who currently
+     holds the vehicle, and its last recorded reading. Both optional, both
+     default blank on an older record. `docs` (documents) rides on the record
+     but is edited through its own sheet, not the form draft — carried here only
+     so a save round-trips it untouched. */
+  keyholder: v.keyholder || '', keyholderSince: v.keyholderSince || '', odo: v.odo != null ? String(v.odo) : '',
+  docs: Array.isArray(v.docs) ? v.docs : []
+});
 
 /* The draft check. Names are copied in alongside the ids because a check is a
    document: it has to still read correctly in a year, after the person has
@@ -3247,7 +3833,7 @@ const ACTIONS = {
     // The draft is gone the moment it becomes a record — there is only one of it.
     S = { ...S, cap: null, selectedId: check.id };
     save();
-    goTab('queue');
+    goTab('home');
     toast(failed
       ? (van ? van.reg + ' submitted. ' : 'Submitted. ') + failed + (failed === 1 ? ' defect waiting on a countersign.' : ' defects waiting on a countersign.')
       : (van ? van.reg + ' submitted clean.' : 'Submitted clean.'));
@@ -3403,10 +3989,88 @@ const ACTIONS = {
 
   /* vans -------------------------------------------------------------- */
   cycleFilter: () => set({ filterIdx: cycle(S.filterIdx, FILTERS.length) }),
+  setFilter: (_, el) => set({ filterIdx: Number(el.dataset.id) || 0 }),
+  onFleetQuery: (_, el) => set({ fleetQuery: el.value }),
+  clearFleetQuery: () => set({ fleetQuery: '' }),
+  toggleRemoved: () => set({ removedOpen: !S.removedOpen }),
+  restoreVan: (_, el) => {
+    const v = Store.get('vans', el.dataset.id);
+    if (!v) return;
+    Store.update('vans', v.id, { status: 'active', retiredOn: '' });
+    toast(v.reg + ' restored to the fleet.');
+  },
+  editKeyholder: (_, el) => set({ draft: { ...S.draft, keyholder: el.value } }),
+  editOdo: (_, el) => set({ draft: { ...S.draft, odo: el.value.replace(/[^0-9]/g, '') } }),
+
+  /* documents ---------------------------------------------------------- */
+  openDocSheet: () => {
+    const vanId = S.draft.id;
+    if (!vanId) return;
+    set({ docSheet: { id: null, vanId, name: '', dueOn: '', note: '', photoId: '', _orig: '' } });
+  },
+  onDocName: (_, el) => { if (S.docSheet) set({ docSheet: { ...S.docSheet, name: el.value } }); },
+  /* onDocDate is handled in the input listener (native date caret), like editMot. */
+  onDocNote: (_, el) => { if (S.docSheet) set({ docSheet: { ...S.docSheet, note: el.value } }); },
+  attachDocPhoto: () => pickDocPhoto(),
+  clearDocPhoto: () => {
+    const sh = S.docSheet;
+    if (!sh) return;
+    if (sh.photoId && sh.photoId !== sh._orig) { photoUrls.delete(sh.photoId); Photos.remove(sh.photoId); }
+    set({ docSheet: { ...sh, photoId: '' } });
+  },
+  openDocView: (_, el) => set({ docView: { vanId: S.draft.id, docId: el.dataset.id } }),
+  closeDocView: () => set({ docView: null }),
+  editDoc: (_, el) => {
+    const vanId = (S.docView && S.docView.vanId) || S.draft.id;
+    const van = Store.get('vans', vanId);
+    const d = van && Array.isArray(van.docs) ? van.docs.find(x => x.id === el.dataset.id) : null;
+    if (!d) return;
+    set({ docView: null, docSheet: { id: d.id, vanId, name: d.name, dueOn: d.dueOn || '', note: d.note || '', photoId: d.photoId || '', _orig: d.photoId || '' } });
+  },
+  closeDocSheet: () => {
+    const sh = S.docSheet;
+    /* A photo attached but never saved is an orphan — drop it, unless it is the
+       document's own already-saved attachment. */
+    if (sh && sh.photoId && sh.photoId !== sh._orig) { photoUrls.delete(sh.photoId); Photos.remove(sh.photoId); }
+    set({ docSheet: null });
+  },
+  saveDoc: () => {
+    const sh = S.docSheet;
+    if (!sh) return;
+    const name = sh.name.trim();
+    if (!name) return toast('Give the document a name.');
+    const van = Store.get('vans', sh.vanId);
+    if (!van) return;
+    const docs = Array.isArray(van.docs) ? van.docs.slice() : [];
+    if (sh.id) {
+      const i = docs.findIndex(d => d.id === sh.id);
+      if (i >= 0) {
+        /* Editing away from an old attachment orphans the old blob. */
+        if (sh._orig && sh._orig !== sh.photoId) { photoUrls.delete(sh._orig); Photos.remove(sh._orig); }
+        docs[i] = { ...docs[i], name, dueOn: sh.dueOn, note: sh.note.trim(), photoId: sh.photoId };
+      }
+    } else {
+      docs.push({ id: 'doc' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, dueOn: sh.dueOn, note: sh.note.trim(), photoId: sh.photoId, addedOn: Store.today() });
+    }
+    Store.update('vans', van.id, { docs });
+    set({ docSheet: null });
+    toast(sh.id ? 'Document saved.' : name + ' added.');
+  },
+  removeDoc: (_, el) => {
+    const vanId = (S.docSheet && S.docSheet.vanId) || (S.docView && S.docView.vanId) || S.draft.id;
+    const van = Store.get('vans', vanId);
+    if (!van) return;
+    const docs = (van.docs || []).filter(d => d.id !== el.dataset.id);
+    const gone = (van.docs || []).find(d => d.id === el.dataset.id);
+    if (gone && gone.photoId) { photoUrls.delete(gone.photoId); Photos.remove(gone.photoId); }
+    Store.update('vans', van.id, { docs });
+    set({ docSheet: null, docView: null });
+    toast('Document removed.');
+  },
   startAdd: () => {
     // Blank, not pre-filled: a guessed model that nobody corrects is worse
     // than a gap somebody notices.
-    S = { ...S, adding: true, vanSelId: null, draft: { id: null, reg: '', model: '', status: 'active', bay: '', motDue: '' } };
+    S = { ...S, adding: true, vanSelId: null, draft: { id: null, reg: '', model: '', status: 'active', bay: '', motDue: '', keyholder: '', keyholderSince: '', odo: '', docs: [] } };
     save();
     push('van');
   },
@@ -3460,13 +4124,22 @@ const ACTIONS = {
     const d = S.draft;
     // Trim on the way to disk, not on every keystroke — typing a space
     // mid-name is normal and shouldn't fight the caret.
+    const kh = (d.keyholder || '').trim();
+    const prev = d.id ? Store.get('vans', d.id) : null;
+    /* Stamp who-since only when the holder actually changes, so a save that
+       leaves the keyholder alone doesn't reset the date. */
+    const keyholderSince = kh
+      ? ((prev && prev.keyholder === kh && prev.keyholderSince) ? prev.keyholderSince : (d.keyholderSince || Store.today()))
+      : '';
+    const odoNum = String(d.odo || '').replace(/[^0-9]/g, '');
     const fields = {
       reg: d.reg.trim(), model: d.model.trim(), status: d.status,
-      bay: d.bay.trim(), motDue: d.motDue
+      bay: d.bay.trim(), motDue: d.motDue,
+      keyholder: kh, keyholderSince, odo: odoNum === '' ? '' : Number(odoNum)
     };
     if (!fields.reg) return;
     if (S.adding) {
-      const v = Store.insert('vans', { ...fields, lastCheckOn: '' });
+      const v = Store.insert('vans', { ...fields, lastCheckOn: '', docs: [] });
       /* Back to the fleet list, not the van that was just typed: the form has
          nothing left to say about it, and the list is the proof it landed. */
       set({ adding: false, vanSelId: v.id, draft: { ...d, ...fields, id: v.id } });
@@ -3838,6 +4511,12 @@ document.addEventListener('input', e => {
     if (was !== !!el.value) invalidate();
     return;
   }
+  if (el.dataset.a === 'onDocDate') {
+    const was = !!(S.docSheet && S.docSheet.dueOn);
+    if (S.docSheet) { S = { ...S, docSheet: { ...S.docSheet, dueOn: el.value } }; save(); }
+    if (was !== !!el.value) invalidate();
+    return;
+  }
   handle(e);
 });
 
@@ -3899,6 +4578,13 @@ function gcPhotos() {
     if (c.photos) Object.keys(c.photos).forEach(k => { if (c.photos[k]) keep.push(c.photos[k]); });
     if (c.signatureId) keep.push(c.signatureId);   // the countersignature blob
   });
+  /* Van document attachments live in the same blob store — keep them, or the
+     next boot would garbage-collect every scanned rego and insurance doc. */
+  Store.all('vans').forEach(v => {
+    if (Array.isArray(v.docs)) v.docs.forEach(d => { if (d && d.photoId) keep.push(d.photoId); });
+  });
+  /* A document attachment staged in the open sheet but not yet saved. */
+  if (S.docSheet && S.docSheet.photoId) keep.push(S.docSheet.photoId);
   if (S.cap && S.cap.photos) {
     Object.keys(S.cap.photos).forEach(k => { if (S.cap.photos[k]) keep.push(S.cap.photos[k]); });
   }

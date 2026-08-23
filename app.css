@@ -1418,3 +1418,197 @@ button:active,
 }
 @keyframes push { from { opacity: 0; transform: translateX(14px); } }
 @keyframes pop  { from { opacity: 0; transform: translateX(-14px); } }
+
+/* ======================================================================== */
+/* Dashboard (home), Approvals and the floating add button (SpotCheckPhone). */
+/* ======================================================================== */
+
+/* Greeting block at the head of the inspector dashboard. */
+.dash-greeting { display: flex; flex-direction: column; gap: 2px; }
+.dash-greet-line { font: 500 13px/1.3 var(--sans); color: var(--muted); }
+.dash-greet-name { font: 700 24px/1.2 var(--sans); letter-spacing: -.01em; color: var(--text); }
+
+/* The big blue "Start a spot-check" hero, and the manager's approvals hero
+   (which sets its own background inline — blue when work waits, green when
+   clear). Same shape. */
+.dash-hero, .dash-approve-hero {
+  text-align: left; border: 0; border-radius: 18px; padding: 18px;
+  background: var(--ink); color: #fff;
+  display: flex; align-items: center; gap: 14px;
+}
+.dash-approve-hero { border-radius: 16px; padding: 16px; }
+.dash-hero:active, .dash-approve-hero:active { opacity: .9; }
+.dash-hero-icon {
+  flex: none; width: 52px; height: 52px; border-radius: 14px;
+  background: rgba(255,255,255,.15); display: grid; place-items: center;
+}
+.dash-approve-hero .dash-hero-icon { width: 46px; height: 46px; border-radius: 12px; }
+.dash-hero-icon svg { width: 27px; height: 27px; }
+.dash-approve-hero .dash-hero-icon svg { width: 24px; height: 24px; }
+.dash-hero-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.dash-hero-title { font: 700 19px/1.15 var(--sans); }
+.dash-approve-hero .dash-hero-title { font-size: 18px; }
+.dash-hero-sub { font: 400 13px/1.35 var(--sans); opacity: .84; }
+.dash-hero-chev { flex: none; opacity: .85; display: flex; }
+.dash-hero-chev svg { width: 18px; height: 18px; }
+
+/* Small caps-ish section label between dashboard blocks. */
+.dash-section-label {
+  font: 600 12px/1.35 var(--sans); letter-spacing: .03em; text-transform: uppercase;
+  color: var(--faint); padding-top: 2px;
+}
+.dash-section-label.is-red { color: var(--red); text-transform: none; letter-spacing: 0; font-size: 12.5px; }
+
+/* Three-up stat tiles (reuses .stat). */
+.stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+
+/* Two-up metric tiles on the admin dashboard. */
+.metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+.metric-tile {
+  text-align: left; background: var(--card); border: 1px solid var(--line);
+  border-radius: 14px; box-shadow: var(--shadow-card); padding: 14px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.metric-tile:active { opacity: .6; }
+.metric-tile-num { font: 700 26px/1 var(--sans); color: var(--text); }
+.metric-tile-num.is-alert { color: var(--red); }
+.metric-tile-cap { font: 500 12.5px/1.3 var(--sans); color: var(--muted); }
+.metric-tile-sub { font: 400 11px/1.3 var(--sans); color: var(--faint); }
+
+/* A tappable row: leading badge or icon, title + sub, trailing chevron. */
+.metric-row {
+  text-align: left; background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--r-card); box-shadow: var(--shadow-card); padding: 14px;
+  min-height: 64px; display: flex; align-items: center; gap: 13px; width: 100%;
+}
+.metric-row:active { opacity: .6; }
+.metric-row-badge {
+  flex: none; width: 40px; height: 40px; border-radius: 11px;
+  background: var(--ink-wash); color: var(--ink);
+  display: grid; place-items: center; font: 700 16px/1 var(--sans);
+}
+.metric-row-badge.is-alert { background: var(--red-wash); color: var(--red); }
+.metric-row-icon { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--ink-wash); color: var(--ink); display: grid; place-items: center; }
+.metric-row-icon svg { width: 20px; height: 20px; }
+.metric-row-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.metric-row-title { font: 600 15px/1.25 var(--sans); color: var(--text); }
+.metric-row-sub { font: 400 12.5px/1.35 var(--sans); color: var(--muted); }
+
+/* Fleet-health bar. */
+.mono-num { font: 600 12px/1 var(--mono); color: var(--muted); }
+.mono-num.is-ink { color: var(--ink); }
+.health-bar { display: flex; height: 14px; border-radius: var(--r-chip); overflow: hidden; background: var(--line-soft); }
+.health-seg { display: block; height: 100%; }
+.health-legend { display: flex; flex-wrap: wrap; gap: 12px; }
+.health-legend span { display: flex; align-items: center; gap: 6px; font: 500 12px/1 var(--sans); color: var(--body); }
+.health-legend .dot { width: 9px; height: 9px; border-radius: 2px; }
+
+/* Checks-by-inspector rows. */
+.insp-row { display: flex; align-items: center; gap: 10px; }
+.insp-name { flex: none; width: 58px; font: 500 12.5px/1.3 var(--sans); color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.insp-track { flex: 1 1 auto; height: 9px; border-radius: var(--r-chip); background: var(--line-soft); overflow: hidden; }
+.insp-bar { display: block; height: 100%; border-radius: var(--r-chip); background: var(--ink); }
+.insp-count { flex: none; width: 20px; text-align: right; font: 600 12px/1 var(--mono); color: var(--body); }
+
+/* Dark depot-setup card on the admin dashboard. */
+.setup-card { background: var(--text); border-radius: var(--r-card); padding: 16px; color: #fff; display: flex; flex-direction: column; gap: 6px; }
+.setup-kicker { font: 500 12px/1.3 var(--mono); opacity: .6; letter-spacing: .04em; }
+.setup-name { font: 700 22px/1.15 var(--sans); }
+.setup-meta { font: 400 12.5px/1.35 var(--mono); opacity: .75; }
+
+/* Button with a leading icon (Run a spot-check). */
+.btn-hero-icon { gap: 9px; }
+.btn-hero-icon svg { width: 19px; height: 19px; flex: none; }
+
+/* Document-reminders card. */
+.dash-rem-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 13px 14px; }
+.dash-rem-list { border-top: 1px solid var(--line-soft); }
+.dash-rem-row { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--line-soft); padding: 11px 14px; display: flex; align-items: center; gap: 11px; text-align: left; }
+.dash-rem-row:last-child { border-bottom: 0; }
+.dash-rem-row:active { opacity: .6; }
+.dash-rem-dot { flex: none; width: 8px; height: 8px; border-radius: var(--r-chip); }
+.dash-rem-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dash-rem-title { font: 600 14px/1.3 var(--sans); color: var(--text); }
+.dash-rem-sub { font: 400 11.5px/1.2 var(--sans); color: var(--muted); }
+.dash-rem-pill { flex: none; font: 700 10px/1 var(--mono); padding: 5px 8px; border-radius: 6px; }
+
+/* Floating add button — above the tab bar, out of the way of the thumb rest. */
+.fab {
+  position: fixed; z-index: 30;
+  right: calc(var(--sar) + 18px);
+  bottom: calc(var(--tabbar-h) + var(--sab) + 18px);
+  width: 56px; height: 56px; border-radius: var(--r-chip);
+  background: var(--ink); color: #fff; border: 0;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 10px 24px -6px rgba(27, 77, 122, .55);
+}
+.fab[hidden] { display: none; }
+.fab:active { opacity: .85; }
+.fab svg { width: 26px; height: 26px; }
+
+/* Five tabs are tighter than four — let the labels shrink a touch rather than
+   wrap or clip "Dashboard"/"Approvals". */
+.tabbar { grid-auto-columns: 1fr; }
+.tab-label { font-size: 10.5px; letter-spacing: -.01em; }
+
+/* ======================================================================== */
+/* Fleet list + Van detail (Stage 2).                                       */
+/* ======================================================================== */
+
+.fleet-top { display: flex; flex-direction: column; gap: 10px; }
+.fleet-count { font: 400 12px/1.3 var(--sans); color: var(--faint); }
+
+/* Search box. */
+.search { position: relative; display: flex; align-items: center; }
+.search-icon { position: absolute; left: 11px; color: var(--faint); display: flex; pointer-events: none; }
+.search-icon svg { width: 16px; height: 16px; }
+.search-input {
+  width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 12px;
+  padding: 0 36px; font: 400 14.5px/1.3 var(--sans); color: var(--text);
+  background: var(--sunk); outline: none; appearance: none;
+}
+.search-clear {
+  position: absolute; right: 4px; width: 34px; height: 34px; border-radius: var(--r-chip);
+  display: flex; align-items: center; justify-content: center; color: var(--faint);
+  background: transparent; border: 0;
+}
+.search-clear svg { width: 15px; height: 15px; }
+
+/* Status pill on a fleet row. */
+.status-pill { flex: none; font: 700 10px/1 var(--mono); padding: 5px 8px; border-radius: 6px; white-space: nowrap; }
+
+/* Removed-vehicles drawer. */
+.removed-head { width: 100%; background: transparent; border: 0; padding: 13px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; }
+.removed-head-title { font: 600 13px/1.3 var(--sans); color: var(--text); }
+.removed-head-meta { display: flex; align-items: center; gap: 8px; }
+.removed-chev { width: 15px; height: 15px; flex: none; color: var(--faint); display: flex; transition: transform .15s; }
+.removed-chev svg { width: 15px; height: 15px; }
+.removed-list { border-top: 1px solid var(--line-soft); }
+.removed-row { border-bottom: 1px solid var(--line-soft); padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+.removed-row:last-child { border-bottom: 0; }
+.removed-row .list-main { flex: 1 1 auto; min-width: 0; }
+
+/* Open-jobs block on a van. */
+.job-row { display: flex; align-items: flex-start; gap: 10px; padding: 4px 0; }
+.job-sev { flex: none; display: flex; }
+.job-sev svg { width: 18px; height: 18px; }
+.job-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.job-name { font: 500 14px/1.3 var(--sans); color: var(--text); }
+.job-meta { font: 400 12px/1.35 var(--sans); color: var(--muted); }
+
+/* ---------- Van documents (Stage 2b) ----------------------------------- */
+.doc-row { flex-direction: row; align-items: center; gap: 12px; text-align: left; }
+.doc-icon { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--ink-wash); color: var(--ink); display: grid; place-items: center; }
+.doc-icon svg { width: 20px; height: 20px; }
+.doc-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.doc-name { font: 600 15px/1.25 var(--sans); color: var(--text); }
+.doc-sub { font: 400 12.5px/1.35 var(--sans); color: var(--muted); }
+
+/* Sheet form field (label above control). */
+.sheet-field { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.sheet textarea.field-input { resize: none; min-height: 62px; padding-top: 10px; padding-bottom: 10px; line-height: 1.4; }
+
+.doc-attach { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 4px; }
+.doc-attach .btn { flex: 0 0 auto; min-height: 44px; padding: 10px 16px; }
+.doc-thumb { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; border: 1px solid var(--line); background: var(--sunk); }
+.doc-view-img { width: 100%; border-radius: 12px; border: 1px solid var(--line); background: var(--sunk); }
