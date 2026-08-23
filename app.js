@@ -125,7 +125,12 @@ const RULES = [
 ];
 
 const FILTERS = ['All', 'Active only', 'Off road', 'Retired'];
+/* The Fleet screen's own chip filters — retired vans live in their own
+   "Removed vehicles" drawer, so they are not one of these. */
+const FLEET_FILTERS = ['All', 'Active', 'Off road'];
 const STATUS_META = { active: ['Active', 'ink'], offroad: ['Off road', 'red'], retired: ['Retired', 'faint'] };
+/* Background/foreground for a status pill, keyed by the tone in STATUS_META. */
+const STATUS_PILL = { ink: ['var(--ink-wash)', 'var(--ink)'], red: ['var(--red-wash)', 'var(--red)'], faint: ['var(--sunk)', 'var(--faint)'] };
 
 const REASONS = [
   'Photos too dark or blurred to judge',
@@ -209,7 +214,14 @@ const freshState = () => ({
      persisted only because everything in S is, and shut again by load(); the
      half-typed admin name rides along the same way and is cleared on load so a
      reload never re-opens onto a stranger's half-typed name. */
-  adminModal: false, adminName: ''
+  adminModal: false, adminName: '',
+  /* Fleet screen: the search box text and whether the "Removed vehicles"
+     (retired) drawer is open. Both are transient view state — load() clears
+     them so a reload never comes back mid-search or with the drawer sprung. */
+  fleetQuery: '', removedOpen: false,
+  /* The document add/edit sheet on a van (Stage 2b), and the full-screen
+     document viewer. null when closed. Gestures — cleared by load(). */
+  docSheet: null, docView: null
 });
 
 let S = freshState();
@@ -245,6 +257,10 @@ function load() {
   S.adminModal = false;
   S.adminName = '';
   S.importSum = null;
+  S.fleetQuery = '';
+  S.removedOpen = false;
+  S.docSheet = null;
+  S.docView = null;
   /* A blob written before the draw existed has no `draw` at all, and a corrupt
      one can have anything. Repair rather than trust: every read below indexes
      into it, and a draw that throws would take the whole home screen with it. */
@@ -286,6 +302,13 @@ const ICON = {
   back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
   chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
   plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+  key: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0113 0"/></svg>',
+  gauge: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14l4-4"/><path d="M4 18a8 8 0 1116 0z"/></svg>',
+  doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg>',
+  camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>',
   tick: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
   /* The draw — a die face. Stands for "the app picks the van", the one act the
      Dashboard leads with. */
@@ -1656,47 +1679,105 @@ function viewCoverage() {
 
 /* --- Vans: list --------------------------------------------------------- */
 
+/* A status pill, coloured by the van's status. */
+function statusPill(status) {
+  const [label, tone] = STATUS_META[status];
+  const [bg, fg] = STATUS_PILL[tone];
+  return `<span class="status-pill" style="background:${bg};color:${fg}">${esc(label)}</span>`;
+}
+
+/* One fleet-list row: reg, a sub-line (model + keyholder or last-checked), a
+   status pill and a chevron. */
+function vanRow(v) {
+  const dormant = v.status === 'retired';
+  const sub = [v.model || 'Model not set',
+    v.keyholder ? 'Keyholder ' + v.keyholder : ('last ' + (dmy(v.lastCheckOn) || 'never'))].join(' · ');
+  return `
+    <button class="${cls('card', dormant && 'is-dormant')}" data-a="openVan" data-id="${esc(v.id)}">
+      <div class="row-tap">
+        <div class="list-main">
+          <div class="spread">
+            <span class="${cls('reg', dormant && 'is-dormant')}">${esc(v.reg)}</span>
+            ${statusPill(v.status)}
+          </div>
+          <div class="list-sub">${esc(sub)}</div>
+        </div>
+        <span class="chev">${ICON.chev}</span>
+      </div>
+    </button>`;
+}
+
 function viewVans() {
   const fleet = fleetList();
 
-  /* An empty fleet is not "no results" — the filter chip and the count would
-     both be noise here. One instruction and one button instead. */
+  /* An empty fleet is not "no results" — the search, chips and count would all
+     be noise here. One instruction and one button (plus the FAB) instead. */
   if (!fleet.length) {
     return emptyState('No vans yet',
       'This is the list the draw picks from. Add each van once — reg, model, bay and MOT date.',
       { label: '+ Add a van', action: 'startAdd' });
   }
 
-  const filter = FILTERS[S.filterIdx];
-  const shown = fleet.filter(v => filter === 'All'
-    || (filter === 'Active only' && v.status === 'active')
-    || (filter === 'Off road' && v.status === 'offroad')
-    || (filter === 'Retired' && v.status === 'retired'));
+  const idx = S.filterIdx < FLEET_FILTERS.length ? S.filterIdx : 0;
+  const filter = FLEET_FILTERS[idx];
+  const q = S.fleetQuery.trim().toLowerCase();
+  const matches = v => !q || v.reg.toLowerCase().includes(q) || (v.model || '').toLowerCase().includes(q);
 
-  const rows = shown.map(v => {
-    const [label, tone] = STATUS_META[v.status];
-    return `
-      <button class="${cls('card', v.status === 'retired' && 'is-dormant')}" data-a="openVan" data-id="${esc(v.id)}">
-        <div class="row-tap">
-          <div class="list-main">
-            <div class="spread">
-              <span class="${cls('reg', v.status === 'retired' && 'is-dormant')}">${esc(v.reg)}</span>
-              <span class="flag is-${tone}">${esc(label)}</span>
+  const live = fleet.filter(v => v.status !== 'retired');
+  const retired = fleet.filter(v => v.status === 'retired');
+
+  const shown = live.filter(v =>
+    (filter === 'All' || (filter === 'Active' && v.status === 'active') || (filter === 'Off road' && v.status === 'offroad'))
+    && matches(v));
+  const activeCount = live.filter(v => v.status === 'active').length;
+
+  const chips = FLEET_FILTERS.map((f, i) =>
+    `<button class="chip ${i === idx ? 'is-on' : 'is-ghost'}" data-a="setFilter" data-id="${i}">${esc(f)}</button>`).join('');
+
+  const search = `
+    <div class="search">
+      <span class="search-icon">${ICON.search}</span>
+      <input class="search-input" data-a="onFleetQuery" data-fk="fleet-q" value="${esc(S.fleetQuery)}"
+             type="text" placeholder="Search plate or model…" aria-label="Search fleet">
+      ${q ? `<button class="search-clear" data-a="clearFleetQuery" aria-label="Clear search">${ICON.x}</button>` : ''}
+    </div>`;
+
+  const rows = shown.map(vanRow).join('')
+    || `<div class="empty">${note(q ? 'No vehicles match “' + S.fleetQuery.trim() + '”.' : 'No vehicles match this filter.', 'is-faint')}</div>`;
+
+  /* Removed (retired) vehicles, tucked into a drawer. They keep their history
+     and can be restored to the fleet. */
+  let removed = '';
+  if (retired.length) {
+    const list = S.removedOpen ? `
+      <div class="removed-list">
+        ${retired.map(v => `
+          <div class="removed-row">
+            <div class="list-main">
+              <span class="reg is-dormant">${esc(v.reg)}</span>
+              <div class="list-sub">${esc((v.model || 'Model not set') + (v.retiredOn ? ' · retired ' + dmy(v.retiredOn) : ''))}</div>
             </div>
-            <div class="list-sub">${esc((v.model || 'Model not set') + ' · last ' + (dmy(v.lastCheckOn) || 'never'))}</div>
-          </div>
-          <span class="chev">${ICON.chev}</span>
-        </div>
-      </button>`;
-  }).join('');
+            <button class="chip is-ghost" data-a="restoreVan" data-id="${esc(v.id)}">Restore</button>
+          </div>`).join('')}
+      </div>` : '';
+    removed = `
+      <div class="card is-flat" style="padding:0;overflow:hidden;border:1px solid var(--line);background:var(--card)">
+        <button class="removed-head" data-a="toggleRemoved">
+          <span class="removed-head-title">Removed vehicles</span>
+          <span class="removed-head-meta"><span class="mono-num">${retired.length}</span><span class="removed-chev" style="transform:rotate(${S.removedOpen ? '180deg' : '0deg'})">${ICON.chev}</span></span>
+        </button>
+        ${list}
+      </div>`;
+  }
 
   return `
-    <div class="divider-label">
-      ${monoLabel(shown.length + ' shown · ' + fleet.filter(v => v.status === 'active').length + ' in the draw')}
-      <button class="chip is-ghost" data-a="cycleFilter">${esc(filter)}</button>
+    <div class="fleet-top">
+      ${search}
+      <div class="chip-row">${chips}</div>
+      <span class="fleet-count">${shown.length} shown · ${activeCount} in the draw</span>
     </div>
-    <button class="btn-add" data-a="startAdd">+ Add a van</button>
-    ${rows || `<div class="empty">${note('No vans match this filter.', 'is-faint')}</div>`}`;
+    ${rows}
+    ${removed}`;
 }
 
 /* --- Vans: one van ------------------------------------------------------ */
@@ -1715,6 +1796,26 @@ function vanHistoryBlock(vanId) {
   return `
     <div class="divider-label">${monoLabel(rows.length + (rows.length === 1 ? ' check on record' : ' checks on record') + ' — newest first')}</div>
     ${rows.map(c => checkRow(c, false)).join('')}`;
+}
+
+/* Open defects on this van, as a compact block that links through to the
+   Defects tab where they are actually worked. */
+function vanJobsBlock(vanId) {
+  const jobs = Store.where('defects', d => d.vanId === vanId && d.stage !== 'closed');
+  if (!jobs.length) return '';
+  return `
+    <div class="divider-label">${monoLabel(jobs.length + (jobs.length === 1 ? ' open job' : ' open jobs'), 'is-red')}</div>
+    <div class="card">
+      ${jobs.map(d => `
+        <div class="job-row">
+          <span class="job-sev" style="color:${d.severity === 'major' ? 'var(--red)' : 'var(--amber)'}">${ICON.defects}</span>
+          <span class="job-main">
+            <span class="job-name">${esc(d.name)}</span>
+            <span class="job-meta">${esc(defectMetaLine(d))}</span>
+          </span>
+        </div>`).join('')}
+      <button class="btn btn-quiet" data-a="tab" data-id="defects">Open the Defects list</button>
+    </div>`;
 }
 
 function viewVan() {
@@ -1776,8 +1877,21 @@ function viewVan() {
                aria-label="MOT due date">
       </label>
     </div>
+    <div class="field-row">
+      <label class="field">
+        <span class="field-label">Keyholder</span>
+        <input class="field-input" data-a="editKeyholder" data-fk="van-keyholder" value="${esc(draft.keyholder)}"
+               type="text" list="keyholder-names" maxlength="40" placeholder="Who holds it" aria-label="Keyholder">
+      </label>
+      <label class="field">
+        <span class="field-label">Odometer (km)</span>
+        <input class="field-input" data-a="editOdo" data-fk="van-odo" value="${esc(draft.odo)}"
+               type="text" inputmode="numeric" maxlength="9" placeholder="e.g. 84210" aria-label="Odometer reading">
+      </label>
+    </div>
     <!-- Suggestions, not a fixed list: a depot can run anything with wheels. -->
     <datalist id="van-models">${MODELS.map(m => `<option value="${esc(m)}"></option>`).join('')}</datalist>
+    <datalist id="keyholder-names">${peopleList().filter(p => p.active && p.role !== 'admin').map(p => `<option value="${esc(p.name)}"></option>`).join('')}</datalist>
     ${note(detailNote, 'is-faint')}
 
     <div class="divider-label">${monoLabel('Status — decides if it can be drawn')}</div>
@@ -1788,6 +1902,8 @@ function viewVan() {
       ${stat(savedVan ? (dmy(savedVan.lastCheckOn) || 'never') : '—', 'Last checked')}
       ${stat(savedVan ? vanDefectCount(savedVan.id) : 0, 'Open defects', !!(savedVan && vanDefectCount(savedVan.id)))}
     </div>
+
+    ${savedVan ? vanJobsBlock(savedVan.id) : ''}
 
     ${note('Retiring a van keeps its history and past checks — it just stops being drawn.', 'is-faint')}
 
@@ -3354,7 +3470,16 @@ const nextIn = (list, value) => {
   const i = list.indexOf(value);
   return list[(i < 0 ? 0 : i + 1) % list.length];
 };
-const vanDraft = v => ({ id: v.id, reg: v.reg, model: v.model, status: v.status, bay: v.bay || '', motDue: v.motDue || '' });
+const vanDraft = v => ({
+  id: v.id, reg: v.reg, model: v.model, status: v.status, bay: v.bay || '', motDue: v.motDue || '',
+  /* Keyholder and odometer are the design's van-record additions: who currently
+     holds the vehicle, and its last recorded reading. Both optional, both
+     default blank on an older record. `docs` (documents) rides on the record
+     but is edited through its own sheet, not the form draft — carried here only
+     so a save round-trips it untouched. */
+  keyholder: v.keyholder || '', keyholderSince: v.keyholderSince || '', odo: v.odo != null ? String(v.odo) : '',
+  docs: Array.isArray(v.docs) ? v.docs : []
+});
 
 /* The draft check. Names are copied in alongside the ids because a check is a
    document: it has to still read correctly in a year, after the person has
@@ -3734,10 +3859,22 @@ const ACTIONS = {
 
   /* vans -------------------------------------------------------------- */
   cycleFilter: () => set({ filterIdx: cycle(S.filterIdx, FILTERS.length) }),
+  setFilter: (_, el) => set({ filterIdx: Number(el.dataset.id) || 0 }),
+  onFleetQuery: (_, el) => set({ fleetQuery: el.value }),
+  clearFleetQuery: () => set({ fleetQuery: '' }),
+  toggleRemoved: () => set({ removedOpen: !S.removedOpen }),
+  restoreVan: (_, el) => {
+    const v = Store.get('vans', el.dataset.id);
+    if (!v) return;
+    Store.update('vans', v.id, { status: 'active', retiredOn: '' });
+    toast(v.reg + ' restored to the fleet.');
+  },
+  editKeyholder: (_, el) => set({ draft: { ...S.draft, keyholder: el.value } }),
+  editOdo: (_, el) => set({ draft: { ...S.draft, odo: el.value.replace(/[^0-9]/g, '') } }),
   startAdd: () => {
     // Blank, not pre-filled: a guessed model that nobody corrects is worse
     // than a gap somebody notices.
-    S = { ...S, adding: true, vanSelId: null, draft: { id: null, reg: '', model: '', status: 'active', bay: '', motDue: '' } };
+    S = { ...S, adding: true, vanSelId: null, draft: { id: null, reg: '', model: '', status: 'active', bay: '', motDue: '', keyholder: '', keyholderSince: '', odo: '', docs: [] } };
     save();
     push('van');
   },
@@ -3791,13 +3928,22 @@ const ACTIONS = {
     const d = S.draft;
     // Trim on the way to disk, not on every keystroke — typing a space
     // mid-name is normal and shouldn't fight the caret.
+    const kh = (d.keyholder || '').trim();
+    const prev = d.id ? Store.get('vans', d.id) : null;
+    /* Stamp who-since only when the holder actually changes, so a save that
+       leaves the keyholder alone doesn't reset the date. */
+    const keyholderSince = kh
+      ? ((prev && prev.keyholder === kh && prev.keyholderSince) ? prev.keyholderSince : (d.keyholderSince || Store.today()))
+      : '';
+    const odoNum = String(d.odo || '').replace(/[^0-9]/g, '');
     const fields = {
       reg: d.reg.trim(), model: d.model.trim(), status: d.status,
-      bay: d.bay.trim(), motDue: d.motDue
+      bay: d.bay.trim(), motDue: d.motDue,
+      keyholder: kh, keyholderSince, odo: odoNum === '' ? '' : Number(odoNum)
     };
     if (!fields.reg) return;
     if (S.adding) {
-      const v = Store.insert('vans', { ...fields, lastCheckOn: '' });
+      const v = Store.insert('vans', { ...fields, lastCheckOn: '', docs: [] });
       /* Back to the fleet list, not the van that was just typed: the form has
          nothing left to say about it, and the list is the proof it landed. */
       set({ adding: false, vanSelId: v.id, draft: { ...d, ...fields, id: v.id } });

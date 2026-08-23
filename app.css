@@ -1550,3 +1550,48 @@ button:active,
    wrap or clip "Dashboard"/"Approvals". */
 .tabbar { grid-auto-columns: 1fr; }
 .tab-label { font-size: 10.5px; letter-spacing: -.01em; }
+
+/* ======================================================================== */
+/* Fleet list + Van detail (Stage 2).                                       */
+/* ======================================================================== */
+
+.fleet-top { display: flex; flex-direction: column; gap: 10px; }
+.fleet-count { font: 400 12px/1.3 var(--sans); color: var(--faint); }
+
+/* Search box. */
+.search { position: relative; display: flex; align-items: center; }
+.search-icon { position: absolute; left: 11px; color: var(--faint); display: flex; pointer-events: none; }
+.search-icon svg { width: 16px; height: 16px; }
+.search-input {
+  width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 12px;
+  padding: 0 36px; font: 400 14.5px/1.3 var(--sans); color: var(--text);
+  background: var(--sunk); outline: none; appearance: none;
+}
+.search-clear {
+  position: absolute; right: 4px; width: 34px; height: 34px; border-radius: var(--r-chip);
+  display: flex; align-items: center; justify-content: center; color: var(--faint);
+  background: transparent; border: 0;
+}
+.search-clear svg { width: 15px; height: 15px; }
+
+/* Status pill on a fleet row. */
+.status-pill { flex: none; font: 700 10px/1 var(--mono); padding: 5px 8px; border-radius: 6px; white-space: nowrap; }
+
+/* Removed-vehicles drawer. */
+.removed-head { width: 100%; background: transparent; border: 0; padding: 13px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; }
+.removed-head-title { font: 600 13px/1.3 var(--sans); color: var(--text); }
+.removed-head-meta { display: flex; align-items: center; gap: 8px; }
+.removed-chev { width: 15px; height: 15px; flex: none; color: var(--faint); display: flex; transition: transform .15s; }
+.removed-chev svg { width: 15px; height: 15px; }
+.removed-list { border-top: 1px solid var(--line-soft); }
+.removed-row { border-bottom: 1px solid var(--line-soft); padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+.removed-row:last-child { border-bottom: 0; }
+.removed-row .list-main { flex: 1 1 auto; min-width: 0; }
+
+/* Open-jobs block on a van. */
+.job-row { display: flex; align-items: flex-start; gap: 10px; padding: 4px 0; }
+.job-sev { flex: none; display: flex; }
+.job-sev svg { width: 18px; height: 18px; }
+.job-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.job-name { font: 500 14px/1.3 var(--sans); color: var(--text); }
+.job-meta { font: 400 12px/1.35 var(--sans); color: var(--muted); }
