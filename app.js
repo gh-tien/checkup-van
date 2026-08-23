@@ -20,7 +20,7 @@
    MUST equal VERSION in sw.js. They are separate files with no shared module,
    so this is a hand-kept pair — `.publish/stage.ps1` refuses to stage a build
    where the two disagree, which is what keeps it honest. Bump both together. */
-const BUILD = 'v31';
+const BUILD = 'v32';
 
 /* ---------------------------------------------------------------- data --- */
 
@@ -216,7 +216,7 @@ let S = freshState();
 
 /* Navigation: one global stack. Switching tabs resets it, so Back always
    walks the trail the user actually took inside the current tab. */
-let nav = { tab: 'queue', stack: [] };
+let nav = { tab: 'home', stack: [] };
 
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); } catch (_) { /* private mode */ }
@@ -285,8 +285,17 @@ const sentence = s => { const t = String(s == null ? '' : s); return t.charAt(0)
 const ICON = {
   back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
   chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
   tick: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  /* The draw — a die face. Stands for "the app picks the van", the one act the
+     Dashboard leads with. */
+  dice: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="16" cy="8" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="8" cy="16" r="1.4" fill="currentColor"/><circle cx="16" cy="16" r="1.4" fill="currentColor"/></svg>',
   queue: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h4l1.5 3h7L17 14h4"/><path d="M4.4 5.6A2 2 0 016.3 4.2h11.4a2 2 0 011.9 1.4L21 14v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4z"/></svg>',
+  /* Dashboard tab — the depot-at-a-glance home. Same glyph the old single work
+     tab wore, kept so the muscle memory of "home is bottom-left" survives. */
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h4l1.5 3h7L17 14h4"/><path d="M4.4 5.6A2 2 0 016.3 4.2h11.4a2 2 0 011.9 1.4L21 14v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4z"/></svg>',
+  /* Approvals tab — a clipboard with a tick, the countersign work. */
+  approvals: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/><path d="M8 6H6a1 1 0 00-1 1v13a1 1 0 001 1h12a1 1 0 001-1V7a1 1 0 00-1-1h-2"/><path d="M9 13.5l2 2 4-4"/></svg>',
   defects: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9L1.9 18a2 2 0 001.7 3h16.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
   coverage: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
   vans: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7.5A1.5 1.5 0 013.5 6H14v10H3.5A1.5 1.5 0 012 14.5z"/><path d="M14 9h3.6a2 2 0 011.7 1l2.2 3.4a2 2 0 01.3 1.1V16H14z"/><circle cx="7" cy="18" r="2"/><circle cx="17.5" cy="18" r="2"/></svg>',
@@ -703,14 +712,16 @@ const capTally = () => {
 
 /* ------------------------------------------------------------- screens --- */
 
+/* The five-tab bottom bar of the SpotCheckPhone design. `home` is the role
+   dashboard, `approvals` is the countersign work (what the old single `queue`
+   tab used to carry alongside the draw), `defects` and `vans` are unchanged,
+   `more` is the setup hub. Labels are one word each — all five have to sit at
+   ~75px. */
 const TABS = [
-  /* The id stays `queue` — it is the tab key, the screen key and the target of
-     half a dozen "go here" buttons, and renaming it would ripple through all of
-     them to change nothing anybody sees. The LABEL is what people read, and one
-     word is all a tab has room for at 375px. */
-  { id: 'queue', label: 'Check', icon: 'queue' },
+  { id: 'home', label: 'Dashboard', icon: 'home' },
   { id: 'defects', label: 'Defects', icon: 'defects' },
-  { id: 'vans', label: 'Vans', icon: 'vans' },
+  { id: 'vans', label: 'Fleet', icon: 'vans' },
+  { id: 'approvals', label: 'Approvals', icon: 'approvals' },
   { id: 'more', label: 'More', icon: 'more' }
 ];
 
@@ -872,8 +883,8 @@ function viewDraw() {
      offering to start a check on it would be a lie. */
   if (!row) {
     return emptyState('That draw is over',
-      'The van that came up is no longer in the hat — it has been checked, retired or taken off the road since. Draw again from Vehicles Check.',
-      { label: 'Back to Vehicles Check', action: 'back' });
+      'The van that came up is no longer in the hat — it has been checked, retired or taken off the road since. Draw again from the Dashboard.',
+      { label: 'Back to Dashboard', action: 'back' });
   }
 
   const f = drawFacts(row, pool);
@@ -958,6 +969,298 @@ function viewQueue() {
           : 'No checks have been submitted yet. One lands here the moment an inspector finishes theirs.', 'is-faint')}`;
 }
 
+/* --- Dashboard (home) --------------------------------------------------- */
+
+/* The role a dashboard is drawn for. Nobody signed in reads as an inspector —
+   the draw still works, and a sign-in nudge sits above it. */
+const currentRole = () => { const p = me(); return p ? p.role : 'inspector'; };
+
+const greeting = () => { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; };
+const firstName = name => String(name || '').trim().split(/\s+/)[0] || '';
+
+/* One inspector's throughput, from the check history — this week, this month,
+   and how many of the defects they raised are still open. */
+function myCheckStats() {
+  const id = me() && me().id;
+  const today = Store.today();
+  const mine = id ? doneChecks().filter(c => c.inspectorId === id) : [];
+  const within = n => mine.filter(c => { const d = dayOf(c.finishedAt); return d && daysBetween(d, today) <= n; }).length;
+  const defects = id ? openDefects().filter(d => { const c = Store.get('checks', d.checkId); return c && c.inspectorId === id; }).length : 0;
+  return { week: within(7), month: within(30), defects };
+}
+
+/* Fleet health for the manager/admin bar: OK vs overdue vs blocked. Overdue is
+   an active van past the force-days mark (or never walked); blocked is anything
+   off the road, which the draw can't reach. */
+function fleetHealth() {
+  const { forceDays } = drawRules();
+  const rows = coverageRows();
+  const total = rows.length;
+  const blocked = coverVans().filter(v => v.status === 'offroad').length;
+  const overdue = rows.filter(r => r.van.status === 'active' && (r.days === null || r.days > forceDays)).length;
+  const ok = Math.max(0, total - blocked - overdue);
+  const pct = n => total ? Math.round(n / total * 100) + '%' : '0%';
+  return { total, ok, overdue, blocked, forceDays, okPct: pct(ok), overduePct: pct(overdue), blockedPct: pct(blocked) };
+}
+
+/* Checks logged in the last seven days, per active inspector, as bar widths
+   relative to the busiest. */
+function inspectorWeek() {
+  const today = Store.today();
+  const crew = peopleList().filter(p => p.active && p.role !== 'admin');
+  const rows = crew.map(p => ({
+    name: firstName(p.name),
+    week: doneChecks().filter(c => c.inspectorId === p.id && (() => { const d = dayOf(c.finishedAt); return d && daysBetween(d, today) <= 7; })()).length
+  }));
+  const max = Math.max(1, ...rows.map(r => r.week));
+  return rows.map(r => ({ ...r, w: Math.round(r.week / max * 100) + '%' }));
+}
+
+/* The blue draw hero. A standing draw (or an empty hat) hands off to
+   drawBlock(), which already says the right thing; otherwise it is the one big
+   button that starts the whole flow. */
+function drawHero() {
+  const pool = drawPool();
+  const standing = pool.rows.filter(r => r.van.id === S.draw.vanId)[0] || null;
+  if (!pool.rows.length || standing) return drawBlock();
+  return `
+    <button class="dash-hero" data-a="drawVan">
+      <span class="dash-hero-icon">${ICON.dice}</span>
+      <span class="dash-hero-text">
+        <span class="dash-hero-title">Start a spot-check</span>
+        <span class="dash-hero-sub">The app draws the vehicle — you check it</span>
+      </span>
+      <span class="dash-hero-chev">${ICON.chev}</span>
+    </button>`;
+}
+
+/* MOT reminders: any non-retired van whose MOT is overdue or due within 30
+   days, worst first. The design's document reminders — for now MOT is the one
+   dated document a van carries (full documents arrive in a later stage). */
+function motReminders() {
+  const today = Store.today();
+  return fleetList()
+    .filter(v => v.status !== 'retired' && v.motDue)
+    .map(v => ({ van: v, days: daysBetween(today, v.motDue) }))
+    .filter(r => r.days <= 30)
+    .sort((a, b) => a.days - b.days);
+}
+function dashReminders() {
+  const rows = motReminders();
+  if (!rows.length) return '';
+  const item = r => {
+    const overdue = r.days < 0;
+    const pill = overdue ? 'OVERDUE' : (r.days === 0 ? 'TODAY' : r.days + 'd');
+    return `
+      <button class="dash-rem-row" data-a="openVan" data-id="${esc(r.van.id)}">
+        <span class="dash-rem-dot" style="background:${overdue ? 'var(--red)' : 'var(--amber)'}"></span>
+        <span class="dash-rem-main">
+          <span class="dash-rem-title">${esc(r.van.reg)} · MOT</span>
+          <span class="dash-rem-sub">Due ${esc(dmy(r.van.motDue))}</span>
+        </span>
+        <span class="dash-rem-pill" style="background:${overdue ? 'var(--red-wash)' : '#FBF3E0'};color:${overdue ? 'var(--red)' : 'var(--amber)'}">${esc(pill)}</span>
+      </button>`;
+  };
+  return `
+    <div class="card is-flat" style="padding:0;overflow:hidden;border:1px solid var(--line);background:var(--card)">
+      <div class="dash-rem-head">${monoLabel('Document reminders')}<span class="mono-num">${rows.length}</span></div>
+      <div class="dash-rem-list">${rows.map(item).join('')}</div>
+    </div>`;
+}
+
+function dashInspector() {
+  const s = myCheckStats();
+  const od = fleetHealth().overdue;
+  return `
+    <div class="dash-greeting">
+      <span class="dash-greet-line">${esc(greeting())}${me() ? '' : ' — pick who you are'}</span>
+      <span class="dash-greet-name">${esc(me() ? firstName(me().name) : depotName() || 'Depot')}</span>
+    </div>
+    ${drawHero()}
+    <div class="stat-grid">
+      ${stat(s.week, 'This week')}
+      ${stat(s.month, 'This month')}
+      ${stat(s.defects, 'Open defects', s.defects > 0)}
+    </div>
+    <div class="dash-section-label">Your work</div>
+    <button class="metric-row" data-a="tab" data-id="vans">
+      <span class="metric-row-badge${od ? ' is-alert' : ''}">${od}</span>
+      <span class="metric-row-main">
+        <span class="metric-row-title">Vehicles to check</span>
+        <span class="metric-row-sub">${od ? od + (od === 1 ? ' van past its window' : ' vans past their window') : 'All caught up — nothing overdue'}</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>`;
+}
+
+function dashManager() {
+  const pending = pendingChecks().length;
+  const h = fleetHealth();
+  const insp = inspectorWeek();
+  const { targetPerWeek } = drawRules();
+  const thisWeek = insp.reduce((a, r) => a + r.week, 0);
+  const heroBg = pending ? 'var(--ink)' : '#3A7D44';
+  const dirty = S.list && isDirty();
+  return `
+    <button class="dash-approve-hero" data-a="tab" data-id="approvals" style="background:${heroBg}">
+      <span class="dash-hero-icon">${ICON.tick}</span>
+      <span class="dash-hero-text">
+        <span class="dash-hero-title">${pending ? pending + (pending === 1 ? ' check to countersign' : ' checks to countersign') : 'All caught up'}</span>
+        <span class="dash-hero-sub">${pending ? 'Awaiting your signature' : 'Nothing waiting on your signature'}</span>
+      </span>
+      <span class="dash-hero-chev">${ICON.chev}</span>
+    </button>
+    ${dirty ? `
+    <div class="dash-section-label is-red">Needs you</div>
+    <button class="card is-dashed-red" data-a="openChecklist" style="flex-direction:row;align-items:center;gap:12px">
+      <span class="metric-row-badge is-alert">${changeCount()}</span>
+      <span class="metric-row-main">
+        <span class="metric-row-title">Checklist edits not live</span>
+        <span class="metric-row-sub">Publish so inspectors walk the new list</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>` : ''}
+    ${healthCard(h, thisWeek, targetPerWeek)}
+    <div class="card">
+      ${monoLabel('Checks this week by inspector')}
+      ${insp.length ? insp.map(r => `
+        <div class="insp-row">
+          <span class="insp-name">${esc(r.name)}</span>
+          <span class="insp-track"><span class="insp-bar" style="width:${r.w}"></span></span>
+          <span class="insp-count">${r.week}</span>
+        </div>`).join('') : note('No inspectors on the depot yet.', 'is-faint')}
+    </div>
+    <button class="btn btn-outline btn-hero-icon" data-a="drawVan">${ICON.dice}Run a spot-check</button>`;
+}
+
+function healthCard(h, thisWeek, target) {
+  return `
+    <div class="card">
+      <div class="spread">
+        ${monoLabel('Fleet health · ' + h.total + ' vehicles')}
+        ${typeof thisWeek === 'number' ? `<span class="mono-num is-ink">${thisWeek}/${target} this week</span>` : ''}
+      </div>
+      <div class="health-bar">
+        <span class="health-seg" style="width:${h.okPct};background:#3A7D44"></span>
+        <span class="health-seg" style="width:${h.overduePct};background:#5B6670"></span>
+        <span class="health-seg" style="width:${h.blockedPct};background:var(--red)"></span>
+      </div>
+      <div class="health-legend">
+        <span><span class="dot" style="background:#3A7D44"></span>OK ${h.ok}</span>
+        <span><span class="dot" style="background:#5B6670"></span>Overdue ${h.overdue}</span>
+        <span><span class="dot" style="background:var(--red)"></span>Blocked ${h.blocked}</span>
+      </div>
+    </div>`;
+}
+
+function dashAdmin() {
+  const h = fleetHealth();
+  const crew = peopleList().filter(p => p.active && p.role !== 'admin');
+  const mgr = crew.filter(p => p.role === 'manager').length;
+  const ins = crew.filter(p => p.role === 'inspector').length;
+  const dirty = S.list && isDirty();
+  return `
+    <div class="setup-card">
+      <span class="setup-kicker">DEPOT SETUP</span>
+      <span class="setup-name">${esc(depotName() || 'Unnamed depot')}</span>
+      <span class="setup-meta">${h.total} vehicles · ${crew.length} people · checklist v${checklistVersion()}</span>
+    </div>
+    <div class="metric-grid">
+      <button class="metric-tile" data-a="tab" data-id="vans">
+        <span class="metric-tile-num${h.overdue ? ' is-alert' : ''}">${h.overdue}</span>
+        <span class="metric-tile-cap">Coverage gaps</span>
+        <span class="metric-tile-sub">overdue · ${h.blocked} blocked</span>
+      </button>
+      <button class="metric-tile" data-a="openPeople">
+        <span class="metric-tile-num">${crew.length}</span>
+        <span class="metric-tile-cap">People</span>
+        <span class="metric-tile-sub">${mgr} mgr · ${ins} insp</span>
+      </button>
+    </div>
+    <button class="metric-row" data-a="openChecklist">
+      <span class="metric-row-icon">${ICON.tick}</span>
+      <span class="metric-row-main">
+        <span class="metric-row-title">Checklist v${checklistVersion()}</span>
+        <span class="metric-row-sub"${dirty ? ' style="color:var(--red)"' : ''}>${dirty ? changeCount() + ' unpublished change' + (changeCount() === 1 ? '' : 's') : liveSince()}</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>
+    <button class="metric-row" data-a="openSettings">
+      <span class="metric-row-icon">${ICON.settings}</span>
+      <span class="metric-row-main">
+        <span class="metric-row-title">Backup &amp; storage</span>
+        <span class="metric-row-sub">Save, restore or reset this depot</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>
+    <div class="dock-row">
+      <button class="btn btn-outline" data-a="openSettings">Depot config</button>
+      <button class="btn btn-outline" data-a="openPeople">Personnel</button>
+    </div>`;
+}
+
+function viewHome() {
+  /* No fleet is the one setup problem the dashboard surfaces whole: there is
+     nothing to draw and nothing to count. */
+  if (!fleetList().length) {
+    return emptyState('No fleet yet',
+      'Nobody can spot-check a van the depot doesn’t know about. Add the fleet first.',
+      { label: '+ Add a van', action: 'addFirstVan' });
+  }
+  const role = currentRole();
+  const draft = (role !== 'admin') ? capDraftCard() : '';
+  const body = role === 'admin' ? dashAdmin() : role === 'manager' ? dashManager() : dashInspector();
+  return `${draft}${body}${dashReminders()}`;
+}
+
+/* --- Approvals ---------------------------------------------------------- */
+
+/* The countersign work, split into what needs doing and what is done: checks
+   sent back for redo, checks awaiting a signature (plus any still open on a
+   phone), then the recently approved. This is the half the old single work tab
+   carried below the draw. */
+function viewApprovals() {
+  if (!fleetList().length) {
+    return emptyState('No fleet yet',
+      'Checks appear here once there is a fleet to walk and someone has submitted one.',
+      { label: '+ Add a van', action: 'addFirstVan' });
+  }
+
+  const open = queueChecks();
+  const returned = open.filter(c => c.decision === 'sent-back');
+  const pending = open.filter(c => !c.decision);
+  const flying = inFlightChecks();
+  const approved = historyChecks();
+
+  const returnedBlock = returned.length ? `
+    <div class="divider-label">${monoLabel('Sent back — waiting on the inspector', 'is-red')}</div>
+    ${returned.map(c => checkRow(c, false)).join('')}` : '';
+
+  const inFlight = flying.map(c => `
+    <div class="card is-dashed-amber">
+      <div class="spread">
+        <span class="reg" style="color:var(--amber)">${esc(c.reg)}</span>
+        <span class="flag is-amber">ON A PHONE</span>
+      </div>
+      <div class="mono-label is-amber">${esc('Started ' + hhmm(c.startedAt) + ' · ' + c.inspectorName)}</div>
+      ${note('Not yours to countersign yet — it arrives when the phone finds signal.', 'is-faint')}
+    </div>`).join('');
+
+  const waiting = pending.length || flying.length;
+  const pendingBlock = `
+    <div class="divider-label">${monoLabel('Awaiting your countersign' + (waiting ? ' — oldest first' : ''))}</div>
+    ${waiting
+      ? pending.map(c => checkRow(c)).join('') + inFlight
+        + note('Countersigning is what finishes the record, raises the job and schedules the re-check.', 'is-faint')
+      : note('Nothing is waiting on your countersign.', 'is-faint')}`;
+
+  const approvedBlock = approved.length ? `
+    <div class="divider-label">${monoLabel('Recently approved')}</div>
+    ${approved.slice(0, 12).map(c => checkRow(c, false)).join('')}` : '';
+
+  return `${returnedBlock}${pendingBlock}${approvedBlock}`;
+}
+
 /* --- Queue: one check --------------------------------------------------- */
 
 /* Where the defect job is being sent, and by when. Both are picked on the
@@ -1008,7 +1311,7 @@ function assignFields() {
 
 function viewCheck() {
   const sel = selectedCheck();
-  if (!sel) return `<div class="empty">${monoLabel('No check open')}${note('Pick a check from the countersign list on Vehicles Check.', 'is-faint')}</div>`;
+  if (!sel) return `<div class="empty">${monoLabel('No check open')}${note('Pick a check from the countersign list on Approvals.', 'is-faint')}</div>`;
 
   const decided = sel.decision;
   const fails = failedResults(sel);
@@ -1702,7 +2005,7 @@ function viewSettings() {
     <div class="field-row">${ruleField(RULES[2])}${ruleField(RULES[3])}</div>
     ${badDraft.length
       ? note('Not saved yet — ' + badDraft.map(r => r.label.toLowerCase() + ' must be ' + r.min + '–' + r.max).join(', ') + '. The rule in force is unchanged until it is.', 'is-red')
-      : note('These decide what Vehicles Check can draw. A van is held out of the hat for ' + excludeDays +
+      : note('These decide what the Dashboard draw can pick. A van is held out of the hat for ' + excludeDays +
           (excludeDays === 1 ? ' day' : ' days') + ' after it is walked, and any van past ' + forceDays +
           ' days jumps ahead of everything else until somebody walks it. They apply to every phone in the depot, not just this one.', 'is-faint')}
     <div class="divider-label">${monoLabel('Backup')}</div>
@@ -2173,7 +2476,7 @@ function capBlockedState() {
 function viewCaptureStart() {
   const blocked = capBlockedState();
   if (blocked) return blocked;
-  if (!S.cap) return emptyState('No check open', 'Draw a van from Vehicles Check to start one.', { label: 'Go to Vehicles Check', action: 'tab', id: 'queue' });
+  if (!S.cap) return emptyState('No check open', 'Draw a van from the Dashboard to start one.', { label: 'Go to Dashboard', action: 'tab', id: 'home' });
 
   const c = S.cap;
   const vans = capVans();
@@ -2313,7 +2616,7 @@ function capCard(it) {
 }
 
 function viewCapture() {
-  if (!S.cap) return emptyState('No check open', 'Draw a van from Vehicles Check to start one.', { label: 'Go to Vehicles Check', action: 'tab', id: 'queue' });
+  if (!S.cap) return emptyState('No check open', 'Draw a van from the Dashboard to start one.', { label: 'Go to Dashboard', action: 'tab', id: 'home' });
 
   const secs = capSections();
   const sec = capSection();
@@ -2370,7 +2673,7 @@ function capPhotoGrid() {
 }
 
 function viewCaptureReview() {
-  if (!S.cap) return emptyState('No check open', 'Draw a van from Vehicles Check to start one.', { label: 'Go to Vehicles Check', action: 'tab', id: 'queue' });
+  if (!S.cap) return emptyState('No check open', 'Draw a van from the Dashboard to start one.', { label: 'Go to Dashboard', action: 'tab', id: 'home' });
 
   const t = capTally();
   const fails = capFails();
@@ -2447,7 +2750,11 @@ const SCREENS = {
      screen says where you are; now it has a job — draw a van, walk it — and
      the title says that instead. The depot's name moved to the head of More,
      which is where the depot itself is set up. */
-  queue: { title: 'Vehicles Check', view: viewQueue },
+  /* The role dashboard — depot at a glance, and where the draw now lives. */
+  home: { title: () => depotName() || 'Dashboard', view: viewHome },
+  /* The countersign work: awaiting approval, sent back, and recently approved.
+     This is the half the old single `queue` tab carried alongside the draw. */
+  approvals: { title: 'Approvals', view: viewApprovals },
   history: { title: 'History', view: viewHistory, back: true },
   check: { title: () => (selectedCheck() ? selectedCheck().reg : 'Check'), view: viewCheck, back: true },
   defects: { title: 'Open defects', view: viewDefects },
@@ -2613,12 +2920,20 @@ function renderTabbar() {
   return TABS.map(t => {
     const on = nav.tab === t.id;
     let badge = '';
-    if (t.id === 'queue' && pending) badge = `<span class="tab-badge">${pending}</span>`;
+    if (t.id === 'approvals' && pending) badge = `<span class="tab-badge">${pending}</span>`;
     if (t.id === 'defects' && defects) badge = `<span class="tab-badge is-quiet">${defects}</span>`;
     return `<button class="tab" data-a="tab" data-id="${t.id}" ${on ? 'aria-current="page"' : ''}>
       ${ICON[t.icon]}${badge}<span class="tab-label">${esc(t.label)}</span>
     </button>`;
   }).join('');
+}
+
+/* The contextual FAB target for a screen, or null for no button. Kept small on
+   purpose: only the screens with one unambiguous "add" get one. More targets
+   arrive with People and the other builders in later stages. */
+function fabConfig(screen) {
+  if (screen === 'vans') return { action: 'startAdd', label: 'Add a vehicle' };
+  return null;
 }
 
 /* An insert that creates a field the user is meant to type into immediately
@@ -2895,6 +3210,22 @@ function render() {
   const gate = screen === 'setup' || (screen === 'whoami' && !me());
   tabbar.hidden = gate;
   tabbar.innerHTML = gate ? '' : renderTabbar();
+
+  /* The floating add button. Contextual and quiet: it appears only on screens
+     with one obvious "make a new thing" action, and never over a gate. */
+  const fab = document.getElementById('fab');
+  const fc = gate ? null : fabConfig(screen);
+  if (fc) {
+    fab.hidden = false;
+    fab.dataset.a = fc.action;
+    if (fc.id) fab.dataset.id = fc.id; else delete fab.dataset.id;
+    fab.setAttribute('aria-label', fc.label);
+    fab.innerHTML = ICON.plus;
+  } else {
+    fab.hidden = true;
+    delete fab.dataset.a;
+    delete fab.dataset.id;
+  }
 
   // A transition means a new screen: start at the top. Otherwise the user is
   // mid-task on the same screen and must not be yanked around.
@@ -3247,7 +3578,7 @@ const ACTIONS = {
     // The draft is gone the moment it becomes a record — there is only one of it.
     S = { ...S, cap: null, selectedId: check.id };
     save();
-    goTab('queue');
+    goTab('home');
     toast(failed
       ? (van ? van.reg + ' submitted. ' : 'Submitted. ') + failed + (failed === 1 ? ' defect waiting on a countersign.' : ' defects waiting on a countersign.')
       : (van ? van.reg + ' submitted clean.' : 'Submitted clean.'));
