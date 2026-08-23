@@ -20,7 +20,7 @@
    MUST equal VERSION in sw.js. They are separate files with no shared module,
    so this is a hand-kept pair — `.publish/stage.ps1` refuses to stage a build
    where the two disagree, which is what keeps it honest. Bump both together. */
-const BUILD = 'v32';
+const BUILD = 'v33';
 
 /* ---------------------------------------------------------------- data --- */
 
@@ -405,6 +405,71 @@ function helpSheet() {
       <button class="btn btn-quiet" data-a="closeHelp">Close</button>
     </div>`;
 }
+/* The add/edit-document bottom sheet, rendered from the top bar so it sits
+   above the screen (and outside the screen's push/pop transform). Only present
+   when S.docSheet is set. */
+function docSheet() {
+  const sh = S.docSheet;
+  if (!sh) return '';
+  const editing = !!sh.id;
+  const named = sh.name.trim().length > 0;
+  return `
+    <div class="sheet-scrim" data-a="closeDocSheet"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="${editing ? 'Edit document' : 'Add a document'}">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <h2 class="sheet-title">${editing ? 'Edit document' : 'Add a document'}</h2>
+      <label class="sheet-field">
+        <span class="field-label">Name *</span>
+        <input class="field-input" data-a="onDocName" data-fk="doc-name" value="${esc(sh.name)}"
+               type="text" maxlength="60" placeholder="e.g. Insurance certificate" aria-label="Document name">
+      </label>
+      <label class="sheet-field">
+        <span class="field-label">Renewal / due date</span>
+        <input class="${cls('field-input', !sh.dueOn && 'is-empty')}" data-a="onDocDate" data-fk="doc-date"
+               value="${esc(sh.dueOn)}" type="date" min="2000-01-01" max="2099-12-31" aria-label="Renewal or due date">
+      </label>
+      <label class="sheet-field">
+        <span class="field-label">Note</span>
+        <textarea class="field-input" data-a="onDocNote" data-fk="doc-note" rows="2"
+                  placeholder="Anything worth recording" aria-label="Note">${esc(sh.note)}</textarea>
+      </label>
+      <div class="doc-attach">
+        ${sh.photoId ? `<img class="doc-thumb" data-photo-id="${esc(sh.photoId)}" alt="Attachment preview">` : ''}
+        <button class="btn btn-quiet" data-a="attachDocPhoto">${sh.photoId ? 'Replace photo' : 'Attach a photo'}</button>
+        ${sh.photoId ? `<button class="btn btn-quiet" data-a="clearDocPhoto">Remove photo</button>` : ''}
+      </div>
+      <button class="btn ${named ? 'btn-primary' : 'btn-disabled'}" data-a="saveDoc" ${named ? '' : 'disabled'}>${editing ? 'Save document' : 'Add document'}</button>
+      ${editing ? `<button class="btn btn-outline-red" data-a="removeDoc" data-id="${esc(sh.id)}">Remove document</button>` : ''}
+      <button class="btn btn-quiet" data-a="closeDocSheet">Cancel</button>
+    </div>`;
+}
+
+/* The read-only document viewer: details, the attachment (tap to enlarge), and
+   the way through to Edit or Remove. */
+function docViewer() {
+  const dv = S.docView;
+  if (!dv) return '';
+  const van = Store.get('vans', dv.vanId);
+  const d = van && Array.isArray(van.docs) ? van.docs.find(x => x.id === dv.docId) : null;
+  if (!d) return '';
+  return `
+    <div class="sheet-scrim" data-a="closeDocView"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="Document">
+      <div class="sheet-grip" aria-hidden="true"></div>
+      <h2 class="sheet-title">${esc(d.name)}</h2>
+      ${d.dueOn ? `<div class="mono-label">Due ${esc(dmy(d.dueOn))}</div>` : ''}
+      ${d.note ? `<p class="sheet-p">${esc(d.note)}</p>` : ''}
+      ${d.photoId
+        ? `<img class="doc-view-img" data-photo-id="${esc(d.photoId)}" data-a="viewPhoto" alt="Document attachment">`
+        : note('No photo attached to this document.', 'is-faint')}
+      <div class="dock-row">
+        <button class="btn btn-quiet is-wide" data-a="editDoc" data-id="${esc(d.id)}">Edit</button>
+        <button class="btn btn-outline-red" data-a="removeDoc" data-id="${esc(d.id)}">Remove</button>
+      </div>
+      <button class="btn btn-quiet" data-a="closeDocView">Close</button>
+    </div>`;
+}
+
 /* Two different kinds of nothing, and they need opposite things said to them:
    a depot nobody has set up yet needs a way forward, a depot that is simply
    caught up needs reassurance — not a job it hasn't got. */
@@ -1057,29 +1122,31 @@ function drawHero() {
     </button>`;
 }
 
-/* MOT reminders: any non-retired van whose MOT is overdue or due within 30
-   days, worst first. The design's document reminders — for now MOT is the one
-   dated document a van carries (full documents arrive in a later stage). */
-function motReminders() {
+/* Document reminders: MOT, plus every dated van document (rego, insurance,
+   service), overdue or due within 30 days, worst first. */
+function docReminders() {
   const today = Store.today();
-  return fleetList()
-    .filter(v => v.status !== 'retired' && v.motDue)
-    .map(v => ({ van: v, days: daysBetween(today, v.motDue) }))
-    .filter(r => r.days <= 30)
-    .sort((a, b) => a.days - b.days);
+  const out = [];
+  fleetList().filter(v => v.status !== 'retired').forEach(v => {
+    if (v.motDue) out.push({ vanId: v.id, reg: v.reg, label: 'MOT', dueOn: v.motDue, days: daysBetween(today, v.motDue) });
+    (Array.isArray(v.docs) ? v.docs : []).forEach(d => {
+      if (d.dueOn) out.push({ vanId: v.id, reg: v.reg, label: d.name, dueOn: d.dueOn, days: daysBetween(today, d.dueOn) });
+    });
+  });
+  return out.filter(r => r.days <= 30).sort((a, b) => a.days - b.days);
 }
 function dashReminders() {
-  const rows = motReminders();
+  const rows = docReminders();
   if (!rows.length) return '';
   const item = r => {
     const overdue = r.days < 0;
     const pill = overdue ? 'OVERDUE' : (r.days === 0 ? 'TODAY' : r.days + 'd');
     return `
-      <button class="dash-rem-row" data-a="openVan" data-id="${esc(r.van.id)}">
+      <button class="dash-rem-row" data-a="openVan" data-id="${esc(r.vanId)}">
         <span class="dash-rem-dot" style="background:${overdue ? 'var(--red)' : 'var(--amber)'}"></span>
         <span class="dash-rem-main">
-          <span class="dash-rem-title">${esc(r.van.reg)} · MOT</span>
-          <span class="dash-rem-sub">Due ${esc(dmy(r.van.motDue))}</span>
+          <span class="dash-rem-title">${esc(r.reg + ' · ' + r.label)}</span>
+          <span class="dash-rem-sub">Due ${esc(dmy(r.dueOn))}</span>
         </span>
         <span class="dash-rem-pill" style="background:${overdue ? 'var(--red-wash)' : '#FBF3E0'};color:${overdue ? 'var(--red)' : 'var(--amber)'}">${esc(pill)}</span>
       </button>`;
@@ -1798,6 +1865,34 @@ function vanHistoryBlock(vanId) {
     ${rows.map(c => checkRow(c, false)).join('')}`;
 }
 
+/* One document row on a van — name, a sub-line (due date + attachment state),
+   opening the viewer. */
+function docRow(d) {
+  const sub = [d.dueOn ? 'Due ' + dmy(d.dueOn) : '', d.photoId ? 'Photo attached' : 'No attachment'].filter(Boolean).join(' · ');
+  return `
+    <button class="card doc-row" data-a="openDocView" data-id="${esc(d.id)}">
+      <span class="doc-icon">${ICON.doc}</span>
+      <span class="doc-main">
+        <span class="doc-name">${esc(d.name)}</span>
+        <span class="doc-sub">${esc(sub || 'Document')}</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>`;
+}
+
+/* The Documents section on a saved van: rego, insurance, service records —
+   each optionally carrying a dated renewal (which feeds the dashboard's
+   reminders) and a photo of the document. */
+function vanDocsBlock(van) {
+  const docs = Array.isArray(van.docs) ? van.docs : [];
+  return `
+    <div class="divider-label">${monoLabel('Documents' + (docs.length ? ' · ' + docs.length : ''))}</div>
+    ${docs.length
+      ? docs.map(docRow).join('')
+      : note('No documents on this vehicle yet — add the rego, insurance or service records.', 'is-faint')}
+    <button class="btn-add" data-a="openDocSheet" data-id="new">+ Add a document</button>`;
+}
+
 /* Open defects on this van, as a compact block that links through to the
    Defects tab where they are actually worked. */
 function vanJobsBlock(vanId) {
@@ -1897,6 +1992,8 @@ function viewVan() {
     <div class="divider-label">${monoLabel('Status — decides if it can be drawn')}</div>
     <div class="dock-row">${statusBtns}</div>
     <div class="card">${note(statusNote)}</div>
+
+    ${savedVan ? vanDocsBlock(savedVan) : ''}
 
     <div class="stats">
       ${stat(savedVan ? (dmy(savedVan.lastCheckOn) || 'never') : '—', 'Last checked')}
@@ -3027,7 +3124,9 @@ function renderTopbar(screen) {
     </div>
     ${menu}
     ${helpSheet()}
-    ${adminModal()}`;
+    ${adminModal()}
+    ${docSheet()}
+    ${docViewer()}`;
 }
 
 function renderTabbar() {
@@ -3262,6 +3361,37 @@ function onPhotoPicked() {
     const prev = S.cap.photos && S.cap.photos[shot];
     setCap({ photos: { ...(S.cap.photos || {}), [shot]: id } });
     if (prev && prev !== id) Photos.remove(prev);   // the shot it replaced is now an orphan
+  }).catch(() => toast('Could not read that photo — try again.'));
+}
+
+/* The document-attachment picker — its own reused file input, same pattern as
+   the walk-around camera. Downscales the same way, so a photographed rego
+   fits localStorage's neighbour, IndexedDB, without bloating it. */
+let docPhotoInput = null;
+function pickDocPhoto() {
+  if (!docPhotoInput) {
+    docPhotoInput = document.createElement('input');
+    docPhotoInput.type = 'file';
+    docPhotoInput.accept = 'image/*';
+    docPhotoInput.setAttribute('capture', 'environment');
+    docPhotoInput.style.display = 'none';
+    docPhotoInput.addEventListener('change', onDocPhotoPicked);
+    document.body.appendChild(docPhotoInput);
+  }
+  docPhotoInput.value = '';
+  docPhotoInput.click();
+}
+function onDocPhotoPicked() {
+  const file = docPhotoInput.files && docPhotoInput.files[0];
+  if (!file || !S.docSheet) return;
+  downscale(file).then(blob => Photos.put(blob)).then(id => {
+    if (!S.docSheet) { Photos.remove(id); return; }   // sheet closed while encoding
+    const prev = S.docSheet.photoId;
+    /* Drop the blob this one replaces — but only if it was itself a fresh,
+       unsaved stage. The document's originally-saved attachment stays until
+       the sheet is saved, so a cancel can fall back to it. */
+    if (prev && prev !== S.docSheet._orig) Photos.remove(prev);
+    set({ docSheet: { ...S.docSheet, photoId: id } });
   }).catch(() => toast('Could not read that photo — try again.'));
 }
 
@@ -3871,6 +4001,72 @@ const ACTIONS = {
   },
   editKeyholder: (_, el) => set({ draft: { ...S.draft, keyholder: el.value } }),
   editOdo: (_, el) => set({ draft: { ...S.draft, odo: el.value.replace(/[^0-9]/g, '') } }),
+
+  /* documents ---------------------------------------------------------- */
+  openDocSheet: () => {
+    const vanId = S.draft.id;
+    if (!vanId) return;
+    set({ docSheet: { id: null, vanId, name: '', dueOn: '', note: '', photoId: '', _orig: '' } });
+  },
+  onDocName: (_, el) => { if (S.docSheet) set({ docSheet: { ...S.docSheet, name: el.value } }); },
+  /* onDocDate is handled in the input listener (native date caret), like editMot. */
+  onDocNote: (_, el) => { if (S.docSheet) set({ docSheet: { ...S.docSheet, note: el.value } }); },
+  attachDocPhoto: () => pickDocPhoto(),
+  clearDocPhoto: () => {
+    const sh = S.docSheet;
+    if (!sh) return;
+    if (sh.photoId && sh.photoId !== sh._orig) { photoUrls.delete(sh.photoId); Photos.remove(sh.photoId); }
+    set({ docSheet: { ...sh, photoId: '' } });
+  },
+  openDocView: (_, el) => set({ docView: { vanId: S.draft.id, docId: el.dataset.id } }),
+  closeDocView: () => set({ docView: null }),
+  editDoc: (_, el) => {
+    const vanId = (S.docView && S.docView.vanId) || S.draft.id;
+    const van = Store.get('vans', vanId);
+    const d = van && Array.isArray(van.docs) ? van.docs.find(x => x.id === el.dataset.id) : null;
+    if (!d) return;
+    set({ docView: null, docSheet: { id: d.id, vanId, name: d.name, dueOn: d.dueOn || '', note: d.note || '', photoId: d.photoId || '', _orig: d.photoId || '' } });
+  },
+  closeDocSheet: () => {
+    const sh = S.docSheet;
+    /* A photo attached but never saved is an orphan — drop it, unless it is the
+       document's own already-saved attachment. */
+    if (sh && sh.photoId && sh.photoId !== sh._orig) { photoUrls.delete(sh.photoId); Photos.remove(sh.photoId); }
+    set({ docSheet: null });
+  },
+  saveDoc: () => {
+    const sh = S.docSheet;
+    if (!sh) return;
+    const name = sh.name.trim();
+    if (!name) return toast('Give the document a name.');
+    const van = Store.get('vans', sh.vanId);
+    if (!van) return;
+    const docs = Array.isArray(van.docs) ? van.docs.slice() : [];
+    if (sh.id) {
+      const i = docs.findIndex(d => d.id === sh.id);
+      if (i >= 0) {
+        /* Editing away from an old attachment orphans the old blob. */
+        if (sh._orig && sh._orig !== sh.photoId) { photoUrls.delete(sh._orig); Photos.remove(sh._orig); }
+        docs[i] = { ...docs[i], name, dueOn: sh.dueOn, note: sh.note.trim(), photoId: sh.photoId };
+      }
+    } else {
+      docs.push({ id: 'doc' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, dueOn: sh.dueOn, note: sh.note.trim(), photoId: sh.photoId, addedOn: Store.today() });
+    }
+    Store.update('vans', van.id, { docs });
+    set({ docSheet: null });
+    toast(sh.id ? 'Document saved.' : name + ' added.');
+  },
+  removeDoc: (_, el) => {
+    const vanId = (S.docSheet && S.docSheet.vanId) || (S.docView && S.docView.vanId) || S.draft.id;
+    const van = Store.get('vans', vanId);
+    if (!van) return;
+    const docs = (van.docs || []).filter(d => d.id !== el.dataset.id);
+    const gone = (van.docs || []).find(d => d.id === el.dataset.id);
+    if (gone && gone.photoId) { photoUrls.delete(gone.photoId); Photos.remove(gone.photoId); }
+    Store.update('vans', van.id, { docs });
+    set({ docSheet: null, docView: null });
+    toast('Document removed.');
+  },
   startAdd: () => {
     // Blank, not pre-filled: a guessed model that nobody corrects is worse
     // than a gap somebody notices.
@@ -4315,6 +4511,12 @@ document.addEventListener('input', e => {
     if (was !== !!el.value) invalidate();
     return;
   }
+  if (el.dataset.a === 'onDocDate') {
+    const was = !!(S.docSheet && S.docSheet.dueOn);
+    if (S.docSheet) { S = { ...S, docSheet: { ...S.docSheet, dueOn: el.value } }; save(); }
+    if (was !== !!el.value) invalidate();
+    return;
+  }
   handle(e);
 });
 
@@ -4376,6 +4578,13 @@ function gcPhotos() {
     if (c.photos) Object.keys(c.photos).forEach(k => { if (c.photos[k]) keep.push(c.photos[k]); });
     if (c.signatureId) keep.push(c.signatureId);   // the countersignature blob
   });
+  /* Van document attachments live in the same blob store — keep them, or the
+     next boot would garbage-collect every scanned rego and insurance doc. */
+  Store.all('vans').forEach(v => {
+    if (Array.isArray(v.docs)) v.docs.forEach(d => { if (d && d.photoId) keep.push(d.photoId); });
+  });
+  /* A document attachment staged in the open sheet but not yet saved. */
+  if (S.docSheet && S.docSheet.photoId) keep.push(S.docSheet.photoId);
   if (S.cap && S.cap.photos) {
     Object.keys(S.cap.photos).forEach(k => { if (S.cap.photos[k]) keep.push(S.cap.photos[k]); });
   }

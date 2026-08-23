@@ -1595,3 +1595,20 @@ button:active,
 .job-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .job-name { font: 500 14px/1.3 var(--sans); color: var(--text); }
 .job-meta { font: 400 12px/1.35 var(--sans); color: var(--muted); }
+
+/* ---------- Van documents (Stage 2b) ----------------------------------- */
+.doc-row { flex-direction: row; align-items: center; gap: 12px; text-align: left; }
+.doc-icon { flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--ink-wash); color: var(--ink); display: grid; place-items: center; }
+.doc-icon svg { width: 20px; height: 20px; }
+.doc-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.doc-name { font: 600 15px/1.25 var(--sans); color: var(--text); }
+.doc-sub { font: 400 12.5px/1.35 var(--sans); color: var(--muted); }
+
+/* Sheet form field (label above control). */
+.sheet-field { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.sheet textarea.field-input { resize: none; min-height: 62px; padding-top: 10px; padding-bottom: 10px; line-height: 1.4; }
+
+.doc-attach { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 4px; }
+.doc-attach .btn { flex: 0 0 auto; min-height: 44px; padding: 10px 16px; }
+.doc-thumb { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; border: 1px solid var(--line); background: var(--sunk); }
+.doc-view-img { width: 100%; border-radius: 12px; border: 1px solid var(--line); background: var(--sunk); }
