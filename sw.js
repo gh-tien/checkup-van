@@ -3,7 +3,7 @@
    app shell is precached and served cache-first, and fonts are cached as they
    arrive so a second launch works with the radio off. */
 
-const VERSION = 'v34';
+const VERSION = 'v35';
 const SHELL = 'spotcheck-shell-' + VERSION;
 const FONTS = 'spotcheck-fonts-' + VERSION;
 

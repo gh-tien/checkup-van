@@ -20,7 +20,7 @@
    MUST equal VERSION in sw.js. They are separate files with no shared module,
    so this is a hand-kept pair — `.publish/stage.ps1` refuses to stage a build
    where the two disagree, which is what keeps it honest. Bump both together. */
-const BUILD = 'v34';
+const BUILD = 'v35';
 
 /* ---------------------------------------------------------------- data --- */
 
@@ -702,6 +702,10 @@ const curSection = () => S.list[S.secIdx] || null;
 const liveCount = () => liveSections().reduce((a, s) => a + s.items.filter(i => !i.retired).length, 0);
 const isDirty = () => JSON.stringify(S.list) !== JSON.stringify(publishedList());
 const checklistVersion = () => Store.settings().checklistVersion;
+/* Published checklist versions, newest first — a snapshot is pushed on every
+   human publish (see the publish action). v1 shipped with the depot and has no
+   snapshot, so an empty list simply means "only the as-shipped version". */
+const checklistHistory = () => { const h = Store.settings().checklistHistory; return Array.isArray(h) ? h : []; };
 /* What this depot calls itself. Trimmed on the way out rather than on the way
    in, because trimming per keystroke makes the space in "Barking depot"
    impossible to type. '' means nobody has named it yet, and every caller says
@@ -2210,9 +2214,9 @@ function viewMore() {
      it always did. */
   return `
     ${monoLabel(depotName() ? depotName() + ' · depot setup' : 'Depot setup')}
-    ${item('openChecklist', 'list', 'Checklist',
-      dirty ? changeCount() + ' change' + (changeCount() === 1 ? '' : 's') + ' not yet live'
-            : live + ' checks live · v' + checklistVersion(), dirty ? 'is-red' : '')}
+    ${item('openTemplates', 'list', 'Templates',
+      dirty ? changeCount() + ' checklist change' + (changeCount() === 1 ? '' : 's') + ' not yet live'
+            : 'Walk-around v' + checklistVersion() + ' · defect & handover', dirty ? 'is-red' : '')}
     ${item('openPeople', 'people', 'People', activePeople + ' active · 2 roles')}
     ${item('openWorkshops', 'workshop', 'Workshops', shopSub, activeShops ? '' : 'is-red')}
     <div class="card">${note('One depot, two roles: inspectors check vans, managers countersign. Everyone here sees the same fleet.')}</div>
@@ -2337,6 +2341,79 @@ function backupBlock() {
       STORAGE_DURABLE ? 'is-faint' : 'is-amber')}`;
 }
 
+/* --- Templates hub ------------------------------------------------------ */
+
+/* The forms the crew fill in. The walk-around checklist is the one live,
+   editable template; the defect form is built into the fail flow; handover is
+   not in use yet. Presented honestly rather than as three editable forms. */
+function viewTemplates() {
+  const dirty = isDirty();
+  const v = checklistVersion();
+  return `
+    ${note('Forms the crew fill in on a walk.', 'is-faint')}
+    <button class="tmpl-card" data-a="openChecklist">
+      <span class="tmpl-icon is-ink">${ICON.tick}</span>
+      <span class="tmpl-main">
+        <span class="tmpl-name">Vehicle walk-around</span>
+        <span class="tmpl-sub">Checklist · used on every spot-check</span>
+      </span>
+      ${dirty
+        ? `<span class="tmpl-badge is-red">${changeCount()} draft</span>`
+        : `<span class="tmpl-badge is-green">v${v} live</span>`}
+    </button>
+    <button class="menu-item" data-a="openClHistory">
+      <span style="color:var(--ink);display:flex">${ICON.queue}</span>
+      <span class="list-main">
+        <span class="list-title">Checklist versions</span>
+        <span class="list-sub">${checklistHistory().length + 1} published · restore an earlier one</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>
+    <div class="divider-label">${monoLabel('Other forms')}</div>
+    <div class="tmpl-card is-static">
+      <span class="tmpl-icon is-faint">${ICON.defects}</span>
+      <span class="tmpl-main">
+        <span class="tmpl-name">Defect report</span>
+        <span class="tmpl-sub">Built in — raised from a failed item</span>
+      </span>
+      <span class="tmpl-badge is-grey">Built in</span>
+    </div>
+    <div class="tmpl-card is-static">
+      <span class="tmpl-icon is-faint">${ICON.doc}</span>
+      <span class="tmpl-main">
+        <span class="tmpl-name">Vehicle handover</span>
+        <span class="tmpl-sub">Not set up on this depot yet</span>
+      </span>
+      <span class="tmpl-badge is-grey">Not in use</span>
+    </div>`;
+}
+
+/* --- Checklist version history ------------------------------------------ */
+
+function viewClHistory() {
+  const cur = checklistVersion();
+  const hist = checklistHistory();
+  const row = (version, publishedOn, by, current) => `
+    <div class="card ver-row">
+      <span class="ver-main">
+        <span class="ver-label">Version ${version}</span>
+        <span class="ver-sub">${publishedOn ? 'Published ' + dmy(publishedOn) + (by ? ' · ' + esc(by) : '') : 'As shipped with the depot'}</span>
+      </span>
+      ${current
+        ? '<span class="flag is-ink">current</span>'
+        : `<button class="chip is-ghost" data-a="restoreClVersion" data-id="${version}">Restore</button>`}
+    </div>`;
+  const rows = hist.map(h => row(h.version, h.publishedOn, h.by, h.version === cur)).join('');
+  /* v1 as-shipped (or any current version never snapshotted) still needs a row. */
+  const currentInHist = hist.some(h => h.version === cur);
+  const shippedRow = currentInHist ? '' : row(cur, Store.settings().checklistPublishedOn || '', '', true);
+  return `
+    ${monoLabel('Vehicle walk-around · ' + (hist.length + (currentInHist ? 0 : 1)) + ' version' + ((hist.length + (currentInHist ? 0 : 1)) === 1 ? '' : 's'))}
+    ${shippedRow}
+    ${rows}
+    ${note('Restore loads that version into your draft to review and publish as a new version. Nothing is overwritten — the live list keeps running until you publish.', 'is-faint')}`;
+}
+
 /* --- Checklist: sections ------------------------------------------------ */
 
 function viewChecklist() {
@@ -2365,7 +2442,10 @@ function viewChecklist() {
   }).join('');
 
   return `
-    ${monoLabel('Sections — in the order they’re walked')}
+    <div class="divider-label">
+      ${monoLabel('Sections — in the order they’re walked')}
+      <button class="chip is-ghost" data-a="openClHistory">v${checklistVersion()} · history</button>
+    </div>
     ${rows}
     <button class="btn-add" data-a="addSection">+ Add a section</button>
     <div class="card">${note(live + ' checks live across ' + secs.length + ' sections — ' + critCount + ' safety-critical, ' + measCount + ' measured. A failed safety-critical check takes the van off the road on the spot.')}</div>
@@ -3045,7 +3125,9 @@ const SCREENS = {
   /* The hidden admin's own area. Reached only from the discreet links in
      Settings and on the sign-in gate, never from a tab or a crew list. */
   admin: { title: 'System admin', view: viewAdmin, back: true },
-  checklist: { title: 'Checklist', view: viewChecklist, back: true },
+  templates: { title: 'Templates', view: viewTemplates, back: true },
+  checklist: { title: 'Vehicle walk-around', view: viewChecklist, back: true },
+  clhistory: { title: 'Checklist versions', view: viewClHistory, back: true },
   section: { title: () => (curSection() ? curSection().name : 'Section'), view: viewSection, back: true },
   people: { title: 'People', view: viewPeople, back: true },
   workshops: { title: 'Workshops', view: viewWorkshops, back: true },
@@ -4319,13 +4401,32 @@ const ACTIONS = {
   },
   publish: () => {
     if (!isDirty()) return;
-    const v = checklistVersion() + 1;
+    const prevVer = checklistVersion();
+    const prev = publishedList();
+    const v = prevVer + 1;
     // The draft becomes the published list, in one write — a half-published
     // checklist is worse than an out-of-date one.
     Store.replace('checklist', S.list);
-    Store.setSettings({ checklistVersion: v, checklistPublishedOn: Store.today() });
+    /* Snapshot both the outgoing version (so it can be restored) and the new
+       one. Newest first, capped so the settings blob can't grow without bound. */
+    let hist = checklistHistory();
+    if (!hist.some(h => h.version === prevVer)) {
+      hist = [{ version: prevVer, publishedOn: Store.settings().checklistPublishedOn || '', by: '', sections: cloneList(prev) }, ...hist];
+    }
+    const snap = { version: v, publishedOn: Store.today(), by: meName() || 'System admin', sections: cloneList(S.list) };
+    hist = [snap, ...hist].slice(0, 30);
+    Store.setSettings({ checklistVersion: v, checklistPublishedOn: Store.today(), checklistHistory: hist });
     set({ list: publishedList() });
     toast('Published v' + v + '. Phones pick it up on next sync.');
+  },
+  openTemplates: () => push('templates'),
+  openClHistory: () => push('clhistory'),
+  restoreClVersion: (_, el) => {
+    const snap = checklistHistory().find(h => String(h.version) === el.dataset.id);
+    if (!snap) return;
+    set({ list: cloneList(snap.sections), openId: null, secIdx: 0 });
+    push('checklist');
+    toast('Loaded v' + snap.version + ' into your draft — review, then publish.');
   },
   revertList: () => {
     if (!isDirty()) return;

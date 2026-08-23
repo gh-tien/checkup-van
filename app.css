@@ -1652,3 +1652,27 @@ button:active,
 .fault-chev { flex: none; width: 16px; height: 16px; color: var(--faint); display: flex; transition: transform .15s; }
 .fault-chev svg { width: 16px; height: 16px; }
 .fault-body { border-top: 1px solid var(--line-soft); padding: 12px 14px; display: flex; flex-direction: column; gap: var(--gap-2); }
+
+/* ---------- Templates hub + checklist versions (Stage 5) --------------- */
+.tmpl-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card);
+  box-shadow: var(--shadow-card); padding: 14px; min-height: 72px;
+  display: flex; align-items: center; gap: 13px; width: 100%; text-align: left;
+}
+.tmpl-card.is-static { box-shadow: none; background: var(--dormant); border-color: var(--line-dormant); }
+.tmpl-icon { flex: none; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; border: 1.5px solid; }
+.tmpl-icon.is-ink { color: var(--ink); border-color: var(--ink); }
+.tmpl-icon.is-faint { color: var(--muted); border-color: var(--faint); }
+.tmpl-icon svg { width: 22px; height: 22px; }
+.tmpl-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.tmpl-name { font: 600 16px/1.25 var(--sans); color: var(--text); }
+.tmpl-sub { font: 400 12.5px/1.35 var(--sans); color: var(--muted); }
+.tmpl-badge { flex: none; font: 700 9.5px/1 var(--mono); border: 1px solid; border-radius: 6px; padding: 4px 7px; }
+.tmpl-badge.is-green { color: #3A7D44; border-color: #BCD9C2; }
+.tmpl-badge.is-red { color: var(--red); border-color: #E6BCB4; }
+.tmpl-badge.is-grey { color: var(--faint); border-color: var(--line); }
+
+.ver-row { flex-direction: row; align-items: center; gap: 12px; }
+.ver-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ver-label { font: 600 15px/1.25 var(--sans); color: var(--text); }
+.ver-sub { font: 400 12px/1.35 var(--sans); color: var(--muted); }
