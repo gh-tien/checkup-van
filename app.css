@@ -1644,3 +1644,11 @@ button:active,
 .verdict.is-pass .verdict-title { color: #2F6B3A; }
 .verdict.is-fail .verdict-title { color: var(--red); }
 .verdict-sub { font: 500 13px/1.35 var(--sans); color: var(--body); }
+
+/* ---------- Faults grouped by vehicle (Stage 4) ------------------------- */
+.fault-head { width: 100%; background: transparent; border: 0; padding: 13px 14px; display: flex; align-items: center; gap: 10px; text-align: left; }
+.fault-head-main { flex: 1 1 auto; min-width: 0; display: flex; align-items: baseline; gap: 10px; }
+.fault-head-sub { font: 500 12px/1 var(--mono); color: var(--faint); }
+.fault-chev { flex: none; width: 16px; height: 16px; color: var(--faint); display: flex; transition: transform .15s; }
+.fault-chev svg { width: 16px; height: 16px; }
+.fault-body { border-top: 1px solid var(--line-soft); padding: 12px 14px; display: flex; flex-direction: column; gap: var(--gap-2); }

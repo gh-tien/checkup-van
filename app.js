@@ -219,6 +219,9 @@ const freshState = () => ({
      (retired) drawer is open. Both are transient view state — load() clears
      them so a reload never comes back mid-search or with the drawer sprung. */
   fleetQuery: '', removedOpen: false,
+  /* Defects (Faults) screen: search text, and which per-vehicle groups are
+     collapsed. Transient — cleared by load(). */
+  faultsQuery: '', faultClosed: {},
   /* The document add/edit sheet on a van (Stage 2b), and the full-screen
      document viewer. null when closed. Gestures — cleared by load(). */
   docSheet: null, docView: null
@@ -259,6 +262,8 @@ function load() {
   S.importSum = null;
   S.fleetQuery = '';
   S.removedOpen = false;
+  S.faultsQuery = '';
+  S.faultClosed = {};
   S.docSheet = null;
   S.docView = null;
   /* A blob written before the draw existed has no `draw` at all, and a corrupt
@@ -1636,6 +1641,25 @@ function viewHistory() {
 
 /* --- Defects ------------------------------------------------------------ */
 
+/* One open defect, shown inside its vehicle's group — so no reg here, the group
+   header carries it. */
+function defectCard(d) {
+  const stage = defectStage(d);
+  const mod = stage === 'overdue' ? 'is-red' : stage === 'verified' ? 'is-ink' : 'is-faint';
+  const verified = stage === 'verified';
+  const sev = d.severity || 'minor';
+  return `
+    <div class="${cls('card', stage === 'overdue' && 'is-red')}">
+      <div class="spread">
+        <span style="font:500 15.5px/1.3 var(--sans)">${esc(d.name)}</span>
+        <span class="${cls('flag', mod)}">${esc(stage === 'overdue' ? 'Overdue · ' + sev : sentence(sev))}</span>
+      </div>
+      ${d.note ? note(d.note) : ''}
+      <div class="list-sub">${esc(defectMetaLine(d))}</div>
+      <button class="btn ${verified ? 'btn-outline' : 'btn-outline-red'}" data-a="defectAction" data-id="${d.id}">${verified ? 'Close defect — repair verified' : 'Chase / schedule re-check'}</button>
+    </div>`;
+}
+
 function viewDefects() {
   const list = openDefects();
   if (!list.length) {
@@ -1646,29 +1670,61 @@ function viewDefects() {
       : emptyState('No defects yet',
           'A defect is raised when you countersign a check that failed something. Nothing has been countersigned yet.');
   }
-  const cards = list.map(d => {
-    const stage = defectStage(d);
-    const mod = stage === 'overdue' ? 'is-red' : stage === 'verified' ? 'is-ink' : 'is-faint';
-    const verified = stage === 'verified';
-    const sev = d.severity || 'minor';
+
+  const q = S.faultsQuery.trim().toLowerCase();
+  const matches = d => !q || d.reg.toLowerCase().includes(q) || (d.name || '').toLowerCase().includes(q) || (d.note || '').toLowerCase().includes(q);
+  const shown = list.filter(matches);
+
+  /* Grouped by vehicle — the depot works defects a van at a time, so the
+     overdue ones on one plate read together instead of scattered by date. */
+  const groups = {};
+  shown.forEach(d => {
+    const k = d.vanId || d.reg;
+    (groups[k] = groups[k] || { key: k, reg: d.reg, vanId: d.vanId, items: [] }).items.push(d);
+  });
+  const order = Object.keys(groups).sort((a, b) => groups[a].reg.localeCompare(groups[b].reg));
+
+  const search = `
+    <div class="search">
+      <span class="search-icon">${ICON.search}</span>
+      <input class="search-input" data-a="onFaultsQuery" data-fk="faults-q" value="${esc(S.faultsQuery)}"
+             type="text" placeholder="Search plate, fault or note…" aria-label="Search defects">
+      ${q ? `<button class="search-clear" data-a="clearFaultsQuery" aria-label="Clear search">${ICON.x}</button>` : ''}
+    </div>`;
+
+  const groupHtml = order.map(k => {
+    const g = groups[k];
+    const overdue = g.items.some(d => defectStage(d) === 'overdue');
+    const closed = !!S.faultClosed[k];
     return `
-      <div class="${cls('card', stage === 'overdue' && 'is-red')}">
-        <div class="spread">
-          <span class="reg">${esc(d.reg)} — ${esc(d.name)}</span>
-          <span class="${cls('flag', mod)}">${esc(stage === 'overdue' ? 'Overdue · ' + sev : sentence(sev))}</span>
-        </div>
-        <div class="row-tap" style="align-items:flex-start">
-          <div class="${cls('thumb-sm', stage === 'overdue' && 'is-red')}"></div>
-          <div class="list-main">
-            ${note(d.note)}
-            <div class="list-sub">${esc(defectMetaLine(d))}</div>
-          </div>
-        </div>
-        <button class="btn ${verified ? 'btn-outline' : 'btn-outline-red'}" data-a="defectAction" data-id="${d.id}">${verified ? 'Close defect — repair verified' : 'Chase / schedule re-check'}</button>
+      <div class="card is-flat" style="padding:0;overflow:hidden;border:1px solid var(--line);background:var(--card)">
+        <button class="fault-head" data-a="toggleFault" data-id="${esc(k)}">
+          <span class="fault-head-main">
+            <span class="reg">${esc(g.reg)}</span>
+            <span class="fault-head-sub">${g.items.length} open</span>
+          </span>
+          ${overdue ? '<span class="flag is-red">Overdue</span>' : ''}
+          <span class="fault-chev" style="transform:rotate(${closed ? '0deg' : '90deg'})">${ICON.chev}</span>
+        </button>
+        ${closed ? '' : `
+          <div class="fault-body">
+            ${g.items.map(defectCard).join('')}
+            ${g.vanId ? `<button class="btn btn-quiet" data-a="openVan" data-id="${esc(g.vanId)}">Open ${esc(g.reg)}</button>` : ''}
+          </div>`}
       </div>`;
   }).join('');
 
-  return cards + note('A defect only closes when someone re-checks the van and photographs the repair.', 'is-faint');
+  const noMatch = q && !shown.length
+    ? `<div class="empty">${note('No defect matches “' + S.faultsQuery.trim() + '”.', 'is-faint')}</div>`
+    : '';
+
+  return `
+    <div class="fleet-top">
+      ${search}
+      <span class="fleet-count">${list.length} open · ${order.length} vehicle${order.length === 1 ? '' : 's'}</span>
+    </div>
+    ${groupHtml}${noMatch}
+    ${shown.length ? note('A defect only closes when someone re-checks the van and photographs the repair.', 'is-faint') : ''}`;
 }
 
 /* --- Coverage ----------------------------------------------------------- */
@@ -3996,6 +4052,9 @@ const ACTIONS = {
   setFilter: (_, el) => set({ filterIdx: Number(el.dataset.id) || 0 }),
   onFleetQuery: (_, el) => set({ fleetQuery: el.value }),
   clearFleetQuery: () => set({ fleetQuery: '' }),
+  onFaultsQuery: (_, el) => set({ faultsQuery: el.value }),
+  clearFaultsQuery: () => set({ faultsQuery: '' }),
+  toggleFault: (_, el) => set({ faultClosed: { ...S.faultClosed, [el.dataset.id]: !S.faultClosed[el.dataset.id] } }),
   toggleRemoved: () => set({ removedOpen: !S.removedOpen }),
   restoreVan: (_, el) => {
     const v = Store.get('vans', el.dataset.id);
