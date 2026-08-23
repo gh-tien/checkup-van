@@ -181,7 +181,7 @@ cache-first. **Any change to `index.html`, `app.css`, `store.js`, `photos.js` or
 must be *reloaded* after the new worker activates — navigating within the app is
 not enough, because the old worker is still the one answering.
 
-Current version: `v28`.
+Current version: `v37`.
 
 The version lives in **two** places that must agree: `VERSION` in `sw.js` and `BUILD` at the top of
 `app.js`. `BUILD` is what the header shows in its left gutter, so a mismatch means the app reports a
