@@ -20,7 +20,7 @@
    MUST equal VERSION in sw.js. They are separate files with no shared module,
    so this is a hand-kept pair — `.publish/stage.ps1` refuses to stage a build
    where the two disagree, which is what keeps it honest. Bump both together. */
-const BUILD = 'v36';
+const BUILD = 'v37';
 
 /* ---------------------------------------------------------------- data --- */
 
@@ -225,6 +225,8 @@ const freshState = () => ({
   /* People screen segmented filter, and the person whose profile is open.
      profileId is transient (cleared by load); the filter is harmless to keep. */
   peopleFilter: 'all', profileId: null,
+  /* Which accordion topic is open on the Help screen ('' = all closed). */
+  helpTopic: '',
   /* The document add/edit sheet on a van (Stage 2b), and the full-screen
      document viewer. null when closed. Gestures — cleared by load(). */
   docSheet: null, docView: null
@@ -268,6 +270,7 @@ function load() {
   S.faultsQuery = '';
   S.faultClosed = {};
   S.profileId = null;
+  S.helpTopic = '';
   S.docSheet = null;
   S.docView = null;
   /* A blob written before the draw existed has no `draw` at all, and a corrupt
@@ -2178,6 +2181,61 @@ function readBackup(text) {
 
 /* --- More menu ---------------------------------------------------------- */
 
+/* --- Help ---------------------------------------------------------------- */
+
+/* The design's "How to & help" — an accordion of the things a new crew member
+   asks. The draw and people topics reuse the header (i)-sheet copy so there is
+   one source of truth for each. */
+const HELP_TOPICS = [
+  { id: 'draw', q: 'How the van is picked', a: HELP.queue.body },
+  {
+    id: 'roles', q: 'Roles: inspector, manager, admin', a: [
+      'Inspectors run the draw and record a walk-around spot-check. They see their own checks.',
+      'Managers do everything an inspector can, and also countersign checks, send them back, raise and edit defects, and edit the checklist and draw rules.',
+      'Admin is the hidden setup role: it bootstraps the depot — people, fleet, backup — but never checks a van or countersigns.'
+    ]
+  },
+  { id: 'people', q: 'Suspending and deleting people', a: HELP.people.body },
+  {
+    id: 'defects', q: 'How a defect is raised and closed', a: [
+      'A defect is raised when a manager countersigns a check that failed an item — not before. The failed note becomes the job the workshop reads.',
+      'Each defect is assigned to a workshop with a fix-by date. It shows on the Defects tab, grouped under its vehicle, and goes overdue on its own if the date passes.',
+      'It closes only when someone re-checks the van and marks the repair verified — a defect nobody re-checked never quietly disappears.'
+    ]
+  },
+  {
+    id: 'backup', q: 'Backup and where the data lives', a: [
+      'There is no server and no account. Every van, person, check and defect is stored on this phone alone, and each phone that opens the app keeps its own separate depot.',
+      'Save a backup from Settings — a single .json file, the only copy that exists off the phone. Keep it somewhere safe.',
+      'Restoring a backup replaces everything on the phone with the file, so save the current depot first if you might want it back.'
+    ]
+  },
+  {
+    id: 'offline', q: 'Working offline and installing it', a: [
+      'On the hosted (https) site the app caches itself, so it opens and runs with no signal once it has loaded once.',
+      'Add it to the home screen from the browser’s share menu and it launches like an app, full-screen.',
+      'Photos and the whole depot stay on the device — going offline changes nothing about where the data lives.'
+    ]
+  }
+];
+
+function viewHelp() {
+  const rows = HELP_TOPICS.map(t => {
+    const open = S.helpTopic === t.id;
+    return `
+      <div class="card is-flat" style="padding:0;overflow:hidden;border:1px solid var(--line);background:var(--card)">
+        <button class="help-head" data-a="toggleHelpTopic" data-id="${esc(t.id)}" aria-expanded="${open}">
+          <span class="help-q">${esc(t.q)}</span>
+          <span class="help-chev" style="transform:rotate(${open ? '90deg' : '0deg'})">${ICON.chev}</span>
+        </button>
+        ${open ? `<div class="help-body">${t.a.map(x => `<p class="note is-faint">${esc(x)}</p>`).join('')}</div>` : ''}
+      </div>`;
+  }).join('');
+  return `
+    ${note('The short version of how the depot runs. Tap a question to open it.', 'is-faint')}
+    ${rows}`;
+}
+
 function viewMore() {
   const live = liveCount();
   const dirty = isDirty();
@@ -2227,6 +2285,8 @@ function viewMore() {
     <div class="divider-label">${monoLabel('Records')}</div>
     ${item('openHistory', 'queue', 'History',
       signed ? signed + ' countersigned · newest first' : 'Nothing countersigned yet')}
+    <div class="divider-label">${monoLabel('Support')}</div>
+    ${item('openHelpScreen', 'info', 'How to & help', 'The draw, roles, defects, backup and offline')}
     <div class="divider-label">${monoLabel('Device')}</div>
     ${item('openSettings', 'settings', 'Settings', 'Backup, restore and reset this depot')}
     <div class="divider-label">${monoLabel('Fleet')}</div>
@@ -3199,6 +3259,7 @@ const SCREENS = {
   more: { title: 'More', view: viewMore },
   settings: { title: 'Settings', view: viewSettings, back: true },
   config: { title: 'Depot configuration', view: viewConfig, back: true },
+  help: { title: 'How to & help', view: viewHelp, back: true },
   profile: { title: 'Profile', view: viewProfile, back: true },
   whoami: { title: 'Who are you?', view: viewWho, back: true },
   /* The bootstrap screen, shown only while the depot has no people (see
@@ -4505,6 +4566,8 @@ const ACTIONS = {
   openTemplates: () => push('templates'),
   openClHistory: () => push('clhistory'),
   openConfig: () => push('config'),
+  openHelpScreen: () => push('help'),
+  toggleHelpTopic: (_, el) => set({ helpTopic: S.helpTopic === el.dataset.id ? '' : el.dataset.id }),
   openProfile: (_, el) => { set({ profileId: el.dataset.id }); push('profile'); },
   setPeopleFilter: (_, el) => set({ peopleFilter: el.dataset.id }),
   restoreClVersion: (_, el) => {
