@@ -1676,3 +1676,10 @@ button:active,
 .ver-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .ver-label { font: 600 15px/1.25 var(--sans); color: var(--text); }
 .ver-sub { font: 400 12px/1.35 var(--sans); color: var(--muted); }
+
+/* ---------- Profile (Stage 6) ------------------------------------------ */
+.profile-head { display: flex; align-items: center; gap: 14px; padding: 2px 0 4px; }
+.profile-avatar { flex: none; width: 60px; height: 60px; border-radius: var(--r-chip); background: var(--ink); color: #fff; display: grid; place-items: center; font: 700 22px/1 var(--sans); letter-spacing: .02em; }
+.profile-id { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.profile-name { font: 700 21px/1.2 var(--sans); letter-spacing: -.01em; color: var(--text); }
+.profile-role { font: 500 13.5px/1.35 var(--sans); color: var(--muted); }

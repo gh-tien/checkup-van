@@ -20,7 +20,7 @@
    MUST equal VERSION in sw.js. They are separate files with no shared module,
    so this is a hand-kept pair — `.publish/stage.ps1` refuses to stage a build
    where the two disagree, which is what keeps it honest. Bump both together. */
-const BUILD = 'v35';
+const BUILD = 'v36';
 
 /* ---------------------------------------------------------------- data --- */
 
@@ -222,6 +222,9 @@ const freshState = () => ({
   /* Defects (Faults) screen: search text, and which per-vehicle groups are
      collapsed. Transient — cleared by load(). */
   faultsQuery: '', faultClosed: {},
+  /* People screen segmented filter, and the person whose profile is open.
+     profileId is transient (cleared by load); the filter is harmless to keep. */
+  peopleFilter: 'all', profileId: null,
   /* The document add/edit sheet on a van (Stage 2b), and the full-screen
      document viewer. null when closed. Gestures — cleared by load(). */
   docSheet: null, docView: null
@@ -264,6 +267,7 @@ function load() {
   S.removedOpen = false;
   S.faultsQuery = '';
   S.faultClosed = {};
+  S.profileId = null;
   S.docSheet = null;
   S.docView = null;
   /* A blob written before the draw existed has no `draw` at all, and a corrupt
@@ -1293,7 +1297,7 @@ function dashAdmin() {
       <span class="chev">${ICON.chev}</span>
     </button>
     <div class="dock-row">
-      <button class="btn btn-outline" data-a="openSettings">Depot config</button>
+      <button class="btn btn-outline" data-a="openConfig">Depot config</button>
       <button class="btn btn-outline" data-a="openPeople">Personnel</button>
     </div>`;
 }
@@ -2255,10 +2259,34 @@ function ruleField(r) {
     </label>`;
 }
 
+/* --- Depot configuration ------------------------------------------------ */
+
+function roleCard(name, desc) {
+  return `<div class="card"><span style="font:600 16px/1.2 var(--sans)">${esc(name)}</span>${note(desc, 'is-faint')}</div>`;
+}
+
+function viewConfig() {
+  const badDraft = RULES.filter(r => Object.prototype.hasOwnProperty.call(S.ruleDraft, r.key));
+  return `
+    <div class="divider-label">${monoLabel('Draw rules — how the app picks vans')}</div>
+    <div class="field-row">${ruleField(RULES[0])}${ruleField(RULES[1])}</div>
+    <div class="field-row">${ruleField(RULES[2])}${ruleField(RULES[3])}</div>
+    ${badDraft.length
+      ? note('A rule is mid-edit and out of range — it won’t save until it’s back within its limits.', 'is-red')
+      : note('A van checked within the exclude window is held out of the hat; anything past the force window jumps to the front until it’s walked.', 'is-faint')}
+
+    <div class="divider-label">${monoLabel('Roles & what they can do')}</div>
+    ${roleCard('Inspector', 'Runs the draw and records a walk-around spot-check. Sees their own checks, not other people’s.')}
+    ${roleCard('Manager', 'Everything an inspector can, plus countersign anyone’s check, send one back, raise and edit defects, and edit the checklist and these rules.')}
+    ${roleCard('Admin', 'Sets up the depot — people, fleet, backup and restore. Never checks a van or countersigns.')}
+    ${note('Roles are fixed on this depot. Change a person’s role on the People screen.', 'is-faint')}
+
+    <div class="divider-label">${monoLabel('Check photos')}</div>
+    <div class="card">${note('Every walk records these ' + SHOTS.length + ' angles: ' + SHOTS.map(shotLabel).join(', ') + '.')}</div>`;
+}
+
 function viewSettings() {
   const name = depotName();
-  const badDraft = RULES.filter(r => Object.prototype.hasOwnProperty.call(S.ruleDraft, r.key));
-  const { excludeDays, forceDays } = drawRules();
   return `
     ${monoLabel('This depot')}
     <div class="field-row">
@@ -2273,14 +2301,15 @@ function viewSettings() {
       ? 'This is the name at the head of More, and it rides along in every backup. One install is one depot — the vans on it park here, in the bays you give them; the workshops in More are the outside garages that repair them.'
       : 'Give this depot the name people say out loud — a site, a yard, a base. It shows at the head of More and rides along in every backup. Until then the app says nothing rather than guess.',
       'is-faint')}
-    <div class="divider-label">${monoLabel('Picking a van to check')}</div>
-    <div class="field-row">${ruleField(RULES[0])}${ruleField(RULES[1])}</div>
-    <div class="field-row">${ruleField(RULES[2])}${ruleField(RULES[3])}</div>
-    ${badDraft.length
-      ? note('Not saved yet — ' + badDraft.map(r => r.label.toLowerCase() + ' must be ' + r.min + '–' + r.max).join(', ') + '. The rule in force is unchanged until it is.', 'is-red')
-      : note('These decide what the Dashboard draw can pick. A van is held out of the hat for ' + excludeDays +
-          (excludeDays === 1 ? ' day' : ' days') + ' after it is walked, and any van past ' + forceDays +
-          ' days jumps ahead of everything else until somebody walks it. They apply to every phone in the depot, not just this one.', 'is-faint')}
+    <div class="divider-label">${monoLabel('App')}</div>
+    <button class="menu-item" data-a="openConfig">
+      <span style="color:var(--ink);display:flex">${ICON.settings}</span>
+      <span class="list-main">
+        <span class="list-title">Depot configuration</span>
+        <span class="list-sub">Draw rules · roles &amp; capabilities</span>
+      </span>
+      <span class="chev">${ICON.chev}</span>
+    </button>
     <div class="divider-label">${monoLabel('Backup')}</div>
     ${backupBlock()}
     <div class="divider-label">${monoLabel('This device')}</div>
@@ -2711,9 +2740,56 @@ function viewAdmin() {
 const personCheckCount = id =>
   Store.count('checks', c => c.inspectorId === id || c.secondId === id);
 
+/* One person's stats, from the check history: this week, this month, and the
+   open defects raised off their checks. */
+function personStats(id) {
+  const today = Store.today();
+  const mine = doneChecks().filter(c => c.inspectorId === id);
+  const within = n => mine.filter(c => { const d = dayOf(c.finishedAt); return d && daysBetween(d, today) <= n; }).length;
+  const defects = openDefects().filter(d => { const c = Store.get('checks', d.checkId); return c && c.inspectorId === id; }).length;
+  return { total: mine.length, week: within(7), month: within(30), defects };
+}
+
+function viewProfile() {
+  const p = S.profileId && Store.get('people', S.profileId);
+  if (!p) return emptyState('No one selected', 'Open a person from the People screen to see their profile.', { label: 'Go to People', action: 'openPeople' });
+  const s = personStats(p.id);
+  const isMe = !!me() && me().id === p.id;
+  const vans = fleetList().filter(v => v.status !== 'retired' && v.keyholder && v.keyholder === p.name);
+  return `
+    <div class="profile-head">
+      <span class="profile-avatar">${esc(initials(p.name))}</span>
+      <span class="profile-id">
+        <span class="profile-name">${esc(p.name)}${isMe ? ' · you' : ''}</span>
+        <span class="profile-role">${esc(ROLE_LABEL[p.role])}${p.active ? '' : ' · suspended'}</span>
+      </span>
+    </div>
+    <div class="stat-grid">
+      ${stat(s.week, 'This week')}
+      ${stat(s.month, 'This month')}
+      ${stat(s.defects, 'Open defects', !!s.defects)}
+    </div>
+    <div class="divider-label">${monoLabel(s.total + (s.total === 1 ? ' check on record' : ' checks on record'))}</div>
+    <div class="divider-label">${monoLabel('Assigned vehicles' + (vans.length ? ' · ' + vans.length : ''))}</div>
+    ${vans.length
+      ? vans.map(v => `
+        <button class="card" data-a="openVan" data-id="${esc(v.id)}">
+          <div class="row-tap">
+            <div class="list-main"><span class="reg">${esc(v.reg)}</span><div class="list-sub">${esc(v.model || 'Model not set')}</div></div>
+            <span class="chev">${ICON.chev}</span>
+          </div>
+        </button>`).join('')
+      : note('No vehicles list ' + p.name + ' as keyholder.', 'is-faint')}
+    <button class="btn btn-quiet" data-a="openPeople">Manage on the People screen</button>`;
+}
+
 function viewPeople() {
   const signer = me();
-  const cards = peopleList().filter(p => p.role !== 'admin').map(p => {
+  const filter = S.peopleFilter;
+  const roster = peopleList().filter(p => p.role !== 'admin');
+  const chips = [['all', 'All'], ['manager', 'Managers'], ['inspector', 'Inspectors']]
+    .map(([k, l]) => `<button class="chip ${filter === k ? 'is-on' : 'is-ghost'}" data-a="setPeopleFilter" data-id="${k}">${esc(l)}</button>`).join('');
+  const cards = roster.filter(p => filter === 'all' || p.role === filter).map(p => {
     const isMgr = p.role === 'manager';
     const armed = S.armDelPerson === p.id;
     const onChecks = personCheckCount(p.id);
@@ -2736,7 +2812,7 @@ function viewPeople() {
               'Tap anything else to cancel.', 'is-red')
           : ''}
         <div class="row-tap">
-          <span class="list-sub" style="flex:1 1 auto">${isMe ? 'This is you on this phone' : 'Signs in by name — no PIN'}</span>
+          <button class="chip is-ghost" data-a="openProfile" data-id="${esc(p.id)}" style="flex:1 1 auto;justify-content:flex-start">Profile</button>
           <button class="chip" data-a="toggleActive" data-id="${esc(p.id)}">${p.active ? 'Suspend' : 'Reinstate'}</button>
           <button class="${cls('chip', armed && 'is-red-on')}" data-a="delPerson" data-id="${esc(p.id)}">Delete</button>
         </div>
@@ -2749,8 +2825,13 @@ function viewPeople() {
      itself: every card names its own role on it. The two standing notes that
      used to close the screen — what Suspend keeps and what Delete does not
      touch — are behind the (i) in the header now. See HELP. */
+  const shown = roster.filter(p => filter === 'all' || p.role === filter).length;
   return `
-    ${cards}
+    <div class="fleet-top">
+      <div class="chip-row">${chips}</div>
+      <span class="fleet-count">${shown} shown · ${roster.filter(p => p.active).length} active</span>
+    </div>
+    ${cards || `<div class="empty">${note('No ' + (filter === 'manager' ? 'managers' : 'inspectors') + ' on the depot yet.', 'is-faint')}</div>`}
     <button class="btn-add" data-a="addPerson">+ Add someone</button>`;
 }
 
@@ -3117,6 +3198,8 @@ const SCREENS = {
   van: { title: () => (S.adding ? 'New van' : S.draft.reg), view: viewVan, back: true },
   more: { title: 'More', view: viewMore },
   settings: { title: 'Settings', view: viewSettings, back: true },
+  config: { title: 'Depot configuration', view: viewConfig, back: true },
+  profile: { title: 'Profile', view: viewProfile, back: true },
   whoami: { title: 'Who are you?', view: viewWho, back: true },
   /* The bootstrap screen, shown only while the depot has no people (see
      render()). It is not reachable by nav — it pre-empts it — so it takes no
@@ -4421,6 +4504,9 @@ const ACTIONS = {
   },
   openTemplates: () => push('templates'),
   openClHistory: () => push('clhistory'),
+  openConfig: () => push('config'),
+  openProfile: (_, el) => { set({ profileId: el.dataset.id }); push('profile'); },
+  setPeopleFilter: (_, el) => set({ peopleFilter: el.dataset.id }),
   restoreClVersion: (_, el) => {
     const snap = checklistHistory().find(h => String(h.version) === el.dataset.id);
     if (!snap) return;
