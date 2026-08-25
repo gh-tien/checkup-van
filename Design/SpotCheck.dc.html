@@ -9,8 +9,8 @@
 <x-dc>
 <helmet>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box}
     ::-webkit-scrollbar{width:0;height:0}
@@ -41,7 +41,7 @@
     </div>
     <div style="height:1px;background:#D3D9DD"></div>
     <div onClick="{{ onSignOut }}" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 11px;border:1px solid #D3D9DD;border-radius:11px;font-family:'Fustat';font-weight:600;font-size:13px;color:#58626A;background:#fff">
-      <dc-import name="Icon" hint-size="16px,16px" nameprop="lock" name="Icon" iconname="lock" size="15" color="#58626A" sw="1.8"></dc-import>
+      <dc-import name="Icon" hint-size="16px,16px" nameprop="lock" iconname="lock" size="15" color="#58626A" sw="1.8"></dc-import>
       Sign out → Gate
     </div>
     <div style="font-family:'Fustat';font-size:11.5px;line-height:16px;color:#68727A">Navigate with the tab bar and in-screen controls, exactly like the live app. Switch role above to see both dashboards.</div>
@@ -72,7 +72,7 @@
         <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;border-bottom:1px solid #E7EBEE">
           <sc-if value="{{ header.showBack }}" hint-placeholder-val="{{ false }}">
             <div onClick="{{ onBack }}" style="cursor:pointer;width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;transform:rotate(180deg)">
-              <dc-import name="Icon" hint-size="20px,20px" iconname="chevronRight" name="Icon" size="20" color="#1B2126" sw="2.2"></dc-import>
+              <dc-import name="Icon" hint-size="20px,20px" iconname="chevronRight" size="20" color="#1B2126" sw="2.2"></dc-import>
             </div>
             <div style="flex:1;min-width:0;font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ header.title }}</div>
           </sc-if>
@@ -90,12 +90,12 @@
       <div class="scroll" style="flex:1;min-height:0;overflow-y:auto;background:{{ bodyBg }};position:relative">
         <!-- GATE -->
         <sc-if value="{{ isGate }}" hint-placeholder-val="{{ false }}">
-          <div style="min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:40px 22px">
+          <div style="min-height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 40px 22px; position: relative">
             <div style="display:flex;justify-content:center;margin-bottom:22px"><div style="width:56px;height:56px;border-radius:16px;background:#1B4D7A;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><dc-import name="Icon" hint-size="28px,28px" iconname="check" size="28" color="#fff" sw="2.8"></dc-import></div></div>
 
             <sc-if value="{{ gate.isPick }}" hint-placeholder-val="{{ true }}">
               <div>
-                <div style="position:relative;display:flex;align-items:center"><div style="position:absolute;left:14px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="19px,19px" iconname="search" size="19" color="#68727A" sw="1.9"></dc-import></div><input value="{{ gate.pickQuery }}" onInput="{{ gate.onQuery }}" placeholder="Search your name…" style="width:100%;min-height:56px;border-radius:14px;border:1px solid #E7EBEE;background:#fff;padding:0 16px 0 42px;font-family:'Fustat';font-size:16px;color:#1B2126;outline:none" /></div>
+                <div style="position:relative;display:flex;align-items:center"><div style="position:absolute;left:14px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="19px,19px" iconname="search" size="19" color="#68727A" sw="1.9"></dc-import></div><input value="{{ gate.pickQuery }}" onInput="{{ gate.onQuery }}" placeholder="Search your name…" style="width:100%;min-height:56px;border-radius:14px;border:1px solid #E7EBEE;background:#fff;padding:0 16px 0 42px;font-family:'Fustat';font-size:16px;color:#1B2126;outline:none"></div>
                 <sc-if value="{{ gate.hasResults }}" hint-placeholder-val="{{ false }}">
                   <div style="margin-top:6px;background:#fff;border:1px solid #E7EBEE;border-radius:14px;overflow:hidden">
                     <sc-for list="{{ gate.results }}" as="r" hint-placeholder-count="0"><div onClick="{{ r.onPress }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 14px;min-height:58px;border-bottom:1px solid #F1F2F3"><div style="width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:13px;background:{{ r.avBg }};color:{{ r.avColor }}">{{ r.ini }}</div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15.5px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div><div style="font-family:'Fustat';font-size:12px;color:#616B73">{{ r.role }}</div></div></div></sc-for>
@@ -122,7 +122,7 @@
                 <div onClick="{{ gate.onPickBack }}" style="cursor:pointer;margin-top:18px;min-height:44px;display:flex;align-items:center"><span style="font-family:'Fustat';font-weight:500;font-size:14px;color:#616B73">← Choose someone else</span></div>
               </div>
             </sc-if>
-          </div>
+          <div style="font-size: 16px; line-height: 1; position: absolute; left: 151px; top: 629px">Testing</div></div>
         </sc-if>
         <!-- @@SCREENS@@ -->
 
@@ -139,17 +139,17 @@
                 </div>
                 <div onClick="{{ dash.onDraw }}" style="cursor:pointer;display:flex;align-items:center;gap:14px;border-radius:18px;padding:18px;background:#1B4D7A">
                   <div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center">
-                    <dc-import name="Icon" hint-size="27px,27px" iconname="dice" name="Icon" size="27" color="#ffffff" sw="1.7"></dc-import>
+                    <dc-import name="Icon" hint-size="27px,27px" iconname="dice" size="27" color="#ffffff" sw="1.7"></dc-import>
                   </div>
                   <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:700;font-size:19px;color:#fff">Start a full inspection</div></div>
-                  <dc-import name="Icon" hint-size="18px,18px" iconname="chevronRight" name="Icon" size="18" color="rgba(255,255,255,.9)" sw="2.2"></dc-import>
+                  <dc-import name="Icon" hint-size="18px,18px" iconname="chevronRight" size="18" color="rgba(255,255,255,.9)" sw="2.2"></dc-import>
                 </div>
 
                 <!-- finder -->
                 <div style="display:flex;flex-direction:column;gap:8px">
                   <div style="position:relative;display:flex;align-items:center">
-                    <div style="position:absolute;left:11px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="16px,16px" iconname="search" name="Icon" size="16" color="#68727A" sw="2"></dc-import></div>
-                    <input value="{{ finderQuery }}" onInput="{{ onFinderInput }}" placeholder="Find a vehicle — plate or model…" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;padding:0 34px;font-family:'Fustat';font-size:14.5px;color:#1B2126;background:#F6F7F8;outline:none" />
+                    <div style="position:absolute;left:11px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="16px,16px" iconname="search" size="16" color="#68727A" sw="2"></dc-import></div>
+                    <input value="{{ finderQuery }}" onInput="{{ onFinderInput }}" placeholder="Find a vehicle — plate or model…" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;padding:0 34px;font-family:'Fustat';font-size:14.5px;color:#1B2126;background:#F6F7F8;outline:none">
                   </div>
                   <sc-if value="{{ finderHasResults }}" hint-placeholder-val="{{ false }}">
                     <div style="background:#fff;border:1px solid #E7EBEE;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
@@ -167,7 +167,7 @@
                 <div onClick="{{ dash.onToCheck }}" style="cursor:pointer;display:flex;align-items:center;gap:13px;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px;min-height:64px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
                   <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:{{ dash.overdueBadgeBg }}"><span style="font-family:'Fustat';font-weight:700;font-size:16px;color:{{ dash.overdueBadgeColor }}">{{ dash.overdue }}</span></div>
                   <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126">Vehicles to check</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73">{{ dash.overdueSub }}</div></div>
-                  <dc-import name="Icon" hint-size="16px,16px" iconname="chevronRight" name="Icon" size="16" color="#8B9197" sw="2"></dc-import>
+                  <dc-import name="Icon" hint-size="16px,16px" iconname="chevronRight" size="16" color="#8B9197" sw="2"></dc-import>
                 </div>
 
                 <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:2px">Your record</div>
@@ -187,16 +187,16 @@
               <div style="display:flex;flex-direction:column;gap:14px">
                 <div onClick="{{ dash.onToApprove }}" style="cursor:pointer;display:flex;align-items:center;gap:14px;border-radius:18px;padding:18px;background:{{ dash.heroBg }}">
                   <div style="width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center">
-                    <dc-import name="Icon" hint-size="24px,24px" iconname="check" name="Icon" size="24" color="#ffffff" sw="2"></dc-import>
+                    <dc-import name="Icon" hint-size="24px,24px" iconname="check" size="24" color="#ffffff" sw="2"></dc-import>
                   </div>
                   <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:700;font-size:18px;color:#fff">{{ dash.heroLabel }}</div></div>
-                  <dc-import name="Icon" hint-size="18px,18px" iconname="chevronRight" name="Icon" size="18" color="rgba(255,255,255,.9)" sw="2.2"></dc-import>
+                  <dc-import name="Icon" hint-size="18px,18px" iconname="chevronRight" size="18" color="rgba(255,255,255,.9)" sw="2.2"></dc-import>
                 </div>
 
                 <div style="display:flex;flex-direction:column;gap:8px">
                   <div style="position:relative;display:flex;align-items:center">
-                    <div style="position:absolute;left:11px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="16px,16px" iconname="search" name="Icon" size="16" color="#68727A" sw="2"></dc-import></div>
-                    <input value="{{ finderQuery }}" onInput="{{ onFinderInput }}" placeholder="Find a vehicle — plate or model…" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;padding:0 34px;font-family:'Fustat';font-size:14.5px;color:#1B2126;background:#F6F7F8;outline:none" />
+                    <div style="position:absolute;left:11px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="16px,16px" iconname="search" size="16" color="#68727A" sw="2"></dc-import></div>
+                    <input value="{{ finderQuery }}" onInput="{{ onFinderInput }}" placeholder="Find a vehicle — plate or model…" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;padding:0 34px;font-family:'Fustat';font-size:14.5px;color:#1B2126;background:#F6F7F8;outline:none">
                   </div>
                   <sc-if value="{{ finderHasResults }}" hint-placeholder-val="{{ false }}">
                     <div style="background:#fff;border:1px solid #E7EBEE;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
@@ -237,13 +237,13 @@
 
                 <!-- NEW FEATURE entry -->
                 <div onClick="{{ dash.onReport }}" style="cursor:pointer;display:flex;align-items:center;gap:13px;background:#F6F9FC;border:1px solid #E3EBF2;border-radius:16px;padding:14px;min-height:64px">
-                  <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#E9F0F6"><dc-import name="Icon" hint-size="20px,20px" iconname="chart" name="Icon" size="20" color="#1B4D7A" sw="1.8"></dc-import></div>
+                  <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#E9F0F6"><dc-import name="Icon" hint-size="20px,20px" iconname="chart" size="20" color="#1B4D7A" sw="1.8"></dc-import></div>
                   <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126">Weekly depot report</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73">Coverage, defects, expiring docs</div></div>
                   <div style="padding:3px 8px;border-radius:999px;background:#E9F0F6"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:9.5px;letter-spacing:.4px;color:#1B4D7A;text-transform:uppercase">New</span></div>
                 </div>
 
                 <div onClick="{{ dash.onDraw }}" style="cursor:pointer;min-height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid #1B4D7A">
-                  <dc-import name="Icon" hint-size="19px,19px" iconname="dice" name="Icon" size="19" color="#1B4D7A" sw="1.8"></dc-import>
+                  <dc-import name="Icon" hint-size="19px,19px" iconname="dice" size="19" color="#1B4D7A" sw="1.8"></dc-import>
                   <span style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B4D7A">Run a full inspection</span>
                 </div>
               </div>
@@ -258,7 +258,7 @@
             <div style="background:#fff;padding:14px 16px 10px;border-bottom:1px solid #EEF1F3;display:flex;flex-direction:column;gap:10px">
               <div style="position:relative;display:flex;align-items:center">
                 <div style="position:absolute;left:11px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="16px,16px" iconname="search" size="16" color="#68727A" sw="2"></dc-import></div>
-                <input value="{{ fleet.query }}" onInput="{{ fleet.onQuery }}" placeholder="Search plate or model…" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;padding:0 34px;font-family:'Fustat';font-size:14.5px;color:#1B2126;background:#F6F7F8;outline:none" />
+                <input value="{{ fleet.query }}" onInput="{{ fleet.onQuery }}" placeholder="Search plate or model…" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;padding:0 34px;font-family:'Fustat';font-size:14.5px;color:#1B2126;background:#F6F7F8;outline:none">
               </div>
               <div class="scroll" style="display:flex;gap:7px;overflow-x:auto;padding-bottom:2px">
                 <sc-for list="{{ fleet.chips }}" as="c" hint-placeholder-count="4">
@@ -284,7 +284,7 @@
           <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
             <div style="position:relative;display:flex;align-items:center">
               <div style="position:absolute;left:12px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="17px,17px" iconname="search" size="17" color="#68727A" sw="1.9"></dc-import></div>
-              <input value="{{ faults.query }}" onInput="{{ faults.onQuery }}" placeholder="Search reg, model or defect" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;background:#fff;padding-left:36px;padding-right:14px;font-family:'Fustat';font-size:15px;color:#1B2126;outline:none" />
+              <input value="{{ faults.query }}" onInput="{{ faults.onQuery }}" placeholder="Search reg, model or defect" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;background:#fff;padding-left:36px;padding-right:14px;font-family:'Fustat';font-size:15px;color:#1B2126;outline:none">
             </div>
             <div style="font-family:'Fustat';font-size:13.5px;line-height:19px;color:#616B73">{{ faults.count }}</div>
             <sc-for list="{{ faults.groups }}" as="g" hint-placeholder-count="4">
@@ -523,7 +523,7 @@
                     <sc-for list="{{ check.defects }}" as="d" hint-placeholder-count="1"><div style="display:flex;gap:10px;background:#fff;border:1px solid #F0D9D5;border-radius:12px;padding:11px"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:9.5px;padding:5px 7px;border-radius:6px;align-self:flex-start;color:{{ d.sevFg }};background:{{ d.sevBg }}">{{ d.sev }}</span><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:500;font-size:14px;color:#1B2126">{{ d.desc }}</div><div style="font-family:'IBM Plex Mono';font-size:11.5px;color:#68727A">{{ d.section }}</div></div></div></sc-for>
                   </div>
                 </sc-if>
-                <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Odometer reading (km)</span><input value="{{ check.odo }}" onInput="{{ check.onOdo }}" placeholder="e.g. 84210" style="border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none" /></div>
+                <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Odometer reading (km)</span><input value="{{ check.odo }}" onInput="{{ check.onOdo }}" placeholder="e.g. 84210" style="border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div>
                 <div style="border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;{{ check.signBoxStyle }}">
                   <span style="font-family:'Fustat';font-size:13px;line-height:20px;color:#58626A">I confirm this walk-around was carried out on {{ check.plate }} and the record above is accurate.</span>
                   <sc-if value="{{ check.signed }}" hint-placeholder-val="{{ false }}">
@@ -772,7 +772,7 @@
           <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
             <div onClick="{{ t.onPress }}" style="flex:1;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer">
               <div style="position:relative">
-                <dc-import name="Icon" hint-size="23px,23px" iconname="{{ t.icon }}" name="Icon" size="23" color="{{ t.color }}" sw="1.7"></dc-import>
+                <dc-import name="Icon" hint-size="23px,23px" iconname="{{ t.icon }}" size="23" color="{{ t.color }}" sw="1.7"></dc-import>
                 <sc-if value="{{ t.hasBadge }}" hint-placeholder-val="{{ false }}">
                   <div style="position:absolute;top:-4px;left:14px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#A03428;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:10px;color:#fff">{{ t.badge }}</span></div>
                 </sc-if>
@@ -811,7 +811,7 @@
             </sc-if>
             <sc-if value="{{ draw.spinning }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex;flex-direction:column;align-items:center;gap:20px">
-                <span style="font-family:'Fustat';font-weight:700;font-size:22px;line-height:28px;color:#fff;text-align:center">Picking a vehicle<br />from the pool…</span>
+                <span style="font-family:'Fustat';font-weight:700;font-size:22px;line-height:28px;color:#fff;text-align:center">Picking a vehicle<br>from the pool…</span>
                 <div style="width:288px;max-width:82%;height:78px;border-radius:12px;border:3px solid rgba(255,255,255,.28);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:32px;letter-spacing:1.6px;color:rgba(255,255,255,.9)">{{ draw.spinPlate }}</span></div>
               </div>
             </sc-if>
@@ -834,7 +834,7 @@
             <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="min-width:0"><div style="font-family:'IBM Plex Mono';font-weight:700;font-size:15px;letter-spacing:1.2px;color:#58626A">{{ driverSheet.plate }}</div><div style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126">Confirm driver to start</div></div><div onClick="{{ driverSheet.onClose }}" style="cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="x" size="16" color="#58626A" sw="2.2"></dc-import></div></div>
             <div style="display:flex;align-items:center;gap:12px;background:#F6F9FC;border:1px solid #E3EBF2;border-radius:16px;padding:12px"><div style="width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:15px;background:{{ driverSheet.avBg }};color:{{ driverSheet.avColor }}">{{ driverSheet.ini }}</div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:700;font-size:17px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ driverSheet.shownName }}</div><div style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73;margin-top:2px">{{ driverSheet.meta }}</div></div></div>
             <sc-if value="{{ driverSheet.showField }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Someone else driving it?</span><div style="position:relative;display:flex;align-items:center"><div style="position:absolute;left:13px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="18px,18px" iconname="search" size="18" color="#68727A" sw="1.7"></dc-import></div><input value="{{ driverSheet.reassignVal }}" onInput="{{ driverSheet.onReassign }}" placeholder="Search a different driver" style="width:100%;border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px 0 40px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none" /></div></div>
+              <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Someone else driving it?</span><div style="position:relative;display:flex;align-items:center"><div style="position:absolute;left:13px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="18px,18px" iconname="search" size="18" color="#68727A" sw="1.7"></dc-import></div><input value="{{ driverSheet.reassignVal }}" onInput="{{ driverSheet.onReassign }}" placeholder="Search a different driver" style="width:100%;border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px 0 40px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div></div>
             </sc-if>
             <div onClick="{{ driverSheet.onToggleSpare }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;min-height:44px"><div style="width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;{{ driverSheet.checkboxStyle }}"><sc-if value="{{ driverSheet.noDriver }}" hint-placeholder-val="{{ false }}"><dc-import name="Icon" hint-size="14px,14px" iconname="check" size="14" color="#fff" sw="3"></dc-import></sc-if></div><span style="font-family:'Fustat';font-weight:500;font-size:14px;color:#1B2126">Vehicle not in use (spare)</span></div>
             <div onClick="{{ driverSheet.onConfirm }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;{{ driverSheet.confirmStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:{{ driverSheet.confirmColor }}">{{ driverSheet.confirmLabel }}</span></div>
@@ -850,7 +850,7 @@
             <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="font-family:'Fustat';font-weight:700;font-size:17px;color:#A03428">Record a defect</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73">{{ failSheet.text }}</div></div><div onClick="{{ failSheet.onClose }}" style="cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="x" size="16" color="#58626A" sw="2.2"></dc-import></div></div>
             <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">What is wrong</span><textarea onInput="{{ failSheet.onDesc }}" placeholder="Describe the fault" style="border:1px solid #D3D9DD;border-radius:12px;min-height:62px;padding:10px 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none;resize:none">{{ failSheet.desc }}</textarea></div>
             <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Severity</span><div style="display:flex;gap:8px"><sc-for list="{{ failSheet.sevs }}" as="s" hint-placeholder-count="3"><div onClick="{{ s.onPress }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;{{ s.style }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ s.color }}">{{ s.label }}</span></div></sc-for></div></div>
-            <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Due date (optional)</span><input value="{{ failSheet.due }}" onInput="{{ failSheet.onDue }}" placeholder="e.g. 30 Aug 2026" style="border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none" /></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Due date (optional)</span><input value="{{ failSheet.due }}" onInput="{{ failSheet.onDue }}" placeholder="e.g. 30 Aug 2026" style="border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div>
             <div onClick="{{ failSheet.onSave }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-top:2px;{{ failSheet.saveStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:{{ failSheet.saveColor }}">Save defect &amp; fail item</span></div>
           </div>
         </div>
