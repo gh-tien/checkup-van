@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box}
+    ::-webkit-scrollbar{width:0;height:0}
+    .scroll{scrollbar-width:none;-ms-overflow-style:none}
+    a{color:#1B4D7A}a:hover{color:#14375A}
+  </style>
+</helmet>
+<div style="min-height:100vh;background:#EAECEE;display:flex;align-items:flex-start;justify-content:center;gap:26px;padding:34px 20px;font-family:'Fustat',system-ui,sans-serif;flex-wrap:wrap">
+
+  <!-- ============ PROTOTYPE CONTROL RAIL ============ -->
+  <div style="width:210px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;position:sticky;top:34px">
+    <div>
+      <div style="font-family:'Fustat';font-weight:700;font-size:16px;color:#1B2126">Vehicle Spot-Check</div>
+      <div style="font-family:'IBM Plex Mono';font-size:11px;color:#68727A;margin-top:2px">Faithful recreation · v30</div>
+    </div>
+    <div style="height:1px;background:#D3D9DD"></div>
+    <div style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#616B73">Signed in as</div>
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <sc-for list="{{ personChoices }}" as="p" hint-placeholder-count="3">
+        <div onClick="{{ p.onPress }}" style="{{ p.style }}">
+          <div style="{{ p.avStyle }}">{{ p.ini }}</div>
+          <div style="min-width:0">
+            <div style="font-family:'Fustat';font-weight:600;font-size:13px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div>
+            <div style="font-family:'Fustat';font-size:11px;color:#68727A">{{ p.role }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="height:1px;background:#D3D9DD"></div>
+    <div onClick="{{ onSignOut }}" style="cursor:pointer;display:flex;align-items:center;gap:8px;padding:9px 11px;border:1px solid #D3D9DD;border-radius:11px;font-family:'Fustat';font-weight:600;font-size:13px;color:#58626A;background:#fff">
+      <dc-import name="Icon" hint-size="16px,16px" nameprop="lock" name="Icon" iconname="lock" size="15" color="#58626A" sw="1.8"></dc-import>
+      Sign out → Gate
+    </div>
+    <div style="font-family:'Fustat';font-size:11.5px;line-height:16px;color:#68727A">Navigate with the tab bar and in-screen controls, exactly like the live app. Switch role above to see both dashboards.</div>
+  </div>
+
+  <!-- ============ PHONE ============ -->
+  <div style="width:390px;flex-shrink:0">
+  <div style="width:390px;height:844px;background:#0b0d0f;border-radius:46px;padding:11px;box-shadow:0 30px 70px -20px rgba(11,13,15,.45);position:sticky;top:34px">
+    <div style="position:relative;width:100%;height:100%;background:#FFFFFF;border-radius:36px;overflow:hidden;display:flex;flex-direction:column">
+
+      <!-- status bar -->
+      <div style="height:44px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:space-between;padding:0 26px 7px;background:#fff">
+        <div style="font-family:'Fustat';font-weight:600;font-size:14px;color:#1B2126">{{ statusTime }}</div>
+        <div style="position:absolute;left:50%;top:9px;transform:translateX(-50%);width:104px;height:26px;background:#0b0d0f;border-radius:999px"></div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="display:flex;gap:2px;align-items:flex-end;height:11px">
+            <div style="width:3px;height:5px;background:#1B2126;border-radius:1px"></div>
+            <div style="width:3px;height:7px;background:#1B2126;border-radius:1px"></div>
+            <div style="width:3px;height:9px;background:#1B2126;border-radius:1px"></div>
+            <div style="width:3px;height:11px;background:#1B2126;border-radius:1px"></div>
+          </div>
+          <div style="width:22px;height:11px;border:1.3px solid #1B2126;border-radius:3px;padding:1.5px"><div style="width:70%;height:100%;background:#1B2126;border-radius:1px"></div></div>
+        </div>
+      </div>
+
+      <!-- header -->
+      <sc-if value="{{ showHeader }}" hint-placeholder-val="{{ true }}">
+        <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;border-bottom:1px solid #E7EBEE">
+          <sc-if value="{{ header.showBack }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ onBack }}" style="cursor:pointer;width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;transform:rotate(180deg)">
+              <dc-import name="Icon" hint-size="20px,20px" iconname="chevronRight" name="Icon" size="20" color="#1B2126" sw="2.2"></dc-import>
+            </div>
+            <div style="flex:1;min-width:0;font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ header.title }}</div>
+          </sc-if>
+          <sc-if value="{{ header.showTitleBlock }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:1;min-width:0">
+              <div style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126">{{ header.title }}</div>
+              <div style="font-family:'Fustat';font-size:12px;color:#616B73">{{ header.sub }}</div>
+            </div>
+          </sc-if>
+          <div onClick="{{ onAvatar }}" style="cursor:pointer;width:34px;height:34px;border-radius:999px;background:#1B4D7A;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:13px;color:#fff">{{ header.ini }}</div>
+        </div>
+      </sc-if>
+
+      <!-- body -->
+      <div class="scroll" style="flex:1;min-height:0;overflow-y:auto;background:{{ bodyBg }};position:relative">
+        <!-- GATE -->
+        <sc-if value="{{ isGate }}" hint-placeholder-val="{{ false }}">
+          <div style="min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:40px 22px">
+            <div style="display:flex;justify-content:center;margin-bottom:22px"><div style="width:56px;height:56px;border-radius:16px;background:#1B4D7A;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><dc-import name="Icon" hint-size="28px,28px" iconname="check" size="28" color="#fff" sw="2.8"></dc-import></div></div>
+
+            <sc-if value="{{ gate.isPick }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <div style="position:relative;display:flex;align-items:center"><div style="position:absolute;left:14px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="19px,19px" iconname="search" size="19" color="#68727A" sw="1.9"></dc-import></div><input value="{{ gate.pickQuery }}" onInput="{{ gate.onQuery }}" placeholder="Search your name…" style="width:100%;min-height:56px;border-radius:14px;border:1px solid #E7EBEE;background:#fff;padding:0 16px 0 42px;font-family:'Fustat';font-size:16px;color:#1B2126;outline:none" /></div>
+                <sc-if value="{{ gate.hasResults }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:6px;background:#fff;border:1px solid #E7EBEE;border-radius:14px;overflow:hidden">
+                    <sc-for list="{{ gate.results }}" as="r" hint-placeholder-count="0"><div onClick="{{ r.onPress }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 14px;min-height:58px;border-bottom:1px solid #F1F2F3"><div style="width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:13px;background:{{ r.avBg }};color:{{ r.avColor }}">{{ r.ini }}</div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15.5px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div><div style="font-family:'Fustat';font-size:12px;color:#616B73">{{ r.role }}</div></div></div></sc-for>
+                  </div>
+                </sc-if>
+                <div style="margin-top:16px"><div onClick="{{ gate.onAdmin }}" style="cursor:pointer;min-height:48px;border-radius:14px;border:1.5px solid #1B4D7A;display:flex;align-items:center;justify-content:center;gap:7px"><dc-import name="Icon" hint-size="17px,17px" iconname="shield" size="17" color="#1B4D7A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:500;font-size:14px;color:#1B4D7A">Admin</span></div></div>
+                <div style="margin-top:16px;font-family:'IBM Plex Mono';font-size:11.5px;color:#68727A;text-align:center">Search a name to sign in · Demo PIN 1234</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ gate.isPin }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;align-items:center">
+                <div style="width:66px;height:66px;border-radius:999px;background:#1B4D7A;display:flex;align-items:center;justify-content:center;margin-bottom:12px"><span style="font-family:'Fustat';font-weight:700;font-size:22px;color:#fff">{{ gate.pinIni }}</span></div>
+                <span style="font-family:'Fustat';font-weight:700;font-size:21px;color:#1B2126">{{ gate.pinName }}</span>
+                <span style="font-family:'Fustat';font-size:13.5px;color:#616B73;margin-top:2px">{{ gate.pinRole }}</span>
+                <div style="display:flex;gap:14px;margin:22px 0"><sc-for list="{{ gate.dots }}" as="d" hint-placeholder-count="4"><div style="width:14px;height:14px;border-radius:999px;border:1.6px solid {{ d.border }};background:{{ d.bg }}"></div></sc-for></div>
+                <div style="height:18px;font-family:'Fustat';font-weight:500;font-size:13px;color:#A03428"><sc-if value="{{ gate.pinError }}" hint-placeholder-val="{{ false }}"><span>Wrong PIN — try again</span></sc-if></div>
+                <div style="width:236px;display:flex;flex-wrap:wrap;gap:14px;margin-top:8px">
+                  <sc-for list="{{ gate.keys }}" as="k" hint-placeholder-count="9"><div onClick="{{ k.onPress }}" style="cursor:pointer;width:69px;height:64px;border-radius:16px;background:#fff;border:1px solid #E7EBEE;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:500;font-size:26px;color:#1B2126">{{ k.d }}</span></div></sc-for>
+                  <div style="width:69px;height:64px"></div>
+                  <div onClick="{{ gate.zeroPress }}" style="cursor:pointer;width:69px;height:64px;border-radius:16px;background:#fff;border:1px solid #E7EBEE;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:500;font-size:26px;color:#1B2126">0</span></div>
+                  <div onClick="{{ gate.onDel }}" style="cursor:pointer;width:69px;height:64px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="26px,26px" iconname="backspace" size="26" color="#616B73" sw="1.8"></dc-import></div>
+                </div>
+                <div onClick="{{ gate.onPickBack }}" style="cursor:pointer;margin-top:18px;min-height:44px;display:flex;align-items:center"><span style="font-family:'Fustat';font-weight:500;font-size:14px;color:#616B73">← Choose someone else</span></div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <!-- @@SCREENS@@ -->
+
+        <!-- DASHBOARD -->
+        <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:16px;padding-bottom:28px;display:flex;flex-direction:column;gap:14px">
+
+            <!-- Inspector -->
+            <sc-if value="{{ dash.isInspector }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div>
+                  <div style="font-family:'Fustat';font-weight:500;font-size:13px;color:#616B73">{{ dash.greeting }}</div>
+                  <div style="font-family:'Fustat';font-weight:700;font-size:24px;color:#1B2126;letter-spacing:-.2px">{{ dash.firstName }}</div>
+                </div>
+                <div onClick="{{ dash.onDraw }}" style="cursor:pointer;display:flex;align-items:center;gap:14px;border-radius:18px;padding:18px;background:#1B4D7A">
+                  <div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center">
+                    <dc-import name="Icon" hint-size="27px,27px" iconname="dice" name="Icon" size="27" color="#ffffff" sw="1.7"></dc-import>
+                  </div>
+                  <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:700;font-size:19px;color:#fff">Start a full inspection</div></div>
+                  <dc-import name="Icon" hint-size="18px,18px" iconname="chevronRight" name="Icon" size="18" color="rgba(255,255,255,.9)" sw="2.2"></dc-import>
+                </div>
+
+                <!-- finder -->
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="position:relative;display:flex;align-items:center">
+                    <div style="position:absolute;left:11px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="16px,16px" iconname="search" name="Icon" size="16" color="#68727A" sw="2"></dc-import></div>
+                    <input value="{{ finderQuery }}" onInput="{{ onFinderInput }}" placeholder="Find a vehicle — plate or model…" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;padding:0 34px;font-family:'Fustat';font-size:14.5px;color:#1B2126;background:#F6F7F8;outline:none" />
+                  </div>
+                  <sc-if value="{{ finderHasResults }}" hint-placeholder-val="{{ false }}">
+                    <div style="background:#fff;border:1px solid #E7EBEE;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                      <sc-for list="{{ finderResults }}" as="r" hint-placeholder-count="0">
+                        <div onClick="{{ r.onPress }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:48px;{{ r.divider }}">
+                          <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15.5px;color:#1B2126;letter-spacing:.2px">{{ r.plate }}</div><div style="font-family:'Fustat';font-size:12px;color:#616B73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.sub }}</div></div>
+                          <div style="padding:5px 8px;border-radius:6px;background:{{ r.bg }}"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;color:{{ r.color }}">{{ r.label }}</span></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:2px">Your work</div>
+                <div onClick="{{ dash.onToCheck }}" style="cursor:pointer;display:flex;align-items:center;gap:13px;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px;min-height:64px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                  <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:{{ dash.overdueBadgeBg }}"><span style="font-family:'Fustat';font-weight:700;font-size:16px;color:{{ dash.overdueBadgeColor }}">{{ dash.overdue }}</span></div>
+                  <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126">Vehicles to check</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73">{{ dash.overdueSub }}</div></div>
+                  <dc-import name="Icon" hint-size="16px,16px" iconname="chevronRight" name="Icon" size="16" color="#8B9197" sw="2"></dc-import>
+                </div>
+
+                <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:2px">Your record</div>
+                <div style="display:flex;gap:10px">
+                  <sc-for list="{{ dash.stats }}" as="st" hint-placeholder-count="3">
+                    <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:14px;padding:13px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                      <div style="font-family:'Fustat';font-weight:700;font-size:24px;color:{{ st.color }}">{{ st.n }}</div>
+                      <div style="font-family:'Fustat';font-weight:500;font-size:11.5px;color:#616B73">{{ st.label }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- Manager -->
+            <sc-if value="{{ dash.isManager }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div onClick="{{ dash.onToApprove }}" style="cursor:pointer;display:flex;align-items:center;gap:14px;border-radius:18px;padding:18px;background:{{ dash.heroBg }}">
+                  <div style="width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center">
+                    <dc-import name="Icon" hint-size="24px,24px" iconname="check" name="Icon" size="24" color="#ffffff" sw="2"></dc-import>
+                  </div>
+                  <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:700;font-size:18px;color:#fff">{{ dash.heroLabel }}</div></div>
+                  <dc-import name="Icon" hint-size="18px,18px" iconname="chevronRight" name="Icon" size="18" color="rgba(255,255,255,.9)" sw="2.2"></dc-import>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="position:relative;display:flex;align-items:center">
+                    <div style="position:absolute;left:11px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="16px,16px" iconname="search" name="Icon" size="16" color="#68727A" sw="2"></dc-import></div>
+                    <input value="{{ finderQuery }}" onInput="{{ onFinderInput }}" placeholder="Find a vehicle — plate or model…" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;padding:0 34px;font-family:'Fustat';font-size:14.5px;color:#1B2126;background:#F6F7F8;outline:none" />
+                  </div>
+                  <sc-if value="{{ finderHasResults }}" hint-placeholder-val="{{ false }}">
+                    <div style="background:#fff;border:1px solid #E7EBEE;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                      <sc-for list="{{ finderResults }}" as="r" hint-placeholder-count="0">
+                        <div onClick="{{ r.onPress }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:48px;{{ r.divider }}">
+                          <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15.5px;color:#1B2126;letter-spacing:.2px">{{ r.plate }}</div><div style="font-family:'Fustat';font-size:12px;color:#616B73">{{ r.sub }}</div></div>
+                          <div style="padding:5px 8px;border-radius:6px;background:{{ r.bg }}"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;color:{{ r.color }}">{{ r.label }}</span></div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px;box-shadow:0 1px 2px rgba(27,33,38,.05);display:flex;flex-direction:column;gap:11px">
+                  <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Fleet health · {{ dash.total }} vehicles</div>
+                  <div style="display:flex;height:14px;border-radius:999px;overflow:hidden;background:#EEF1F3">
+                    <div style="flex:{{ dash.ok }};background:#397B43"></div>
+                    <div style="flex:{{ dash.overdue }};background:#5B6670"></div>
+                    <div style="flex:{{ dash.blocked }};background:#A03428"></div>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:12px">
+                    <div style="display:flex;align-items:center;gap:6px"><div style="width:9px;height:9px;border-radius:2px;background:#397B43"></div><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#58626A">OK {{ dash.ok }}</span></div>
+                    <div style="display:flex;align-items:center;gap:6px"><div style="width:9px;height:9px;border-radius:2px;background:#5B6670"></div><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#58626A">Overdue {{ dash.overdue }}</span></div>
+                    <div style="display:flex;align-items:center;gap:6px"><div style="width:9px;height:9px;border-radius:2px;background:#A03428"></div><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#58626A">Attention {{ dash.blocked }}</span></div>
+                  </div>
+                </div>
+
+                <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px;box-shadow:0 1px 2px rgba(27,33,38,.05);display:flex;flex-direction:column;gap:10px">
+                  <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Checks this week by inspector</div>
+                  <sc-for list="{{ dash.inspectorBars }}" as="b" hint-placeholder-count="4">
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <div style="width:58px;font-family:'Fustat';font-weight:500;font-size:12.5px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.name }}</div>
+                      <div style="flex:1;height:9px;border-radius:999px;background:#EEF1F3;overflow:hidden"><div style="height:100%;border-radius:999px;background:#1B4D7A;width:{{ b.pct }}"></div></div>
+                      <div style="width:20px;text-align:right;font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#58626A">{{ b.n }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <!-- NEW FEATURE entry -->
+                <div onClick="{{ dash.onReport }}" style="cursor:pointer;display:flex;align-items:center;gap:13px;background:#F6F9FC;border:1px solid #E3EBF2;border-radius:16px;padding:14px;min-height:64px">
+                  <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#E9F0F6"><dc-import name="Icon" hint-size="20px,20px" iconname="chart" name="Icon" size="20" color="#1B4D7A" sw="1.8"></dc-import></div>
+                  <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126">Weekly depot report</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73">Coverage, defects, expiring docs</div></div>
+                  <div style="padding:3px 8px;border-radius:999px;background:#E9F0F6"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:9.5px;letter-spacing:.4px;color:#1B4D7A;text-transform:uppercase">New</span></div>
+                </div>
+
+                <div onClick="{{ dash.onDraw }}" style="cursor:pointer;min-height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid #1B4D7A">
+                  <dc-import name="Icon" hint-size="19px,19px" iconname="dice" name="Icon" size="19" color="#1B4D7A" sw="1.8"></dc-import>
+                  <span style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B4D7A">Run a full inspection</span>
+                </div>
+              </div>
+            </sc-if>
+
+          </div>
+        </sc-if>
+
+        <!-- FLEET -->
+        <sc-if value="{{ isFleet }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="background:#fff;padding:14px 16px 10px;border-bottom:1px solid #EEF1F3;display:flex;flex-direction:column;gap:10px">
+              <div style="position:relative;display:flex;align-items:center">
+                <div style="position:absolute;left:11px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="16px,16px" iconname="search" size="16" color="#68727A" sw="2"></dc-import></div>
+                <input value="{{ fleet.query }}" onInput="{{ fleet.onQuery }}" placeholder="Search plate or model…" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;padding:0 34px;font-family:'Fustat';font-size:14.5px;color:#1B2126;background:#F6F7F8;outline:none" />
+              </div>
+              <div class="scroll" style="display:flex;gap:7px;overflow-x:auto;padding-bottom:2px">
+                <sc-for list="{{ fleet.chips }}" as="c" hint-placeholder-count="4">
+                  <div onClick="{{ c.onPress }}" style="cursor:pointer;flex-shrink:0;min-height:44px;display:flex;align-items:center;padding:0 13px;border-radius:999px;{{ c.style }}"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:{{ c.txtColor }}">{{ c.label }}</span></div>
+                </sc-for>
+              </div>
+              <div style="font-family:'Fustat';font-size:12px;color:#68727A">{{ fleet.count }}</div>
+            </div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ fleet.rows }}" as="r" hint-placeholder-count="6">
+                <div onClick="{{ r.onPress }}" style="cursor:pointer;background:#fff;border:1px solid #E7EBEE;border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                  <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:16.5px;color:#1B2126;letter-spacing:.2px">{{ r.plate }}</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73">{{ r.sub }}</div></div>
+                  <div style="padding:5px 8px;border-radius:6px;background:{{ r.bg }}"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;color:{{ r.color }}">{{ r.label }}</span></div>
+                  <dc-import name="Icon" hint-size="16px,16px" iconname="chevronRight" size="16" color="#8B9197" sw="2"></dc-import>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- DEFECTS -->
+        <sc-if value="{{ isFaults }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="position:relative;display:flex;align-items:center">
+              <div style="position:absolute;left:12px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="17px,17px" iconname="search" size="17" color="#68727A" sw="1.9"></dc-import></div>
+              <input value="{{ faults.query }}" onInput="{{ faults.onQuery }}" placeholder="Search reg, model or defect" style="width:100%;min-height:44px;border:1px solid #E7EBEE;border-radius:12px;background:#fff;padding-left:36px;padding-right:14px;font-family:'Fustat';font-size:15px;color:#1B2126;outline:none" />
+            </div>
+            <div style="font-family:'Fustat';font-size:13.5px;line-height:19px;color:#616B73">{{ faults.count }}</div>
+            <sc-for list="{{ faults.groups }}" as="g" hint-placeholder-count="4">
+              <div style="background:#fff;border:1px solid #E7EBEE;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                <div onClick="{{ g.onToggle }}" style="cursor:pointer;padding:13px 14px;min-height:58px;display:flex;align-items:center;gap:12px">
+                  <div style="width:8px;height:8px;border-radius:999px;background:#A03428"></div>
+                  <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126">{{ g.plate }}</div><div style="font-family:'Fustat';font-size:12px;color:#616B73">{{ g.sub }}</div></div>
+                  <div style="{{ g.chevStyle }}"><dc-import name="Icon" hint-size="16px,16px" iconname="chevronDown" size="16" color="#8B9197" sw="2"></dc-import></div>
+                </div>
+                <sc-if value="{{ g.open }}" hint-placeholder-val="{{ false }}">
+                  <div style="border-top:1px solid #F1F2F3">
+                    <sc-for list="{{ g.jobs }}" as="j" hint-placeholder-count="1">
+                      <div style="border-bottom:1px solid #F1F2F3;display:flex;align-items:center;gap:8px;padding:9px 12px 9px 34px">
+                        <div onClick="{{ j.onOpen }}" style="cursor:pointer;flex:1;min-width:0;min-height:34px;display:flex;align-items:center"><span style="font-family:'Fustat';font-size:14px;line-height:19px;color:#58626A">{{ j.text }}</span></div>
+                        <div onClick="{{ j.onFix }}" style="cursor:pointer;min-height:44px;padding:0 12px;border-radius:999px;display:flex;align-items:center;gap:6px;border:1px solid #BCD9C2;background:#EAF3EC"><dc-import name="Icon" hint-size="14px,14px" iconname="check" size="14" color="#397B43" sw="2.2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#397B43">Mark fixed</span></div>
+                      </div>
+                    </sc-for>
+                    <div onClick="{{ g.onOpenVan }}" style="cursor:pointer;background:#FAFBFC;padding:11px 14px;min-height:44px;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#1B4D7A">Open vehicle record ›</span></div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+            <sc-if value="{{ faults.allClear }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px solid #E7EBEE;border-radius:16px;background:#FBFBFA;padding:16px"><span style="font-family:'Fustat';font-size:14px;line-height:21px;color:#616B73">No open defects — all clear.</span></div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- APPROVALS -->
+        <sc-if value="{{ isApproved }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="font-family:'Fustat';font-size:13.5px;line-height:19px;color:#616B73">{{ approved.sub }}</div>
+
+            <sc-if value="{{ approved.hasReturned }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:9px">
+                <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#A03428">Returned — needs redo</div>
+                <sc-for list="{{ approved.returned }}" as="r" hint-placeholder-count="1">
+                  <div style="background:#fff;border:1.5px dashed #A03428;border-radius:16px;padding:13px 14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">{{ r.plate }}</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#A03428">redo</span></div>
+                    <div style="font-family:'Fustat';font-weight:500;font-size:14px;line-height:20px;color:#1B2126">{{ r.reason }}</div>
+                    <div style="font-family:'IBM Plex Mono';font-size:11.5px;color:#616B73">{{ r.meta }}</div>
+                    <sc-if value="{{ r.mine }}" hint-placeholder-val="{{ false }}"><div onClick="{{ r.onRedo }}" style="cursor:pointer;min-height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:#1B4D7A"><span style="font-family:'Fustat';font-weight:600;font-size:15px;color:#fff">Redo this walk</span></div></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ approved.hasQueue }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:9px">
+                <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#8A6116">{{ approved.queueLabel }}</div>
+                <sc-for list="{{ approved.queueCards }}" as="q" hint-placeholder-count="2">
+                  <div style="background:#fff;border:1.5px dashed #8A6116;border-radius:16px;padding:13px 14px;display:flex;flex-direction:column;gap:9px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-family:'Fustat';font-weight:600;font-size:17px;color:#1B2126;letter-spacing:.2px">{{ q.plate }}</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:{{ q.tagColor }}">{{ q.tag }}</span></div>
+                    <div style="font-family:'Fustat';font-size:13px;line-height:18px;color:#616B73">{{ q.meta }}</div>
+                    <div style="border:1px solid #E7EBEE;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px">
+                      <div style="display:flex;gap:10px">
+                        <div style="flex:1"><div style="font-family:'IBM Plex Mono';font-weight:600;font-size:10px;letter-spacing:.4px;color:#68727A">ODOMETER</div><div style="font-family:'Fustat';font-weight:600;font-size:13.5px;color:#1B2126;margin-top:3px">{{ q.odo }}</div></div>
+                        <div style="flex:1"><div style="font-family:'IBM Plex Mono';font-weight:600;font-size:10px;letter-spacing:.4px;color:#68727A">PHOTOS</div><div style="font-family:'Fustat';font-weight:600;font-size:13.5px;color:#1B2126;margin-top:3px">{{ q.photos }}</div></div>
+                        <div style="flex:1"><div style="font-family:'IBM Plex Mono';font-weight:600;font-size:10px;letter-spacing:.4px;color:#68727A">ITEMS</div><div style="font-family:'Fustat';font-weight:600;font-size:13.5px;color:#1B2126;margin-top:3px">{{ q.items }}</div></div>
+                      </div>
+                      <div><div style="font-family:'IBM Plex Mono';font-weight:600;font-size:10px;letter-spacing:.4px;color:#68727A">DRIVER</div><div style="font-family:'Fustat';font-weight:600;font-size:13.5px;color:#1B2126;margin-top:3px">{{ q.keyholder }}</div></div>
+                      <sc-if value="{{ q.hasFails }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;flex-direction:column;gap:5px"><div style="font-family:'IBM Plex Mono';font-weight:600;font-size:10px;letter-spacing:.4px;color:#A03428">DEFECTS RAISED</div><sc-for list="{{ q.fails }}" as="f" hint-placeholder-count="1"><div style="display:flex;gap:7px;align-items:flex-start"><div style="width:6px;height:6px;border-radius:999px;background:#A03428;margin-top:6px"></div><span style="flex:1;font-family:'Fustat';font-size:13px;line-height:18px;color:#1B2126">{{ f.text }}</span></div></sc-for></div>
+                      </sc-if>
+                      <sc-if value="{{ q.clean }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Fustat';font-weight:500;font-size:13px;color:#397B43">All items passed — no defects.</span></sc-if>
+                    </div>
+                    <sc-if value="{{ q.canSign }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:9px">
+                        <div onClick="{{ q.onApprove }}" style="cursor:pointer;flex:2;min-height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;gap:7px;background:#1B4D7A"><dc-import name="Icon" hint-size="16px,16px" iconname="check" size="16" color="#fff" sw="2.2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:15px;color:#fff">Countersign</span></div>
+                        <div onClick="{{ q.onSendBack }}" style="cursor:pointer;flex:1;min-height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;border:1px solid #E7EBEE;background:#fff"><span style="font-family:'Fustat';font-weight:600;font-size:15px;color:#616B73">Send back</span></div>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ q.mgrOwn }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:12px;color:#68727A">Another manager signs this off</span></sc-if>
+                    <sc-if value="{{ q.insp }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:12px;color:#68727A">Awaiting manager approval</span></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:6px">
+              <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Approved · {{ approved.periodLabel }}</div>
+              <div style="display:flex;gap:6px">
+                <div onClick="{{ approved.onWeek }}" style="cursor:pointer;min-height:44px;display:flex;align-items:center;padding:0 12px;border-radius:999px;border:1px solid {{ approved.weekBorder }};background:{{ approved.weekBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:12px;color:{{ approved.weekColor }}">Week</span></div>
+                <div onClick="{{ approved.onMonth }}" style="cursor:pointer;min-height:44px;display:flex;align-items:center;padding:0 12px;border-radius:999px;border:1px solid {{ approved.monthBorder }};background:{{ approved.monthBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:12px;color:{{ approved.monthColor }}">Month</span></div>
+              </div>
+            </div>
+            <sc-for list="{{ approved.approvedRows }}" as="a" hint-placeholder-count="3">
+              <div onClick="{{ a.onPress }}" style="cursor:pointer;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">{{ a.plate }}</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#1B4D7A">Signed ✓</span></div><div style="font-family:'Fustat';font-size:13px;line-height:18px;color:{{ a.metaColor }}">{{ a.meta }}</div></div>
+                <dc-import name="Icon" hint-size="16px,16px" iconname="chevronRight" size="16" color="#8B9197" sw="2"></dc-import>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- VAN DETAIL -->
+        <sc-if value="{{ isVan }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:18px;padding:15px;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div style="display:flex;align-items:flex-start;gap:10px">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
+                  <div style="font-family:'IBM Plex Mono';font-weight:700;font-size:23px;letter-spacing:1.5px;color:#1B2126">{{ van.plate }}</div>
+                  <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:#58626A">{{ van.model }}</span><span style="color:#8B9197">·</span><span style="font-family:'Fustat';font-weight:500;font-size:13.5px;color:#616B73">{{ van.bay }}</span></div>
+                </div>
+                <div style="padding:5px 8px;border-radius:6px;background:{{ van.statBg }}"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;color:{{ van.statColor }}">{{ van.statLabel }}</span></div>
+              </div>
+              <sc-if value="{{ van.blocked }}" hint-placeholder-val="{{ false }}"><div style="border:1.5px solid #A03428;background:#FBEEEC;border-radius:14px;padding:12px 13px"><span style="font-family:'Fustat';font-weight:500;font-size:13px;line-height:19px;color:#A03428">{{ van.blockReason }}</span></div></sc-if>
+              <div style="display:flex;border-top:1px solid #F1F2F3;padding-top:13px">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.5px;color:#616B73">DRIVER</span><span style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ van.driver }}</span><span style="font-family:'IBM Plex Mono';font-size:11.5px;color:#68727A">{{ van.driverFoot }}</span></div>
+                <div style="width:1px;background:#F1F2F3;margin:0 14px"></div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.5px;color:#616B73">ODOMETER</span><span style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126">{{ van.odo }}</span><span style="font-family:'IBM Plex Mono';font-size:11.5px;color:#68727A">{{ van.lastChecked }}</span></div>
+              </div>
+              <div onClick="{{ van.onPrimary }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:{{ van.primaryBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:{{ van.primaryColor }}">{{ van.primaryLabel }}</span></div>
+            </div>
+
+            <sc-if value="{{ van.hasJobs }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px solid #F0D9D5;background:#FDF6F5;border-radius:16px;padding:13px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;gap:7px"><dc-import name="Icon" hint-size="15px,15px" iconname="alert" size="15" color="#A03428" sw="2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#A03428">{{ van.jobsTitle }}</span></div>
+                <sc-for list="{{ van.jobs }}" as="j" hint-placeholder-count="1">
+                  <div style="border:1px solid #F0D9D5;background:#fff;border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:10px">
+                    <span style="flex:1;min-width:0;font-family:'Fustat';font-size:14px;line-height:20px;color:#1B2126">{{ j.text }}</span>
+                    <div onClick="{{ j.onFix }}" style="cursor:pointer;min-height:44px;padding:0 12px;border-radius:999px;display:flex;align-items:center;gap:6px;border:1px solid #BCD9C2;background:#EAF3EC"><dc-import name="Icon" hint-size="14px,14px" iconname="check" size="14" color="#397B43" sw="2.2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#397B43">Mark fixed</span></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <!-- Details card -->
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div onClick="{{ van.tDetails }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:0 14px;min-height:48px;{{ van.detailsHeadBorder }}"><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:14px;color:#1B2126">Details</span><div style="{{ van.cDetails }}"><dc-import name="Icon" hint-size="16px,16px" iconname="chevronDown" size="16" color="#8B9197" sw="2"></dc-import></div></div>
+              <sc-if value="{{ van.oDetails }}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <sc-for list="{{ van.details }}" as="d" hint-placeholder-count="8"><div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid #F1F2F3;min-height:46px"><span style="font-family:'Fustat';font-weight:500;font-size:14px;color:#616B73;width:92px">{{ d.k }}</span><span style="flex:1;min-width:0;font-family:'Fustat';font-weight:600;font-size:14px;color:#1B2126;text-align:right">{{ d.val }}</span></div></sc-for>
+                  <div onClick="{{ van.onExport }}" style="cursor:pointer;background:#FAFBFC;padding:12px 14px;min-height:46px;display:flex;align-items:center;justify-content:center;gap:7px"><dc-import name="Icon" hint-size="15px,15px" iconname="pen" size="15" color="#1B4D7A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#1B4D7A">Edit details</span></div>
+                </div>
+              </sc-if>
+            </div>
+
+            <!-- Documents card -->
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div onClick="{{ van.tDocs }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:0 14px;min-height:48px"><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:14px;color:#1B2126">Documents</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11.5px;color:#68727A">{{ van.docsMeta }}</span><div style="{{ van.cDocs }}"><dc-import name="Icon" hint-size="16px,16px" iconname="chevronDown" size="16" color="#8B9197" sw="2"></dc-import></div></div>
+              <sc-if value="{{ van.oDocs }}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <sc-for list="{{ van.docs }}" as="d" hint-placeholder-count="3"><div style="border-bottom:1px solid #F1F2F3;padding:11px 14px;display:flex;align-items:center;gap:10px;min-height:46px"><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:500;font-size:14px;color:#1B2126">{{ d.name }}</div><div style="font-family:'IBM Plex Mono';font-size:12px;color:#616B73">{{ d.date }}</div></div><sc-if value="{{ d.hasBadge }}" hint-placeholder-val="{{ false }}"><div style="padding:5px 8px;border-radius:6px;background:{{ d.badgeBg }}"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;color:{{ d.badgeColor }}">{{ d.badgeTxt }}</span></div></sc-if><dc-import name="Icon" hint-size="15px,15px" iconname="chevronRight" size="15" color="#8B9197" sw="2"></dc-import></div></sc-for>
+                  <div onClick="{{ van.onExport }}" style="cursor:pointer;background:#FAFBFC;padding:12px 14px;min-height:46px;display:flex;align-items:center;justify-content:center;gap:7px"><dc-import name="Icon" hint-size="16px,16px" iconname="plus" size="16" color="#1B4D7A" sw="2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#1B4D7A">Add document</span></div>
+                </div>
+              </sc-if>
+            </div>
+
+            <!-- Photo timeline card -->
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div onClick="{{ van.tHist }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:0 14px;min-height:48px"><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:14px;color:#1B2126">Photo timeline</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11.5px;color:#68727A">{{ van.histMeta }}</span><div style="{{ van.cHist }}"><dc-import name="Icon" hint-size="16px,16px" iconname="chevronDown" size="16" color="#8B9197" sw="2"></dc-import></div></div>
+              <sc-if value="{{ van.oHist }}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <sc-for list="{{ van.history }}" as="h" hint-placeholder-count="3">
+                    <div style="border-bottom:1px solid #F1F2F3">
+                      <div onClick="{{ h.onToggle }}" style="cursor:pointer;padding:12px 14px;min-height:58px;display:flex;align-items:center;gap:10px"><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:14.5px;color:#1B2126">{{ h.date }}</div><div style="font-family:'Fustat';font-size:12px;color:#616B73">{{ h.by }}</div></div><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;color:{{ h.resultColor }}">{{ h.result }}</span><div style="{{ h.chevStyle }}"><dc-import name="Icon" hint-size="15px,15px" iconname="chevronDown" size="15" color="#8B9197" sw="2"></dc-import></div></div>
+                      <sc-if value="{{ h.open }}" hint-placeholder-val="{{ false }}"><div style="border-top:1px solid #F1F2F3;padding:12px;display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ h.photos }}" as="p" hint-placeholder-count="5"><div style="width:23%;aspect-ratio:1;border-radius:8px;background:#EEF1F3;border:1px solid #E7EBEE;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="camera" size="16" color="#8B9197" sw="1.7"></dc-import></div></sc-for></div></sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+
+            <!-- Activity log card -->
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div onClick="{{ van.tLog }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:0 14px;min-height:48px"><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:14px;color:#1B2126">Activity log</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11.5px;color:#68727A">{{ van.logMeta }}</span><div style="{{ van.cLog }}"><dc-import name="Icon" hint-size="16px,16px" iconname="chevronDown" size="16" color="#8B9197" sw="2"></dc-import></div></div>
+              <sc-if value="{{ van.oLog }}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <sc-for list="{{ van.logRows }}" as="e" hint-placeholder-count="5"><div style="display:flex;gap:11px;padding:11px 14px;border-bottom:1px solid #F1F2F3"><div style="margin-top:5px;width:9px;height:9px;border-radius:999px;flex-shrink:0;background:{{ e.dot }}"></div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:500;font-size:14px;line-height:19px;color:#1B2126">{{ e.what }}</div><div style="font-family:'IBM Plex Mono';font-size:11.5px;color:#616B73">{{ e.when }}</div></div></div></sc-for>
+                  <sc-if value="{{ van.logMore }}" hint-placeholder-val="{{ false }}"><div onClick="{{ van.onLogMore }}" style="cursor:pointer;padding:11px;min-height:44px;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#1B4D7A">{{ van.logMoreTxt }}</span></div></sc-if>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;padding-top:4px">
+              <div onClick="{{ van.onExport }}" style="cursor:pointer;min-height:48px;border-radius:14px;border:1px solid #E7EBEE;background:#fff;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 1px 2px rgba(27,33,38,.05)"><dc-import name="Icon" hint-size="16px,16px" iconname="download" size="16" color="#1B2126" sw="1.9"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126">Export vehicle records</span></div>
+              <div onClick="{{ van.onRemove }}" style="cursor:pointer;min-height:48px;border-radius:14px;border:1px solid #F0D9D5;background:#FBEEEC;display:flex;align-items:center;justify-content:center;gap:8px"><dc-import name="Icon" hint-size="16px,16px" iconname="trash" size="16" color="#A03428" sw="1.9"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:15px;color:#A03428">Remove vehicle</span></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- CHECK FLOW -->
+        <sc-if value="{{ isCheck }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;padding-bottom:32px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-family:'IBM Plex Mono';font-weight:700;font-size:21px;letter-spacing:1.4px;color:#1B2126">{{ check.plate }}</div>
+
+            <!-- photos -->
+            <sc-if value="{{ check.sPhotos }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#58626A">{{ check.photosLabel }}</span><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:{{ check.photosCountColor }}">{{ check.photosCount }}</span></div>
+                <div style="display:flex;flex-wrap:wrap;gap:9px">
+                  <sc-for list="{{ check.angles }}" as="a" hint-placeholder-count="6">
+                    <div onClick="{{ a.onTap }}" style="cursor:pointer;width:48.5%;min-height:96px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px;{{ a.tileStyle }}">
+                      <dc-import name="Icon" hint-size="22px,22px" iconname="camera" size="22" color="#68727A" sw="1.7"></dc-import>
+                      <span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#1B2126;text-align:center">{{ a.name }}</span>
+                      <span style="font-family:'IBM Plex Mono';font-size:10.5px;color:{{ a.metaColor }}">{{ a.metaTxt }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div onClick="{{ check.onToList }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#1B4D7A;margin-top:4px"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#fff">Next: checklist</span></div>
+              </div>
+            </sc-if>
+
+            <!-- list -->
+            <sc-if value="{{ check.sList }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:11px">
+                <span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#58626A">{{ check.listLabel }}</span>
+                <sc-for list="{{ check.items }}" as="it" hint-placeholder-count="8">
+                  <div style="background:#fff;border:1px solid #E7EBEE;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:7px">
+                    <div><div style="font-family:'Fustat';font-weight:500;font-size:14px;color:#1B2126">{{ it.text }}</div><div style="font-family:'Fustat';font-size:11px;color:#68727A">{{ it.section }}</div></div>
+                    <div style="display:flex;gap:8px">
+                      <div onClick="{{ it.onPass }}" style="cursor:pointer;flex:1;min-height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;{{ it.passStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:{{ it.passColor }}">Pass</span></div>
+                      <div onClick="{{ it.onFail }}" style="cursor:pointer;flex:1;min-height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;{{ it.failStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:{{ it.failColor }}">Fail</span></div>
+                    </div>
+                    <sc-if value="{{ it.hasFail }}" hint-placeholder-val="{{ false }}"><div onClick="{{ it.onFail }}" style="cursor:pointer;display:flex;align-items:center;gap:8px;background:#FBEEEC;border-radius:9px;padding:8px 10px"><dc-import name="Icon" hint-size="15px,15px" iconname="alert" size="15" color="#A03428" sw="1.9"></dc-import><span style="flex:1;min-width:0;font-family:'Fustat';font-weight:500;font-size:12px;color:#A03428;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.failDesc }}</span><span style="font-family:'Fustat';font-weight:600;font-size:11px;color:#A03428">Edit</span></div></sc-if>
+                  </div>
+                </sc-for>
+                <div onClick="{{ check.onToReview }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#1B4D7A;margin-top:4px"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#fff">Next: review</span></div>
+              </div>
+            </sc-if>
+
+            <!-- review -->
+            <sc-if value="{{ check.sReview }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#58626A">{{ check.reviewLabel }}</span>
+                <div style="border:1.5px solid {{ check.verdictBorder }};background:{{ check.verdictBg }};border-radius:16px;padding:15px;display:flex;flex-direction:column;gap:3px"><span style="font-family:'Fustat';font-weight:700;font-size:19px;color:{{ check.verdictColor }}">{{ check.verdictLabel }}</span><span style="font-family:'Fustat';font-weight:500;font-size:13px;color:#58626A">{{ check.verdictSub }}</span></div>
+                <div style="display:flex;gap:8px">
+                  <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:12px;padding:11px 0;display:flex;flex-direction:column;align-items:center"><span style="font-family:'Fustat';font-weight:700;font-size:22px;color:#397B43">{{ check.pass }}</span><span style="font-family:'Fustat';font-weight:500;font-size:11px;color:#616B73;margin-top:3px">Passed</span></div>
+                  <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:12px;padding:11px 0;display:flex;flex-direction:column;align-items:center"><span style="font-family:'Fustat';font-weight:700;font-size:22px;color:#A03428">{{ check.fail }}</span><span style="font-family:'Fustat';font-weight:500;font-size:11px;color:#616B73;margin-top:3px">Failed</span></div>
+                  <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:12px;padding:11px 0;display:flex;flex-direction:column;align-items:center"><span style="font-family:'Fustat';font-weight:700;font-size:22px;color:#1B4D7A">{{ check.photoCount }}</span><span style="font-family:'Fustat';font-weight:500;font-size:11px;color:#616B73;margin-top:3px">Photos</span></div>
+                </div>
+                <sc-if value="{{ check.hasDefects }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Defects you're reporting</span>
+                    <sc-for list="{{ check.defects }}" as="d" hint-placeholder-count="1"><div style="display:flex;gap:10px;background:#fff;border:1px solid #F0D9D5;border-radius:12px;padding:11px"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:9.5px;padding:5px 7px;border-radius:6px;align-self:flex-start;color:{{ d.sevFg }};background:{{ d.sevBg }}">{{ d.sev }}</span><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:500;font-size:14px;color:#1B2126">{{ d.desc }}</div><div style="font-family:'IBM Plex Mono';font-size:11.5px;color:#68727A">{{ d.section }}</div></div></div></sc-for>
+                  </div>
+                </sc-if>
+                <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Odometer reading (km)</span><input value="{{ check.odo }}" onInput="{{ check.onOdo }}" placeholder="e.g. 84210" style="border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none" /></div>
+                <div style="border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;{{ check.signBoxStyle }}">
+                  <span style="font-family:'Fustat';font-size:13px;line-height:20px;color:#58626A">I confirm this walk-around was carried out on {{ check.plate }} and the record above is accurate.</span>
+                  <sc-if value="{{ check.signed }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;align-items:center;gap:12px;border-top:1px solid #E7EBEE;padding-top:12px"><div style="width:44px;height:44px;border-radius:999px;background:#1B4D7A;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:15px;color:#fff">{{ check.signerIni }}</div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-size:22px;font-style:italic;color:#1B2126">{{ check.signer }}</div><div style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#397B43">Signed · 24 Aug 2026</div></div><div onClick="{{ check.onSign }}" style="cursor:pointer;padding:0 10px;min-height:44px;display:flex;align-items:center"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Clear</span></div></div>
+                  </sc-if>
+                  <sc-if value="{{ check.signPrompt }}" hint-placeholder-val="{{ true }}">
+                    <div onClick="{{ check.onSign }}" style="cursor:pointer;min-height:56px;border-radius:13px;border:1.5px dashed #1B4D7A;background:#F6F9FC;display:flex;align-items:center;justify-content:center;gap:9px"><dc-import name="Icon" hint-size="19px,19px" iconname="pen" size="19" color="#1B4D7A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B4D7A">Tap to sign as {{ check.signer }}</span></div>
+                  </sc-if>
+                  <sc-if value="{{ check.needOdo }}" hint-placeholder-val="{{ false }}">
+                    <div style="min-height:56px;border-radius:13px;border:1.5px dashed #C6D2DC;background:#F6F7F8;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px"><dc-import name="Icon" hint-size="17px,17px" iconname="info" size="17" color="#58626A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:#58626A">Record the odometer to sign</span></div>
+                  </sc-if>
+                </div>
+                <div onClick="{{ check.onSubmit }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;{{ check.submitStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:{{ check.submitColor }}">Submit for approval</span></div>
+              </div>
+            </sc-if>
+
+            <!-- done -->
+            <sc-if value="{{ check.sDone }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px">
+                <div style="width:56px;height:56px;border-radius:999px;background:#EAF3EC;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="28px,28px" iconname="check" size="28" color="#397B43" sw="2.4"></dc-import></div>
+                <span style="font-family:'Fustat';font-weight:700;font-size:19px;color:#1B2126">Check submitted</span>
+                <span style="font-family:'Fustat';font-size:14px;line-height:21px;color:#616B73;text-align:center">{{ check.doneSub }}</span>
+                <div onClick="{{ check.onFinish }}" style="cursor:pointer;min-height:56px;padding:0 22px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#1B4D7A"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#fff">Back to van record</span></div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- MORE -->
+        <sc-if value="{{ isMore }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;padding-bottom:28px;display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ more.sections }}" as="sec" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">{{ sec.label }}</div>
+                <sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="1">
+                  <div onClick="{{ r.onPress }}" style="cursor:pointer;background:{{ r.rowBg }};border:1px solid #E7EBEE;border-radius:16px;padding:14px;min-height:66px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                    <dc-import name="Icon" hint-size="23px,23px" iconname="{{ r.icon }}" size="23" color="{{ r.iconColor }}" sw="1.7"></dc-import>
+                    <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:500;font-size:16px;color:{{ r.titleColor }}">{{ r.title }}</div><sc-if value="{{ r.hasSub }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Fustat';font-size:13px;color:#616B73">{{ r.sub }}</div></sc-if></div>
+                    <sc-if value="{{ r.soon }}" hint-placeholder-val="{{ false }}"><div style="padding:0 10px;min-height:24px;display:flex;align-items:center;border-radius:999px;background:#E9F0F6"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:10px;letter-spacing:.4px;color:#1B4D7A;text-transform:uppercase">Coming soon</span></div></sc-if>
+                    <sc-if value="{{ r.isNew }}" hint-placeholder-val="{{ false }}"><div style="padding:0 8px;min-height:22px;display:flex;align-items:center;border-radius:999px;background:#E9F0F6"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:9.5px;letter-spacing:.4px;color:#1B4D7A;text-transform:uppercase">New</span></div></sc-if>
+                    <sc-if value="{{ r.chev }}" hint-placeholder-val="{{ true }}"><dc-import name="Icon" hint-size="16px,16px" iconname="chevronRight" size="16" color="#8B9197" sw="2"></dc-import></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- SETTINGS -->
+        <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;padding-bottom:32px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Depot</div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:6px 12px;min-height:52px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73">Depot name</span><span style="font-family:'Fustat';font-weight:500;font-size:16px;color:#1B4D7A">{{ settings.depotName }}</span></div>
+            <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:8px">App</div>
+            <div onClick="{{ settings.onConfig }}" style="cursor:pointer;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px;min-height:64px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 2px rgba(27,33,38,.05)"><dc-import name="Icon" hint-size="22px,22px" iconname="listCheck" size="22" color="#1B4D7A" sw="1.7"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:16px;color:#1B2126">Depot configuration</span><dc-import name="Icon" hint-size="16px,16px" iconname="chevronRight" size="16" color="#8B9197" sw="2"></dc-import></div>
+            <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:8px">Backup</div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div onClick="{{ settings.onBackup }}" style="cursor:pointer;padding:0 14px;min-height:58px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F1F2F3"><dc-import name="Icon" hint-size="21px,21px" iconname="download" size="21" color="#1B4D7A" sw="1.7"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15.5px;color:#1B2126">Save a backup</span></div>
+              <div onClick="{{ settings.onRestore }}" style="cursor:pointer;padding:0 14px;min-height:58px;display:flex;align-items:center;gap:12px"><dc-import name="Icon" hint-size="21px,21px" iconname="upload" size="21" color="#1B4D7A" sw="1.7"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15.5px;color:#1B2126">Restore from a backup</span></div>
+            </div>
+            <div style="font-family:'Fustat';font-size:13px;line-height:19px;color:#616B73">{{ settings.note }}</div>
+            <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:8px">About</div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div style="padding:0 14px;min-height:48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #F1F2F3"><span style="font-family:'Fustat';font-size:14.5px;color:#58626A">App build</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:13px;color:#1B2126">{{ settings.build }}</span></div>
+              <div style="padding:0 14px;min-height:48px;display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Fustat';font-size:14.5px;color:#58626A">Checklist</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:13px;color:#1B2126">{{ settings.checklist }}</span></div>
+            </div>
+            <div style="font-family:'Fustat';font-weight:700;font-size:12.5px;color:#A03428;padding-top:8px">Danger zone</div>
+            <div onClick="{{ settings.onReset }}" style="cursor:pointer;background:#A03428;border-radius:16px;min-height:56px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:15.5px;color:#fff">Factory Reset</span></div>
+          </div>
+        </sc-if>
+
+        <!-- CONFIG -->
+        <sc-if value="{{ isConfig }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;padding-bottom:32px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126">Depot configuration</span><div style="min-height:44px;padding:0 14px;display:flex;align-items:center;gap:6px;border-radius:999px;border:1px solid #1B4D7A;background:#fff"><dc-import name="Icon" hint-size="14px,14px" iconname="pen" size="14" color="#1B4D7A" sw="1.9"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13.5px;color:#1B4D7A">Edit</span></div></div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div onClick="{{ config.onToggleDraw }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ config.drawChev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">Draw rules</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">4 rules</span></div>
+              <sc-if value="{{ config.drawOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="border-top:1px solid #F1F2F3;padding:14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;gap:8px">
+                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Exclude if checked within (days)</span><span style="font-family:'Fustat';font-weight:500;font-size:16px;color:#1B4D7A">{{ config.excludeDays }}</span></div>
+                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Force any vehicle past (days)</span><span style="font-family:'Fustat';font-weight:500;font-size:16px;color:#1B4D7A">{{ config.forceDays }}</span></div>
+                  </div>
+                  <div style="display:flex;gap:8px">
+                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Re-rolls per check</span><span style="font-family:'Fustat';font-weight:500;font-size:16px;color:#1B4D7A">{{ config.rerolls }}</span></div>
+                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Target per week (checks)</span><span style="font-family:'Fustat';font-weight:500;font-size:16px;color:#1B4D7A">{{ config.target }}</span></div>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div onClick="{{ config.onTogglePhotos }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ config.photosChev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">Check photos</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">{{ config.angleCount }}</span></div>
+              <sc-if value="{{ config.photosOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="border-top:1px solid #F1F2F3">
+                  <sc-for list="{{ config.angles }}" as="a" hint-placeholder-count="6"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="width:24px;height:24px;border-radius:7px;background:#EEF1F3;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#616B73">{{ a.n }}</span></div><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ a.name }}</span></div></sc-for>
+                </div>
+              </sc-if>
+            </div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div onClick="{{ config.onToggleRoles }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ config.rolesChev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">Roles &amp; capabilities</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">3 roles</span></div>
+              <sc-if value="{{ config.rolesOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="border-top:1px solid #F1F2F3;padding:12px;display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ config.groups }}" as="g" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                <div onClick="{{ g.onToggle }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ g.chev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">{{ g.role }}</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">{{ g.count }}</span></div>
+                <sc-if value="{{ g.open }}" hint-placeholder-val="{{ false }}">
+                  <div style="border-top:1px solid #F1F2F3">
+                    <sc-for list="{{ g.caps }}" as="c" hint-placeholder-count="3"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ c.name }}</div><div style="font-family:'Fustat';font-size:12.5px;line-height:17px;color:#68727A">{{ c.desc }}</div></div><div style="width:38px;height:22px;border-radius:999px;background:#1B4D7A;position:relative"><div style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:999px;background:#fff"></div></div></div></sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- PEOPLE -->
+        <sc-if value="{{ isPeople }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;padding-bottom:28px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-family:'Fustat';font-size:13.5px;line-height:19px;color:#616B73">{{ people.sub }}</div>
+            <div style="display:flex;gap:8px">
+              <div onClick="{{ people.onAll }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid {{ people.allBorder }};background:{{ people.allBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ people.allColor }}">All</span></div>
+              <div onClick="{{ people.onMgr }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid {{ people.mgrBorder }};background:{{ people.mgrBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ people.mgrColor }}">Managers</span></div>
+              <div onClick="{{ people.onInsp }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid {{ people.inspBorder }};background:{{ people.inspBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ people.inspColor }}">Inspectors</span></div>
+            </div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <sc-for list="{{ people.rows }}" as="p" hint-placeholder-count="5">
+                <div onClick="{{ p.onPress }}" style="cursor:pointer;min-height:66px;padding:0 14px;display:flex;align-items:center;gap:12px;{{ p.rowBorder }}">
+                  <div style="width:40px;height:40px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:14px;{{ p.avStyle }};color:{{ p.avColor }}">{{ p.ini }}</div>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                    <div style="display:flex;align-items:center;gap:7px"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">{{ p.name }}</span><sc-if value="{{ p.you }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:9.5px;color:#1B4D7A;background:#E9F0F6;padding:3px 5px;border-radius:5px">YOU</span></sc-if></div>
+                    <div style="display:flex;align-items:center;gap:6px"><div style="width:7px;height:7px;border-radius:999px;background:{{ p.dotColor }}"></div><span style="font-family:'Fustat';font-size:12.5px;color:#616B73">{{ p.status }}</span></div>
+                  </div>
+                  <div style="padding:5px 9px;border-radius:999px;{{ p.chipStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:10.5px;color:{{ p.chipColor }}">{{ p.chipTxt }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- PROFILE -->
+        <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;padding-bottom:32px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:4px">
+              <div style="width:76px;height:76px;border-radius:999px;background:#1B4D7A;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:700;font-size:26px;color:#fff;letter-spacing:.5px">{{ profile.ini }}</span></div>
+              <span style="font-family:'Fustat';font-weight:700;font-size:23px;color:#1B2126;letter-spacing:-.4px">{{ profile.name }}</span>
+              <div style="padding:5px 12px;border-radius:999px;background:#E9F0F6"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#1B4D7A">{{ profile.roleLabel }}</span></div>
+              <sc-if value="{{ profile.suspended }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:#FBF3E7"><dc-import name="Icon" hint-size="13px,13px" iconname="lock" size="13" color="#8A6116" sw="1.9"></dc-import><span style="font-family:'Fustat';font-weight:500;font-size:12.5px;color:#8A6116">Suspended — cannot sign in</span></div></sc-if>
+            </div>
+            <sc-if value="{{ profile.showTiles }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:10px">
+                <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:24px;color:#1B2126">{{ profile.month }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#1B4D7A;margin-top:3px">This month</span></div>
+                <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:24px;color:#1B2126">{{ profile.week }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#1B4D7A;margin-top:3px">This week</span></div>
+              </div>
+            </sc-if>
+            <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:6px">Details</div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:0 14px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div style="min-height:48px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><span style="flex:1;font-family:'Fustat';font-size:14.5px;color:#58626A">Role</span><span style="font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126">{{ profile.roleLabel }}</span></div>
+              <div style="min-height:48px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><span style="flex:1;font-family:'Fustat';font-size:14.5px;color:#58626A">Last active</span><span style="font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126">Today · 08:12</span></div>
+              <div style="min-height:48px;display:flex;align-items:center;gap:10px"><span style="flex:1;font-family:'Fustat';font-size:14.5px;color:#58626A">Member since</span><span style="font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126">{{ profile.since }}</span></div>
+            </div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Assigned vehicles</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">{{ profile.vansCount }}</span></div>
+            <sc-if value="{{ profile.hasVans }}" hint-placeholder-val="{{ true }}">
+              <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:0 14px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                <sc-for list="{{ profile.vans }}" as="v" hint-placeholder-count="2"><div onClick="{{ v.onPress }}" style="cursor:pointer;padding:12px 0;display:flex;align-items:center;gap:12px;{{ v.rowBorder }}"><div style="width:38px;height:38px;border-radius:10px;background:#E9F0F6;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="20px,20px" iconname="truck" size="20" color="#1B4D7A" sw="1.6"></dc-import></div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126;letter-spacing:.3px">{{ v.plate }}</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ v.sub }}</div></div><div style="padding:5px 8px;border-radius:6px;background:{{ v.pillBg }}"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;color:{{ v.pillColor }}">{{ v.pill }}</span></div><dc-import name="Icon" hint-size="15px,15px" iconname="chevronRight" size="15" color="#8B9197" sw="2"></dc-import></div></sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ profile.noVans }}" hint-placeholder-val="{{ false }}"><div style="background:#FBFBFA;border:1px dashed #D3D9DD;border-radius:16px;padding:16px"><span style="font-family:'Fustat';font-size:13.5px;line-height:20px;color:#616B73">No vehicle currently assigned.</span></div></sc-if>
+          </div>
+        </sc-if>
+
+        <!-- HELP -->
+        <sc-if value="{{ isHelp }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;padding-bottom:32px;display:flex;flex-direction:column;gap:14px">
+            <span style="font-family:'Fustat';font-size:14px;line-height:20px;color:#616B73">The notes and instructions that used to sit on the working screens live here now. Tap a topic to read it; the screens themselves stay clear for the job.</span>
+            <sc-for list="{{ help.groups }}" as="g" hint-placeholder-count="2">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">{{ g.label }}</span>
+                <sc-for list="{{ g.topics }}" as="t" hint-placeholder-count="3">
+                  <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                    <div onClick="{{ t.onToggle }}" style="cursor:pointer;min-height:62px;padding:14px;display:flex;align-items:center;gap:12px"><dc-import name="Icon" hint-size="22px,22px" iconname="{{ t.icon }}" size="22" color="#1B4D7A" sw="1.7"></dc-import><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">{{ t.title }}</div><div style="font-family:'Fustat';font-size:13px;color:#616B73">{{ t.sub }}</div></div><div style="{{ t.chev }}"><dc-import name="Icon" hint-size="16px,16px" iconname="chevronDown" size="16" color="#8B9197" sw="2"></dc-import></div></div>
+                    <sc-if value="{{ t.open }}" hint-placeholder-val="{{ false }}"><div style="margin:0 14px;padding:12px 0 15px;border-top:1px dashed #D3D9DD;display:flex;flex-direction:column;gap:11px"><sc-for list="{{ t.body }}" as="p" hint-placeholder-count="2"><span style="font-family:'Fustat';font-size:14.5px;line-height:22px;color:{{ p.color }}">{{ p.text }}</span></sc-for></div></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- WEEKLY REPORT (new feature) -->
+        <sc-if value="{{ isReport }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;padding-bottom:32px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+              <div><div style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126">{{ report.periodTitle }}</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73">{{ report.depot }}</div></div>
+              <div onClick="{{ report.onExport }}" style="cursor:pointer;min-height:40px;padding:0 12px;display:flex;align-items:center;gap:7px;border-radius:11px;border:1px solid #E7EBEE;background:#fff"><dc-import name="Icon" hint-size="15px,15px" iconname="download" size="15" color="#1B4D7A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#1B4D7A">Export</span></div>
+            </div>
+
+            <!-- coverage -->
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:15px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div style="display:flex;align-items:flex-end;justify-content:space-between"><div><div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Checks this week</div><div style="display:flex;align-items:baseline;gap:8px;margin-top:2px"><span style="font-family:'Fustat';font-weight:700;font-size:34px;color:{{ report.coverageColor }}">{{ report.coverageN }}</span><span style="font-family:'IBM Plex Mono';font-size:13px;color:#68727A">{{ report.coverageTarget }}</span></div></div><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:{{ report.coverageColor }}">{{ report.coveragePct }}</span></div>
+              <div style="height:12px;border-radius:999px;background:#EEF1F3;overflow:hidden"><div style="height:100%;border-radius:999px;background:{{ report.coverageColor }};width:{{ report.coveragePct }}"></div></div>
+              <span style="font-family:'Fustat';font-weight:500;font-size:12.5px;color:#616B73">{{ report.coverageNote }}</span>
+            </div>
+
+            <!-- fleet health -->
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:11px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Fleet health · {{ report.total }} vehicles</div>
+              <div style="display:flex;height:14px;border-radius:999px;overflow:hidden;background:#EEF1F3"><div style="flex:{{ report.ok }};background:#397B43"></div><div style="flex:{{ report.overdue }};background:#5B6670"></div><div style="flex:{{ report.blocked }};background:#A03428"></div></div>
+              <div style="display:flex;flex-wrap:wrap;gap:12px"><div style="display:flex;align-items:center;gap:6px"><div style="width:9px;height:9px;border-radius:2px;background:#397B43"></div><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#58626A">OK {{ report.ok }}</span></div><div style="display:flex;align-items:center;gap:6px"><div style="width:9px;height:9px;border-radius:2px;background:#5B6670"></div><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#58626A">Overdue {{ report.overdue }}</span></div><div style="display:flex;align-items:center;gap:6px"><div style="width:9px;height:9px;border-radius:2px;background:#A03428"></div><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#58626A">Attention {{ report.blocked }}</span></div></div>
+            </div>
+
+            <!-- two mini stats -->
+            <div style="display:flex;gap:10px">
+              <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px;box-shadow:0 1px 2px rgba(27,33,38,.05)"><div style="font-family:'Fustat';font-weight:700;font-size:26px;color:#A03428">{{ report.openDefects }}</div><div style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73;margin-top:3px">Open defects</div><div style="font-family:'IBM Plex Mono';font-size:10.5px;color:#68727A;margin-top:2px">{{ report.defectSub }}</div></div>
+              <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px;box-shadow:0 1px 2px rgba(27,33,38,.05)"><div style="font-family:'Fustat';font-weight:700;font-size:26px;color:#8A6116">{{ report.docExpired }}</div><div style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73;margin-top:3px">Documents expired</div><div style="font-family:'IBM Plex Mono';font-size:10.5px;color:#68727A;margin-top:2px">{{ report.docSub }}</div></div>
+            </div>
+
+            <!-- doc watchlist -->
+            <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:4px">Document watchlist</div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <sc-for list="{{ report.watch }}" as="w" hint-placeholder-count="4"><div style="padding:11px 14px;min-height:52px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:14.5px;color:#1B2126;letter-spacing:.2px">{{ w.plate }}</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73">{{ w.name }}</div></div><div style="padding:5px 8px;border-radius:6px;background:{{ w.bg }}"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;color:{{ w.color }}">{{ w.txt }}</span></div></div></sc-for>
+            </div>
+
+            <!-- throughput vs target -->
+            <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:4px">Inspector throughput vs target</div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 2px rgba(27,33,38,.05);position:relative">
+              <div style="position:absolute;top:14px;bottom:14px;width:2px;background:#F0D9D5;left:{{ report.targetLeft }}"></div>
+              <sc-for list="{{ report.bars }}" as="b" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:10px"><div style="width:58px;font-family:'Fustat';font-weight:500;font-size:12.5px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.name }}</div><div style="flex:1;height:10px;border-radius:999px;background:#EEF1F3;overflow:hidden"><div style="height:100%;border-radius:999px;background:#1B4D7A;width:{{ b.pct }}"></div></div><div style="width:20px;text-align:right;font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#58626A">{{ b.n }}</div></div></sc-for>
+            </div>
+
+            <!-- overdue aging -->
+            <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:4px">Overdue aging</div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <sc-for list="{{ report.aging }}" as="a" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:10px"><div style="width:78px;font-family:'Fustat';font-weight:500;font-size:12.5px;color:#58626A">{{ a.label }}</div><div style="flex:1;height:10px;border-radius:999px;background:#EEF1F3;overflow:hidden"><div style="height:100%;border-radius:999px;background:#5B6670;width:{{ a.pct }}"></div></div><div style="width:20px;text-align:right;font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#58626A">{{ a.n }}</div></div></sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+
+      <!-- bottom nav -->
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="flex-shrink:0;display:flex;background:#fff;border-top:1px solid #E7EBEE;padding:0 6px 10px">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+            <div onClick="{{ t.onPress }}" style="flex:1;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer">
+              <div style="position:relative">
+                <dc-import name="Icon" hint-size="23px,23px" iconname="{{ t.icon }}" name="Icon" size="23" color="{{ t.color }}" sw="1.7"></dc-import>
+                <sc-if value="{{ t.hasBadge }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;top:-4px;left:14px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#A03428;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:10px;color:#fff">{{ t.badge }}</span></div>
+                </sc-if>
+              </div>
+              <span style="font-family:'Fustat';font-weight:{{ t.weight }};font-size:11px;color:{{ t.color }}">{{ t.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- toast -->
+      <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:0;right:0;bottom:104px;display:flex;justify-content:center;z-index:80;pointer-events:none">
+          <div style="background:#1B2126;padding:11px 16px;border-radius:20px;max-width:88%"><span style="font-family:'Fustat';font-weight:500;font-size:13.5px;color:#fff;text-align:center">{{ toast }}</span></div>
+        </div>
+      </sc-if>
+
+      <!-- @@OVERLAYS@@ -->
+
+      <!-- DRAW OVERLAY -->
+      <sc-if value="{{ drawOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:60;background:linear-gradient(135deg,#14375A,#1B2126);padding:40px 24px 30px;display:flex;flex-direction:column">
+          <div style="display:flex;justify-content:flex-end"><div onClick="{{ draw.onClose }}" style="cursor:pointer;width:38px;height:38px;border-radius:999px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="x" size="16" color="#fff" sw="2.2"></dc-import></div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+            <sc-if value="{{ draw.settled }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:20px">
+                <span style="font-family:'IBM Plex Mono';font-weight:600;font-size:11px;letter-spacing:1.8px;color:rgba(255,255,255,.55)">YOU'RE CHECKING</span>
+                <div style="width:300px;max-width:84%;height:88px;border-radius:12px;background:#F4C430;border:2px solid #E0B420;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:40px;letter-spacing:2.4px;color:#1B2126">{{ draw.plate }}</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:7px">
+                  <span style="font-family:'Fustat';font-weight:700;font-size:20px;color:#fff;text-align:center">{{ draw.model }}</span>
+                  <span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;letter-spacing:.4px;padding:6px 11px;border-radius:7px;background:{{ draw.pillBg }};color:{{ draw.pillFg }}">{{ draw.pillTxt }}</span>
+                  <span style="font-family:'Fustat';font-weight:500;font-size:13px;color:rgba(255,255,255,.6);text-align:center">{{ draw.lastText }}</span>
+                  <span style="font-family:'Fustat';font-weight:500;font-size:13px;color:rgba(255,255,255,.6);text-align:center">{{ draw.driverText }}</span>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ draw.spinning }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:20px">
+                <span style="font-family:'Fustat';font-weight:700;font-size:22px;line-height:28px;color:#fff;text-align:center">Picking a vehicle<br />from the pool…</span>
+                <div style="width:288px;max-width:82%;height:78px;border-radius:12px;border:3px solid rgba(255,255,255,.28);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:32px;letter-spacing:1.6px;color:rgba(255,255,255,.9)">{{ draw.spinPlate }}</span></div>
+              </div>
+            </sc-if>
+          </div>
+          <sc-if value="{{ draw.settled }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <div onClick="{{ draw.onStart }}" style="cursor:pointer;min-height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;background:#fff"><span style="font-family:'Fustat';font-weight:700;font-size:16px;color:#14375A">Start check</span></div>
+              <div onClick="{{ draw.onReroll }}" style="cursor:pointer;min-height:50px;border-radius:15px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(255,255,255,.4)"><dc-import name="Icon" hint-size="17px,17px" iconname="refresh" size="17" color="#ffffff" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:15px;color:{{ draw.rerollColor }}">{{ draw.rerollText }}</span></div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- DRIVER SHEET -->
+      <sc-if value="{{ driverSheetOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:55;background:rgba(27,33,38,.4);display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ driverSheet.onClose }}" style="position:absolute;inset:0"></div>
+          <div style="position:relative;background:#fff;border-top-left-radius:22px;border-top-right-radius:22px;padding:8px 16px 30px;display:flex;flex-direction:column;gap:16px">
+            <div style="align-self:center;width:36px;height:5px;border-radius:3px;background:#D3D9DD"></div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="min-width:0"><div style="font-family:'IBM Plex Mono';font-weight:700;font-size:15px;letter-spacing:1.2px;color:#58626A">{{ driverSheet.plate }}</div><div style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126">Confirm driver to start</div></div><div onClick="{{ driverSheet.onClose }}" style="cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="x" size="16" color="#58626A" sw="2.2"></dc-import></div></div>
+            <div style="display:flex;align-items:center;gap:12px;background:#F6F9FC;border:1px solid #E3EBF2;border-radius:16px;padding:12px"><div style="width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:15px;background:{{ driverSheet.avBg }};color:{{ driverSheet.avColor }}">{{ driverSheet.ini }}</div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:700;font-size:17px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ driverSheet.shownName }}</div><div style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73;margin-top:2px">{{ driverSheet.meta }}</div></div></div>
+            <sc-if value="{{ driverSheet.showField }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Someone else driving it?</span><div style="position:relative;display:flex;align-items:center"><div style="position:absolute;left:13px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="18px,18px" iconname="search" size="18" color="#68727A" sw="1.7"></dc-import></div><input value="{{ driverSheet.reassignVal }}" onInput="{{ driverSheet.onReassign }}" placeholder="Search a different driver" style="width:100%;border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px 0 40px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none" /></div></div>
+            </sc-if>
+            <div onClick="{{ driverSheet.onToggleSpare }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;min-height:44px"><div style="width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;{{ driverSheet.checkboxStyle }}"><sc-if value="{{ driverSheet.noDriver }}" hint-placeholder-val="{{ false }}"><dc-import name="Icon" hint-size="14px,14px" iconname="check" size="14" color="#fff" sw="3"></dc-import></sc-if></div><span style="font-family:'Fustat';font-weight:500;font-size:14px;color:#1B2126">Vehicle not in use (spare)</span></div>
+            <div onClick="{{ driverSheet.onConfirm }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;{{ driverSheet.confirmStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:{{ driverSheet.confirmColor }}">{{ driverSheet.confirmLabel }}</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- FAIL SHEET -->
+      <sc-if value="{{ failSheetOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:70;background:rgba(27,33,38,.4);display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ failSheet.onClose }}" style="position:absolute;inset:0"></div>
+          <div style="position:relative;background:#fff;border-top-left-radius:22px;border-top-right-radius:22px;padding:16px 16px 30px;display:flex;flex-direction:column;gap:13px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="font-family:'Fustat';font-weight:700;font-size:17px;color:#A03428">Record a defect</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73">{{ failSheet.text }}</div></div><div onClick="{{ failSheet.onClose }}" style="cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="x" size="16" color="#58626A" sw="2.2"></dc-import></div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">What is wrong</span><textarea onInput="{{ failSheet.onDesc }}" placeholder="Describe the fault" style="border:1px solid #D3D9DD;border-radius:12px;min-height:62px;padding:10px 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none;resize:none">{{ failSheet.desc }}</textarea></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Severity</span><div style="display:flex;gap:8px"><sc-for list="{{ failSheet.sevs }}" as="s" hint-placeholder-count="3"><div onClick="{{ s.onPress }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;{{ s.style }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ s.color }}">{{ s.label }}</span></div></sc-for></div></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Due date (optional)</span><input value="{{ failSheet.due }}" onInput="{{ failSheet.onDue }}" placeholder="e.g. 30 Aug 2026" style="border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none" /></div>
+            <div onClick="{{ failSheet.onSave }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-top:2px;{{ failSheet.saveStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:{{ failSheet.saveColor }}">Save defect &amp; fail item</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:660,&quot;height&quot;:920}}">
+// ============================================================================
+// Vehicle Spot-Check — data model + store, ported from src/ (theme, model,
+// format, store) of the expo-rewrite. Deterministic seed data matches the app.
+// ============================================================================
+const TODAY = '24 Aug 2026';
+const C = {
+  primary:'#1B4D7A', primaryDeep:'#14375A', ink:'#1B2126',
+  danger:'#A03428', dangerBg:'#FBEEEC', dangerBg2:'#FDF6F5', dangerBorder:'#F0D9D5',
+  amber:'#8A6116', amberBg:'#FBF3E7',
+  green:'#397B43', greenBg:'#EAF3EC', greenBg2:'#EFF6F0', greenTint:'#F4FAF5', greenBorder:'#BCD9C2', greenBorderSoft:'#CFE6D4',
+  muted:'#616B73', muted2:'#58626A', muted3:'#68727A', faint:'#8B9197',
+  border:'#E7EBEE', border2:'#EEF1F3', border3:'#D3D9DD', borderMuted:'#C6D2DC', hair:'#F1F2F3',
+  card:'#FFFFFF', cardSubtle:'#FAFBFC', cardAlt:'#FBFBFA', inputBg:'#F6F7F8',
+  chipBlue:'#E9F0F6', tintBlue:'#F6F9FC', tintBlueBorder:'#E3EBF2',
+  disabledBg:'#F1F2F3', disabledTxt:'#58626A', slate:'#5B6670', draw:'#F4C430', drawBorder:'#E0B420',
+};
+const STATUS = {
+  blocked:{label:'Attention',c:C.danger,bg:C.dangerBg},
+  jobs:{label:'Open defects',c:C.amber,bg:C.amberBg},
+  overdue:{label:'Overdue',c:C.slate,bg:C.border2},
+  spare:{label:'Spare',c:C.slate,bg:C.chipBlue},
+  ok:{label:'OK',c:C.green,bg:C.greenBg},
+};
+const PEOPLE = {
+  'Tien Nguyen':{role:'Manager',ini:'TN',month:38,week:9,defects:4,since:'March 2024'},
+  'Michael Pak':{role:'Manager',ini:'MP',month:22,week:5,defects:2,since:'January 2025'},
+  'Phuog Lam':{role:'Inspector',ini:'PL',month:31,week:7,defects:3,since:'September 2023'},
+  'Ben Wang':{role:'Inspector',ini:'BW',month:26,week:6,defects:1,since:'June 2024'},
+  'System Admin':{role:'Admin',ini:'SA',month:0,week:0,defects:0,since:'—'},
+};
+const CHECKLIST = {version:4, sections:[
+  {id:'eng',name:'Engine',items:[{id:'eng1',text:'Engine Oil / Level'},{id:'eng2',text:'Engine Coolant'},{id:'eng3',text:'Steering & Brake Fluid'},{id:'eng4',text:'Leaks, Seals & Hoses'}]},
+  {id:'body',name:'Vehicle Body',items:[{id:'body1',text:'Panels and Doors'},{id:'body2',text:'Mud Flaps'},{id:'body3',text:'Mirrors'},{id:'body4',text:'Registration Plates / Signs'},{id:'body5',text:'Tray'},{id:'body6',text:'Fixtures and Fittings'}]},
+  {id:'elec',name:'Electrical',items:[{id:'elec1',text:'Headlights (High / Low)'},{id:'elec2',text:'Park Lights'},{id:'elec3',text:'Indicators'},{id:'elec4',text:'Clearance Lights'},{id:'elec5',text:'Taillights / Plate Lights'},{id:'elec6',text:'Brake Lights'},{id:'elec7',text:'Hazard Lights'},{id:'elec8',text:'Windscreen Wipers'}]},
+  {id:'wheel',name:'Wheels & Tyres',items:[{id:'wheel1',text:'Rims'},{id:'wheel2',text:'Tyres'},{id:'wheel3',text:'Spare Wheel'}]},
+  {id:'safe',name:'Safety Equipment',items:[{id:'safe1',text:'Warning Triangles'},{id:'safe2',text:'Fire Extinguishers'},{id:'safe3',text:'Spill Kit'},{id:'safe4',text:'Fluoro Vest, Gloves, Hard Hat'},{id:'safe5',text:'First Aid Kit'}]},
+  {id:'reg',name:'Registration',items:[{id:'reg1',text:'Registration documents current and available'}]},
+]};
+function initials(name){const p=(name||'').trim().split(/\s+/);return ((p[0]||'')[0]||'').toUpperCase()+((p[1]||'')[0]||'').toUpperCase();}
+function seedPeople(){return [
+  {name:'Tien Nguyen',role:'Manager',ini:'TN',suspended:false,since:'March 2024'},
+  {name:'Michael Pak',role:'Manager',ini:'MP',suspended:false,since:'January 2025'},
+  {name:'Phuog Lam',role:'Inspector',ini:'PL',suspended:false,since:'September 2023'},
+  {name:'Ben Wang',role:'Inspector',ini:'BW',suspended:false,since:'June 2024'},
+  {name:'Aisha Khan',role:'Inspector',ini:'AK',suspended:false,since:'November 2024'},
+  {name:'Rob Ellis',role:'Inspector',ini:'RE',suspended:true,since:'February 2023'},
+];}
+function genVans(){
+  const models=[{name:'Ford Transit',fuel:'Diesel',vin:'WF0'},{name:'Ford Transit Custom',fuel:'Diesel',vin:'WF0'},{name:'MB Sprinter',fuel:'Diesel',vin:'WDB'},{name:'MB Vito',fuel:'Diesel',vin:'WDF'},{name:'VW Crafter',fuel:'Diesel',vin:'WV1'},{name:'VW Transporter',fuel:'Diesel',vin:'WV2'},{name:'Renault Master',fuel:'Diesel',vin:'VF1'},{name:'Renault Trafic',fuel:'Diesel',vin:'VF1'},{name:'Vauxhall Vivaro',fuel:'Diesel',vin:'W0V'},{name:'Peugeot Boxer',fuel:'Diesel',vin:'VF3'},{name:'Fiat Ducato',fuel:'Diesel',vin:'ZFA'},{name:'Ford E-Transit',fuel:'Electric',vin:'WF0'},{name:'MB eVito',fuel:'Electric',vin:'WDF'}];
+  const ages=[['18',2018],['68',2018],['19',2019],['69',2019],['20',2020],['70',2020],['21',2021],['71',2021],['22',2022],['72',2022],['23',2023],['73',2023]];
+  const monthName=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const jobsPool=['Nearside brake light out','OSR tyre tread below 1.6mm','Windscreen chip in swept area','Nearside wing mirror glass cracked','Coolant weep at top hose','Tail-lift slow to raise','Handbrake travel excessive','Offside indicator intermittent','Load area floor trim lifting','Reversing bleeper inoperative','Wiper blade split (driver side)','Fuel cap seal perished','AdBlue warning on dash','Nearside sliding door catch worn','Front number plate lamp out'];
+  const inspectors=['Tien Nguyen','Michael Pak','Phuog Lam','Ben Wang'];
+  const drivers=['James Whelan','Priya Shah','Darren Cole','Elena Petrov','Marcus Boateng','Hannah Blake','Sean Riley','Nina Kowalski','Owen Pearce','Leah Mensah','Tomasz Wójcik','Aisha Rahman','Gary Fletcher','Sofia Marín','Unassigned'];
+  const area=['LA','LB','LC','LD','LF','LG','LJ','LK','LL','LM','LN','LP','LR','LT','LV'];
+  const A='ABCDEFGHJKLMNOPRSTUVWXYZ';const L=(c)=>A[((c%A.length)+A.length)%A.length];
+  const NOW_Y=2026,NOW_M=7;const dstr=(d,m,y)=>d+' '+monthName[((m%12)+12)%12]+' '+y;
+  const out=[];const N=46;
+  const REGOS=['FTW73B','FTG29S','ENS95D','CN40ZM','DLH92G','ECI16A','FFO41K','YNX74Q','YNX74R','EVU54K','FHO67D','YNX86B','YNX86C','FSK38B','YNX93E','FJR28B','FJS78U','TN3636'];
+  for(let i=0;i<N;i++){
+    const ag=ages[(i*5)%ages.length];
+    const plate=REGOS[i]||(area[(i*3)%area.length]+ag[0]+' '+L(i*7+3)+L(i*11+5)+L(i*4+9));
+    const m=models[(i*3+1)%models.length];const model=m.name;const year=ag[1];const ageYears=Math.max(1,NOW_Y-year);
+    const bay=['A','B','C','D','E'][i%5]+(1+(i%8));
+    const last=(i*5+(i%3))%68;const blocked=(i%12===0);const expired=(i%21===0);
+    const blockDoc=i%2?'Roadworthy':'Insurance';const dueDays=expired?-(1+(i%11)):(4+(i%18));
+    const _pl=(n)=>(Math.abs(n)===1?' day':' days');
+    const blockReason=blocked?(expired?blockDoc+' expired '+Math.abs(dueDays)+_pl(dueDays)+' ago':blockDoc+' expires in '+dueDays+_pl(dueDays)):'';
+    const jobs=[];if(i%5===0)jobs.push(jobsPool[(i*2)%jobsPool.length]);if(i%17===0)jobs.push(jobsPool[(i*2+5)%jobsPool.length]);
+    const odo=m.fuel==='Electric'?(6000+ageYears*9000+(i*811)%7000):(ageYears*(19000+(i%6)*1400)+(i*613)%9000);
+    const motM=(NOW_M+1+(i%6))%12,motY=NOW_Y+(NOW_M+1+(i%6)>=12?1:0);
+    const insM=(NOW_M+2+(i%5))%12,insY=NOW_Y+(NOW_M+2+(i%5)>=12?1:0);
+    const docs=[
+      {name:'Roadworthy',date:(blocked&&blockDoc==='Roadworthy'&&expired)?dstr(20+(i%8),NOW_M,NOW_Y):dstr(1+(i%27),motM,motY),soon:blocked&&blockDoc==='Roadworthy',dueDays:(blocked&&blockDoc==='Roadworthy')?dueDays:null,expired:expired&&blockDoc==='Roadworthy'},
+      {name:'Insurance',date:(blocked&&blockDoc==='Insurance'&&expired)?dstr(18+(i%9),NOW_M,NOW_Y):dstr(1+((i+6)%27),insM,insY),soon:blocked&&blockDoc==='Insurance',dueDays:(blocked&&blockDoc==='Insurance')?dueDays:null,expired:expired&&blockDoc==='Insurance'},
+      {name:(i%3===0?'Safety inspection':(i%3===1?'Service':'Registration')),date:dstr(1+((i+3)%27),(NOW_M+5+(i%4))%12,NOW_Y+1),soon:false,dueDays:null,expired:false},
+    ];
+    const hist=[];const hn=2+(i%4);
+    for(let h=0;h<hn;h++){const dAgo=last+h*(11+(i%9));const dt=new Date(2026,NOW_M,14-(dAgo%28));hist.push({date:dstr(dt.getDate(),(NOW_M-Math.floor(dAgo/30)+12)%12,2026),by:inspectors[(i+h)%inspectors.length],result:(jobs.length&&h===0)?'Fault found':'Passed',photos:5+((i+h)%7)});}
+    const driver=drivers[(i*3)%drivers.length];
+    const driverSince=driver==='Unassigned'?'':dstr(1+(i%27),(NOW_M-2-(i%5)+12)%12,2026);
+    const inservice=monthName[(i*2)%12]+' '+year;
+    const vin=m.vin+'ZZZ'+L(i).toString()+(year%100)+(100000+(i*3607)%899999);
+    const log=hist.map((h)=>({when:h.date,who:h.by,what:h.result==='Fault found'?'Full inspection logged — fault found':'Full inspection logged — passed',kind:h.result==='Fault found'?'fault':'check'}));
+    log.unshift({when:hist[0]?hist[0].date:dstr(2,NOW_M,2026),who:hist[0]?hist[0].by:inspectors[0],what:'Odometer reading '+odo.toLocaleString()+' km',kind:'odo'});
+    jobs.forEach((j,ji)=>log.unshift({when:hist[0]?hist[0].date:dstr(2,NOW_M,2026),who:inspectors[(i+ji)%inspectors.length],what:'Defect raised — '+j,kind:'fault'}));
+    if(driver!=='Unassigned')log.push({when:driverSince,who:'Depot admin',what:'Driver assigned — '+driver,kind:'key'});
+    out.push({plate,model,bay,last,blocked,blockReason,expired,jobs,docs,history:hist,driver,driverSince,odo,year,fuel:m.fuel,vin,inservice,color:'',gvm:null,tare:null,use:'',spare:false,log});
+  }
+  return out;
+}
+function seedQueue(f){
+  const withJob=f.find((v)=>v.jobs&&v.jobs.length)||f[3];
+  const clean=f.find((v)=>(!v.jobs||!v.jobs.length)&&!v.blocked)||f[1];
+  return [
+    {id:'q1',plate:withJob.plate,by:'Ben Wang',date:'20 Aug 2026',result:'Fault found',defects:withJob.jobs.length||1,note:(withJob.jobs&&withJob.jobs[0])||'Nearside brake light out',submission:{odo:84210,photos:6,passed:23,failedItems:[(withJob.jobs&&withJob.jobs[0])||'Nearside brake light out'],keyholder:withJob.driver,angles:['Front','Rear','Nearside','Offside','Dashboard / odometer','Interior / load area'],shots:[],signedBy:'Ben Wang'}},
+    {id:'q2',plate:clean.plate,by:'Phuog Lam',date:'20 Aug 2026',result:'Passed',defects:0,note:'',submission:{odo:61050,photos:6,passed:24,failedItems:[],keyholder:clean.driver,angles:['Front','Rear','Nearside','Offside','Dashboard / odometer','Interior / load area'],shots:[],signedBy:'Phuog Lam'}},
+  ];
+}
+function seedApproved(f){const p=(i)=>(f[i]||f[0]).plate;return [
+  {id:'a1',plate:p(5),by:'Phuog Lam',date:'19 Aug 2026',result:'Passed',defects:0,signedBy:'Tien Nguyen',week:true},
+  {id:'a2',plate:p(8),by:'Phuog Lam',date:'18 Aug 2026',result:'Passed',defects:0,signedBy:'Tien Nguyen',week:true},
+  {id:'a3',plate:p(11),by:'Ben Wang',date:'18 Aug 2026',result:'Fault found',defects:1,signedBy:'Michael Pak',week:true},
+  {id:'a4',plate:p(2),by:'Ben Wang',date:'15 Aug 2026',result:'Passed',defects:0,signedBy:'Tien Nguyen',week:false},
+  {id:'a5',plate:p(14),by:'Phuog Lam',date:'11 Aug 2026',result:'Fault found',defects:2,signedBy:'Michael Pak',week:false},
+];}
+function seedCapGroups(){return [
+  {role:'Inspector',caps:[{name:'Run full inspection',desc:'Draw a vehicle and record a full inspection.',seed:true},{name:'Record readings',desc:'Enter measured values and capture the walk-around photos.',seed:true},{name:'Flag failed items',desc:'Mark an item failed with a note during the full inspection.',seed:true}]},
+  {role:'Manager',caps:[{name:'Approve & check',desc:'Approve a submitted full inspection, moving it into Approvals.',seed:true},{name:'Review / send back',desc:'Return a check to the inspector with a reason.',seed:true},{name:'New / edit defects',desc:'Raise a defect, assign a workshop, and set a due date.',seed:true}]},
+  {role:'Admin',caps:[{name:'Manage people',desc:'Add, suspend or delete crew and set their roles.',seed:true},{name:'Backup & restore',desc:'Save a backup, or wipe and replace the whole depot.',seed:true},{name:'Edit checklist & rules',desc:'Change the checklist and the draw rules, and publish.',seed:true}]},
+];}
+const HELP=[
+  {label:'Doing the work',topics:[
+    {id:'draw',icon:'truck',title:'How the vehicle is picked',sub:'The draw, the exclusion window, re-rolls',body:[{t:'The app draws the vehicle, not you. A full inspection is only worth anything if nobody chose where it landed — pick from a list and the same three easy vehicles get walked every week while the awkward one at the back of the yard never does.'},{t:'Only active vehicles go in. One that was checked in the last few days is held out so it can’t come up twice in a week, and any vehicle left too long is forced to the front until somebody walks it. Both of those numbers are yours to set, in Depot configuration.'},{t:'You can re-roll a draw a set number of times, and you can still check a named vehicle when there is a reason to. The draw is the default, not a lock.'}]},
+    {id:'people',icon:'users',title:'Suspending and deleting people',sub:'What happens to the checks they signed',body:[{t:'Suspending someone keeps every check they signed. They just can’t sign in — and their open defects stay on the depot’s list, not theirs.'},{t:'Deleting is for someone added by mistake. It removes them from the depot but never from a record they signed.'},{t:'Suspend is the one to use for somebody who has left.'}]},
+    {id:'roles',icon:'person',title:'Two roles, one fleet',sub:'Who checks, who approves',body:[{t:'One depot, two roles: inspectors check vehicles, managers approve. Everyone here sees the same fleet.'},{t:'An approval is a manager’s claim that they reviewed the full inspection and stand behind it. An inspector can’t countersign their own check.'}]},
+  ]},
+  {label:'Keeping the depot safe',topics:[
+    {id:'backup',icon:'download',title:'Backup and storage',sub:'Everything lives on this phone only',body:[{t:'Everything you enter is kept on this phone only — there is no account and no server. Saving a backup writes the whole depot into a second slot in this phone’s storage.'},{t:'The backup carries every vehicle, person, check and defect, plus your checklist. It does not carry the photos.'},{t:'A backup in phone storage is not a copy held anywhere else: losing or wiping the phone loses both the depot and its backup.',warn:true}]},
+    {id:'offline',icon:'offline',title:'Working offline',sub:'No signal needed anywhere in the yard',body:[{t:'The app runs entirely on the phone. A full inspection in a basement car park works exactly the same as one at the office door.'},{t:'Photos are the one thing to watch. A captured frame is written to the phone’s working storage, so upload or hand over a check rather than leaving it sitting for weeks.'}]},
+  ]},
+];
+const MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+const pad=(n)=>String(n).padStart(2,'0');
+function fmtDate(v){if(v==null||v==='')return '';const s=String(v).trim();let m=s.match(/^(\d{1,2})\s+([A-Za-z]{3})[a-z]*\s+(\d{4})$/);if(m&&MON[m[2].toLowerCase()])return pad(m[1])+'/'+pad(MON[m[2].toLowerCase()])+'/'+m[3];m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(m)return m[3]+'/'+m[2]+'/'+m[1];return s;}
+function fmtNum(n){if(n==null||n==='')return '';return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+function plural(n,one,many){return n+' '+(n===1?one:(many||one+'s'));}
+function greeting(){const h=new Date().getHours();if(h<12)return 'Good morning';if(h<18)return 'Good afternoon';return 'Good evening';}
+
+const CHILD_OF={check:'checkhome',van:'vans',settings:'more',config:'more',people:'more',profile:'more',help:'more',report:'checkhome'};
+const HEADER_TITLES={checkhome:'Dashboard',faults:'Defects',vans:'Fleet',more:'More',check:'Full Inspection',settings:'Settings',config:'Depot configuration',people:'People',help:'How to & help',report:'Weekly report'};
+const BACK_TO={van:'vans',settings:'more',config:'settings',people:'more',profile:'people',help:'more',report:'checkhome',check:'vans'};
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    const fleet=genVans();
+    this.state={
+      screen:'checkhome', activePerson:'Phuog Lam', signedOut:false,
+      toast:'',
+      fleet, people:seedPeople(), queue:seedQueue(fleet), approved:seedApproved(fleet), returned:[],
+      finderQuery:'', fleetQuery:'', fleetFilter:'all', faultsQuery:'', faultOpen:{},
+      vanId:null, vanCards:{}, vanLogOpen:false, timelineOpen:'',
+      approvedPeriod:'week',
+      // draw
+      drawOpen:false, drawSettled:false, drawPlate:null, drawSpinPlate:'', drawRerolls:0, rerolls:2,
+      // driver sheet + check
+      driverSheet:null, checkVan:null, checkStep:'photos', checkNoKeyholder:false, checkDriver:'',
+      checkPhotos:{}, checkResults:{}, checkDefects:{}, failSheet:null, checkSigned:false, checkOdo:'',
+      depotName:'Chullora CPDC',
+      peopleFilter:'all',
+      helpOpen:'',
+      configGroups:seedCapGroups(), groupOpen:'', viewPerson:null,
+      excludeDays:'7', forceDays:'30', target:'12',
+      gatePhase:'pick', pinPerson:'', pinEntry:'', pinError:false, pickQuery:'',
+      drawRulesOpen:false, photosOpen:false, rolesOpen:false,
+    };
+    this._spin=null; this._toastT=null;
+  }
+  set(patch,cb){ this.setState(patch,cb); }
+  say(msg){ this.setState({toast:msg}); clearTimeout(this._toastT); this._toastT=setTimeout(()=>this.setState({toast:''}),2200); }
+
+  // ---- roles / status ----
+  resolvedPerson(){ return this.state.activePerson||'Phuog Lam'; }
+  roleOf(name){ const p=this.state.people.find((x)=>x.name===name); return (p&&p.role)||(PEOPLE[name]||{}).role||'Inspector'; }
+  personRole(){ return this.roleOf(this.resolvedPerson()); }
+  isManager(){ return ['Manager','Manager+','Admin'].includes(this.personRole()); }
+  isAdmin(){ return this.personRole()==='Admin'; }
+  roleLabel(role){ return role==='Admin'?'Manager +':role; }
+  hasJobs(v){ return !!(v.jobs&&v.jobs.length); }
+  isOverdue(v){ return !v.spare&&(v.last==null||v.last>=30); }
+  statOf(v){ return v.blocked?'blocked':v.spare?'spare':this.hasJobs(v)?'jobs':this.isOverdue(v)?'overdue':'ok'; }
+  vanById(p){ return this.state.fleet.find((v)=>v.plate===p)||null; }
+  approvalsCount(){ const me=this.resolvedPerson(); if(this.isManager())return this.state.queue.filter((q)=>q.by!==me).length; return this.state.returned.filter((r)=>r.by===me).length; }
+
+  // ---- nav ----
+  go(screen){ this.setState({screen,finderQuery:''}); }
+  goVan(plate){ this.setState({screen:'van',vanId:plate,vanCards:{},vanLogOpen:false,timelineOpen:'',finderQuery:''}); }
+  navBack(){
+    const st=this.state;
+    if(st.screen==='check'){ const order=['photos','list','review']; const i=order.indexOf(st.checkStep); if(st.checkStep==='done')return this.finishCheck(); if(i>0)return this.setState({checkStep:order[i-1]}); return this.setState({screen:'vans',checkVan:null}); }
+    if(BACK_TO[st.screen])return this.go(BACK_TO[st.screen]);
+    if(st.screen!=='checkhome')return this.go('checkhome');
+  }
+  switchPerson(name){ this.setState({activePerson:name,screen:'checkhome',signedOut:false,finderQuery:''}); }
+  signOut(){ this.setState({signedOut:true,screen:'checkhome',gatePhase:'pick',pinEntry:'',pinPerson:'',pinError:false,pickQuery:''}); }
+  onPickQuery(v){ this.setState({pickQuery:v}); }
+  choosePerson(name){ const p=this.state.people.find((x)=>x.name===name); if(p&&p.suspended)return this.say(name+' is suspended — ask an admin.'); this.setState({gatePhase:'pin',pinPerson:name,pinEntry:'',pinError:false}); }
+  gatePad(d){ const cur=this.state.pinEntry; if(cur.length>=4)return; const entry=cur+d; if(entry.length===4){ if(entry==='1234')this.gateEnter(this.state.pinPerson); else this.setState({pinEntry:'',pinError:true}); } else this.setState({pinEntry:entry,pinError:false}); }
+  gateBack(){ this.setState((s)=>({pinEntry:s.pinEntry.slice(0,-1),pinError:false})); }
+  gateEnter(name){ this.setState({signedOut:false,activePerson:name,screen:'checkhome',gatePhase:'pick',pinEntry:'',pinError:false,finderQuery:''}); }
+  gateAdmin(){ this.gateEnter('System Admin'); }
+  gatePickBack(){ this.setState({gatePhase:'pick',pinEntry:'',pinError:false}); }
+
+  // ---- draw ----
+  drawPool(){ return this.state.fleet.filter((v)=>!v.blocked&&!v.spare); }
+  drawCheck(isReroll){
+    const pool=this.drawPool(); if(!pool.length)return this.say('Every vehicle needs attention.');
+    clearInterval(this._spin);
+    this.setState({drawOpen:true,drawSettled:false,drawPlate:null,drawRerolls:isReroll?(this.state.drawRerolls+1):0});
+    let n=0;
+    this._spin=setInterval(()=>{ const p=pool[Math.floor(Math.random()*pool.length)]; this.setState({drawSpinPlate:p.plate}); if(++n>18){ clearInterval(this._spin); const pick=pool[Math.floor(Math.random()*pool.length)]; this.setState({drawPlate:pick.plate,drawSpinPlate:pick.plate,drawSettled:true}); } },80);
+  }
+  redraw(){ const left=Math.max(0,this.state.rerolls-this.state.drawRerolls); if(!left)return this.say('No re-rolls left ('+this.state.rerolls+' per check).'); this.drawCheck(true); }
+  closeDraw(){ clearInterval(this._spin); this.setState({drawOpen:false,drawSettled:false,drawPlate:null}); }
+  confirmDraw(){ if(this.state.drawPlate)this.startCheck(this.state.drawPlate); }
+
+  // ---- check flow ----
+  startCheck(plate){
+    const v=this.vanById(plate); const drv=(v&&v.driver&&v.driver!=='Unassigned')?v.driver:'';
+    this.setState({checkVan:plate,checkStep:'photos',driverSheet:plate,checkNoKeyholder:false,checkDriver:drv,checkPhotos:{},checkResults:{},checkDefects:{},failSheet:null,checkSigned:false,checkOdo:'',drawOpen:false,drawSettled:false});
+  }
+  closeDriverSheet(){ this.setState({driverSheet:null}); }
+  toggleNoKeyholder(){ this.setState((s)=>({checkNoKeyholder:!s.checkNoKeyholder,checkDriver:s.checkNoKeyholder?s.checkDriver:''})); }
+  onChkDriver(v){ this.setState({checkDriver:v}); }
+  confirmDriverStart(){
+    const st=this.state; let name=(st.checkDriver||'').trim();
+    if(!name&&!st.checkNoKeyholder){ const v=this.vanById(st.checkVan); const onFile=v&&v.driver&&v.driver!=='Unassigned'?v.driver:''; if(onFile){this.setState({checkDriver:onFile});name=onFile;} }
+    if(!name&&!st.checkNoKeyholder)return this.say('Confirm who has the vehicle first.');
+    this.setState({driverSheet:null,screen:'check',checkStep:'photos'});
+  }
+  skipAsSpare(){ const plate=this.state.checkVan; const who=this.resolvedPerson(); this.setState((s)=>({fleet:s.fleet.map((v)=>v.plate===plate?{...v,spare:true}:v),driverSheet:null,checkNoKeyholder:false,checkDriver:'',checkVan:null}),()=>this.drawCheck(false)); }
+  togglePhoto(a){ this.setState((s)=>{ const m={...s.checkPhotos}; if(m[a])delete m[a]; else m[a]=1; return {checkPhotos:m}; }); }
+  chkToList(){ this.setState({checkStep:'list'}); }
+  chkToReview(){ this.setState({checkStep:'review'}); }
+  passItem(id){ this.setState((s)=>{ const d={...s.checkDefects}; delete d[id]; return {checkResults:{...s.checkResults,[id]:'pass'},checkDefects:d}; }); }
+  openFailSheet(it){ const prev=this.state.checkDefects[it.id]; this.setState({failSheet:{itemId:it.id,text:it.text,desc:prev?prev.desc:it.text,severity:prev?prev.severity:'Minor',due:prev?prev.due:''}}); }
+  failSet(patch){ this.setState((s)=>({failSheet:{...s.failSheet,...patch}})); }
+  cancelFail(){ this.setState({failSheet:null}); }
+  saveFail(){ const fs=this.state.failSheet; if(!fs)return; const desc=(fs.desc||'').trim(); if(!desc)return this.say('Describe what is wrong first.'); this.setState((s)=>({checkResults:{...s.checkResults,[fs.itemId]:'fail'},checkDefects:{...s.checkDefects,[fs.itemId]:{desc,severity:fs.severity,due:fs.due}},failSheet:null}),()=>this.say('Defect noted.')); }
+  onChkOdo(v){ this.setState({checkOdo:v}); }
+  signCheck(){ this.setState((s)=>({checkSigned:!s.checkSigned})); }
+  liveItems(){ return CHECKLIST.sections.flatMap((sec)=>sec.items.map((it)=>({...it,section:sec.name}))); }
+  submitCheck(){ if(!this.state.checkSigned)return this.say('Sign the declaration first.'); this.setState({checkStep:'done'}); }
+  finishCheck(){ this.setState({screen:'vans',checkVan:null}); }
+
+  // ---- fleet / defects ----
+  setFleetFilter(f){ this.setState({fleetFilter:f}); }
+  onFleetQuery(v){ this.setState({fleetQuery:v}); }
+  toggleFault(p){ this.setState((s)=>({faultOpen:{...s.faultOpen,[p]:!s.faultOpen[p]}})); }
+  onFaultsQuery(v){ this.setState({faultsQuery:v}); }
+  markFixed(plate,job){ this.setState((s)=>({fleet:s.fleet.map((v)=>v.plate!==plate?v:{...v,jobs:v.jobs.filter((j)=>j!==job)})}),()=>this.say('Marked fixed — '+job)); }
+
+  // ---- van cards ----
+  toggleVanCard(k){ this.setState((s)=>({vanCards:{...s.vanCards,[k]:!s.vanCards[k]}})); }
+  toggleTimeline(id){ this.setState((s)=>({timelineOpen:s.timelineOpen===id?'':id})); }
+  toggleVanLog(){ this.setState((s)=>({vanLogOpen:!s.vanLogOpen})); }
+
+  // ---- approvals ----
+  setApprovedPeriod(p){ this.setState({approvedPeriod:p}); }
+  approveCheck(id){ const signer=this.resolvedPerson(); const item=this.state.queue.find((q)=>q.id===id); if(!item)return; if(item.by===signer)return this.say("You can't approve your own full inspection."); this.setState((s)=>({queue:s.queue.filter((q)=>q.id!==id),approved:[{id:'a'+Date.now(),plate:item.plate,by:item.by,date:item.date,result:item.result,defects:item.defects,signedBy:signer,week:true},...s.approved]}),()=>this.say('Approved — moved to Approvals.')); }
+  sendBack(id){ this.setState((s)=>{const item=s.queue.find((q)=>q.id===id);return {queue:s.queue.filter((q)=>q.id!==id),returned:item?[{...item,reason:'Redo the nearside photos — too dark to read the plate.',returnedBy:this.resolvedPerson(),returnedDate:TODAY},...s.returned]:s.returned};},()=>this.say('Sent back to the inspector.')); }
+
+  onFinderInput(e){ this.setState({finderQuery:e.target.value}); }
+
+  // ---- help ----
+  toggleHelp(id){ this.setState((s)=>({helpOpen:s.helpOpen===id?'':id})); }
+  setPeopleFilter(f){ this.setState({peopleFilter:f}); }
+  openPerson(name){ this.setState({screen:'profile',viewPerson:name}); }
+  toggleGroup(role){ this.setState((s)=>({groupOpen:s.groupOpen===role?'':role})); }
+  roster(){ return this.state.people.filter((p)=>this.roleOf(p.name)!=='Admin'); }
+  peopleList(){ const r=this.roster(); const mgrs=r.filter((p)=>this.roleOf(p.name)!=='Inspector'); const insps=r.filter((p)=>this.roleOf(p.name)==='Inspector'); const all=[...mgrs,...insps]; const f=this.state.peopleFilter; return f==='all'?all:all.filter((p)=>{const rr=this.roleOf(p.name);return (rr==='Admin'?'Manager':rr)===f;}); }
+
+  // ============ render ============
+  renderVals(){
+    const st=this.state;
+    const screen=st.screen;
+    const role=this.personRole();
+    const person=this.resolvedPerson();
+    const ini=(PEOPLE[person]||{}).ini||initials(person);
+    const fleet=st.fleet;
+
+    // header
+    const back=BACK_TO[screen];
+    const headerTitle=screen==='van'?(st.vanId||'Vehicle'):screen==='approved'?(this.isManager()?'Approvals':'My checks'):screen==='profile'?(st.viewPerson||'Profile'):(HEADER_TITLES[screen]||'Dashboard');
+    const showHeader=screen!=='check'&&!st.signedOut||screen==='check';
+    const header={
+      showBack:!!back, showTitleBlock:!back,
+      title:headerTitle, sub:st.depotName, ini,
+    };
+
+    // tabs
+    const TABS=[['checkhome','Dashboard','speed'],['faults','Defects','alert'],['vans','Fleet','truck'],['approved','Approvals','clipboard'],['more','More','menu']];
+    const badgeVal=this.approvalsCount();
+    const tabs=TABS.map(([key,label,icon])=>{
+      const active=screen===key||CHILD_OF[screen]===key;
+      const showBadge=key==='approved'&&badgeVal>0;
+      return {key,label,icon,color:active?C.primary:C.muted,weight:active?600:500,active,hasBadge:showBadge,badge:String(badgeVal),onPress:()=>this.go(key)};
+    });
+
+    // toast
+    const out={
+      statusTime:'9:41',
+      showHeader:!st.signedOut,
+      header,
+      bodyBg:'#FFFFFF',
+      onBack:()=>this.navBack(),
+      onAvatar:()=>this.signOut(),
+      showNav:screen!=='check'&&!st.signedOut,
+      isGate:st.signedOut, gate:this._gate(),
+      tabs,
+      hasToast:!!st.toast, toast:st.toast,
+      // person rail
+      personChoices:this._personChoices(person),
+      onSignOut:()=>this.signOut(),
+      // screen flags
+      isDash:screen==='checkhome'&&!st.signedOut,
+      // finder
+      finderQuery:st.finderQuery,
+      onFinderInput:(e)=>this.onFinderInput(e),
+      ...this._finder(),
+      dash:this._dash(role,person),
+      // screen flags
+      isFleet:screen==='vans', isFaults:screen==='faults', isApproved:screen==='approved', isVan:screen==='van', isCheck:screen==='check',
+      fleet:this._fleet(), faults:this._faults(), approved:this._approved(), van:this._van(), check:this._check(),
+      drawOpen:st.drawOpen, draw:this._draw(),
+      driverSheetOpen:!!st.driverSheet&&!st.drawOpen, driverSheet:this._driverSheet(),
+      failSheetOpen:!!st.failSheet, failSheet:this._failSheetVM(),
+      isMore:screen==='more', isSettings:screen==='settings', isConfig:screen==='config', isPeople:screen==='people', isProfile:screen==='profile', isHelp:screen==='help', isReport:screen==='report',
+      more:this._more(), settings:this._settings(), config:this._config(), people:this._people(), profile:this._profile(), help:this._help(), report:this._report(),
+    };
+    return out;
+  }
+
+  _personChoices(active){
+    const list=['Phuog Lam','Tien Nguyen','System Admin'];
+    return list.map((name)=>{
+      const p=PEOPLE[name]||{}; const on=name===active;
+      return {
+        name, role:this.roleLabel(p.role||'Inspector'), ini:p.ini||initials(name),
+        onPress:()=>this.switchPerson(name),
+        style:'cursor:pointer;display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:11px;border:1px solid '+(on?C.primary:C.border)+';background:'+(on?C.chipBlue:'#fff'),
+        avStyle:'width:30px;height:30px;border-radius:999px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:\'Fustat\';font-weight:700;font-size:12px;color:#fff;background:'+(on?C.primary:C.slate),
+      };
+    });
+  }
+
+  _finder(){
+    const q=(this.state.finderQuery||'').trim().toLowerCase();
+    const matches=q?this.state.fleet.filter((v)=>v.plate.toLowerCase().includes(q)||(v.model||'').toLowerCase().includes(q)).slice(0,6):[];
+    return {
+      finderHasResults:!!q,
+      finderResults:matches.map((v,i)=>{ const stat=STATUS[this.statOf(v)]; return {plate:v.plate,sub:v.model+' · Bay '+v.bay,label:stat.label,bg:stat.bg,color:stat.c,divider:i>0?'border-top:1px solid #EEF1F3':'',onPress:()=>this.goVan(v.plate)}; }),
+    };
+  }
+
+  _fleet(){
+    const st=this.state; const q=(st.fleetQuery||'').trim().toLowerCase();
+    const counts={overdue:st.fleet.filter((v)=>this.isOverdue(v)).length,jobs:st.fleet.filter((v)=>this.hasJobs(v)).length,blocked:st.fleet.filter((v)=>v.blocked).length};
+    const rows=st.fleet.filter((v)=>{ if(st.fleetFilter==='overdue'&&!this.isOverdue(v))return false; if(st.fleetFilter==='jobs'&&!this.hasJobs(v))return false; if(st.fleetFilter==='blocked'&&!v.blocked)return false; if(!q)return true; return v.plate.toLowerCase().includes(q)||(v.model||'').toLowerCase().includes(q); });
+    const CHIPS=[['all','All'],['overdue','Overdue'],['jobs','Open defects'],['blocked','Attention']];
+    return {
+      query:st.fleetQuery, onQuery:(e)=>this.onFleetQuery(e.target.value), hasQuery:!!q, onClear:()=>this.onFleetQuery(''),
+      chips:CHIPS.map(([key,label])=>{ const on=st.fleetFilter===key; return {label:key==='all'?label:label+' '+counts[key],on,style:on?'border:1px solid #1B4D7A;background:#1B4D7A':'border:1px solid #E7EBEE;background:#fff',txtColor:on?'#fff':'#58626A',onPress:()=>this.setFleetFilter(key)}; }),
+      count:plural(rows.length,'vehicle')+' of '+st.fleet.length,
+      rows:rows.map((v)=>{ const stat=STATUS[this.statOf(v)]; return {plate:v.plate,sub:v.model+' · Bay '+v.bay,label:stat.label,bg:stat.bg,color:stat.c,onPress:()=>this.goVan(v.plate)}; }),
+      empty:rows.length===0,
+    };
+  }
+  _faults(){
+    const st=this.state; const q=(st.faultsQuery||'').trim().toLowerCase();
+    const withJobs=st.fleet.filter((v)=>this.hasJobs(v));
+    const groups=withJobs.filter((v)=>{ if(!q)return true; return v.plate.toLowerCase().includes(q)||(v.model||'').toLowerCase().includes(q)||v.jobs.some((j)=>j.toLowerCase().includes(q)); });
+    const totalOpen=st.fleet.reduce((n,v)=>n+v.jobs.length,0);
+    return {
+      query:st.faultsQuery, onQuery:(e)=>this.onFaultsQuery(e.target.value), hasQuery:!!q, onClear:()=>this.onFaultsQuery(''),
+      count:totalOpen+' open across '+plural(withJobs.length,'vehicle'),
+      allClear:withJobs.length===0, noMatch:withJobs.length>0&&groups.length===0, noMatchQuery:st.faultsQuery,
+      groups:groups.map((v)=>{ const open=!!st.faultOpen[v.plate]; return {plate:v.plate,sub:v.model+' · '+plural(v.jobs.length,'defect'),open,chevStyle:open?'transform:rotate(180deg)':'',onToggle:()=>this.toggleFault(v.plate),onOpenVan:()=>this.goVan(v.plate),jobs:v.jobs.map((j)=>({text:j,onFix:()=>this.markFixed(v.plate,j),onOpen:()=>this.goVan(v.plate)}))}; }),
+    };
+  }
+  _approved(){
+    const st=this.state; const me=this.resolvedPerson(); const mgr=this.isManager();
+    const inPeriod=st.approved.filter((a)=>(st.approvedPeriod==='week'?a.week:true));
+    const periodLabel=st.approvedPeriod==='week'?'this week':'this month';
+    const returned=mgr?st.returned:st.returned.filter((r)=>r.by===me);
+    const visibleQueue=mgr?st.queue:st.queue.filter((q)=>q.by===me);
+    const sub=mgr?(st.queue.length+' awaiting · '+inPeriod.length+' signed '+periodLabel):((visibleQueue.length?visibleQueue.length+' of yours awaiting · ':'')+inPeriod.length+' approved '+periodLabel);
+    const queueCards=visibleQueue.map((q)=>{ const own=q.by===me; const canSign=mgr&&!own; const s=q.submission||{}; const fails=s.failedItems||(q.note?[q.note]:[]); const fault=q.result==='Fault found'; return {
+      plate:q.plate, meta:fmtDate(q.date)+' · '+q.by, note:q.note, hasNote:!!q.note,
+      tag:fault?plural(q.defects,'defect'):'Clean', tagColor:fault?C.danger:C.green,
+      odo:s.odo!=null?fmtNum(s.odo)+' km':'—', photos:s.photos!=null?String(s.photos):'—',
+      items:s.passed!=null?(s.passed+' passed · '+fails.length+' failed'):(q.defects+' failed'),
+      keyholder:s.keyholder||'—', angles:(s.angles||[]).map((a)=>({label:a})), signedBy:s.signedBy||q.by,
+      fails:fails.map((t)=>({text:t})), hasFails:fails.length>0, clean:fails.length===0,
+      canSign, mgrOwn:mgr&&own, insp:!mgr,
+      onApprove:()=>this.approveCheck(q.id), onSendBack:()=>this.sendBack(q.id),
+    }; });
+    return {
+      sub, hasReturned:returned.length>0,
+      returned:returned.map((r)=>({plate:r.plate,reason:'“'+(r.reason||'')+'”',meta:'Returned '+fmtDate(r.returnedDate||'')+' · by '+(r.returnedBy||'a manager'),mine:r.by===me,onRedo:()=>this.startCheck(r.plate)})),
+      hasQueue:visibleQueue.length>0, queueLabel:(mgr?'Awaiting approval':'Your submissions awaiting approval')+' · '+visibleQueue.length, queueCards,
+      periodLabel,
+      weekBorder:st.approvedPeriod==='week'?C.primary:C.border, weekBg:st.approvedPeriod==='week'?C.chipBlue:'#fff', weekColor:st.approvedPeriod==='week'?C.primary:C.muted2,
+      monthBorder:st.approvedPeriod==='month'?C.primary:C.border, monthBg:st.approvedPeriod==='month'?C.chipBlue:'#fff', monthColor:st.approvedPeriod==='month'?C.primary:C.muted2,
+      onWeek:()=>this.setApprovedPeriod('week'), onMonth:()=>this.setApprovedPeriod('month'),
+      approvedRows:inPeriod.map((a)=>({plate:a.plate,meta:fmtDate(a.date)+' · '+a.by+' · '+(a.defects?plural(a.defects,'defect'):'clean')+' · signed '+a.signedBy,metaColor:a.defects?C.danger:C.muted,onPress:()=>this.goVan(a.plate)})),
+      noApproved:inPeriod.length===0,
+    };
+  }
+  _van(){
+    const st=this.state; const v=this.vanById(st.vanId)||st.fleet[0]; if(!v)return {none:true};
+    const stat=STATUS[this.statOf(v)];
+    const hasKeyholder=!!(v.driver&&v.driver!=='Unassigned');
+    const lastChecked=v.last==null?'never checked':v.last===0?'checked today':'checked '+plural(v.last,'day')+' ago';
+    const primaryDisabled=v.blocked;
+    const primaryLabel=v.blocked?"Can't be checked — needs attention":(this.hasJobs(v)?'Re-check this vehicle':'Check this vehicle');
+    const log=v.log||[]; const shown=log.slice(0,st.vanLogOpen?200:5);
+    const LOG_DOT={fault:C.danger,fix:C.green,check:C.primary,doc:C.amber,key:C.slate,odo:C.primary};
+    const cardOpen=(k)=>!!st.vanCards[k];
+    return {
+      plate:v.plate, model:v.model, bay:'Bay '+v.bay, statLabel:stat.label, statBg:stat.bg, statColor:stat.c,
+      blocked:v.blocked, blockReason:'Out of the random pool — '+v.blockReason+'.',
+      driver:hasKeyholder?v.driver:'Unassigned', driverMuted:!hasKeyholder, driverFoot:hasKeyholder&&v.driverSince?'since '+fmtDate(v.driverSince):'no driver',
+      odo:v.odo!=null&&v.odo!==''?fmtNum(v.odo)+' km':'—', lastChecked,
+      primaryLabel, primaryDisabled, primaryBg:primaryDisabled?C.disabledBg:C.primary, primaryColor:primaryDisabled?C.disabledTxt:'#fff',
+      onPrimary:()=>primaryDisabled?this.say('Clear the flagged document first.'):this.startCheck(v.plate),
+      hasJobs:v.jobs.length>0, jobsTitle:plural(v.jobs.length,'open defect'),
+      jobs:v.jobs.map((j)=>({text:j,onFix:()=>this.markFixed(v.plate,j)})),
+      details:[['Year',v.year||'—'],['Fuel',v.fuel||'—'],['In service',v.inservice||'—'],['Colour',v.color||'—'],['Use',v.use||'—'],['GVM',v.gvm?fmtNum(v.gvm)+' kg':'—'],['Tare',v.tare?fmtNum(v.tare)+' kg':'—'],['VIN',v.vin||'—']].map(([k,val],i,arr)=>({k,val,last:i===arr.length-1})),
+      docsMeta:plural(v.docs.length,'doc'),
+      docs:v.docs.map((d)=>{ const dd=typeof d.dueDays==='number'?d.dueDays:null; const isExp=d.expired||(dd!==null&&dd<0); const isSoon=!isExp&&d.soon&&dd!==null; const urgent=isSoon&&dd<=7; return {name:d.name,date:fmtDate(d.date),hasDate:!!(d.date&&String(d.date).trim()),hasBadge:isExp||isSoon,badgeBg:isExp?C.danger:urgent?C.dangerBg:C.amberBg,badgeColor:isExp?'#fff':urgent?C.danger:C.amber,badgeTxt:isExp?('overdue '+Math.abs(dd)+'d'):(dd+'d left')}; }),
+      histMeta:plural((v.history||[]).length,'check'),
+      history:(v.history||[]).map((h,hi)=>{ const id=v.plate+hi; const open=st.timelineOpen===id; const fault=h.result==='Fault found'; return {date:h.date,by:h.by+' · '+plural(h.photos||0,'photo'),result:fault?'Defect found':h.result,resultColor:fault?C.danger:C.green,open,chevStyle:open?'transform:rotate(180deg)':'',photos:Array.from({length:h.photos||0}).map(()=>({})),onToggle:()=>this.toggleTimeline(id)}; }),
+      logMeta:plural(log.length,'event')+' · audit',
+      logRows:shown.map((e)=>({what:e.what,when:fmtDate(e.when)+' · '+e.who,dot:LOG_DOT[e.kind]||C.muted3})),
+      logMore:log.length>5, logMoreTxt:st.vanLogOpen?'Show less':'Show all '+log.length, onLogMore:()=>this.toggleVanLog(),
+      // card open flags + toggles
+      oDetails:cardOpen('details'), oDocs:cardOpen('docs'), oHist:cardOpen('hist'), oLog:cardOpen('log'),
+      tDetails:()=>this.toggleVanCard('details'), tDocs:()=>this.toggleVanCard('docs'), tHist:()=>this.toggleVanCard('hist'), tLog:()=>this.toggleVanCard('log'),
+      cDetails:cardOpen('details')?'transform:rotate(180deg)':'', cDocs:cardOpen('docs')?'transform:rotate(180deg)':'', cHist:cardOpen('hist')?'transform:rotate(180deg)':'', cLog:cardOpen('log')?'transform:rotate(180deg)':'',
+      detailsHeadBorder:cardOpen('details')?'border-bottom:1px solid #F1F2F3':'',
+      onExport:()=>this.say('Export coming soon — PDF is on the way.'),
+      onRemove:()=>this.say('Remove needs a confirm — wired in the live app.'),
+    };
+  }
+  _check(){
+    const st=this.state; const plate=st.checkVan; const step=st.checkStep;
+    const ANGLES=['Front','Rear','Nearside','Offside','Dashboard / odometer','Interior / load area'];
+    const taken=ANGLES.filter((a)=>st.checkPhotos[a]).length;
+    const items=this.liveItems();
+    const doneCount=items.filter((it)=>st.checkResults[it.id]).length;
+    const pass=items.filter((it)=>st.checkResults[it.id]==='pass').length;
+    const fail=items.filter((it)=>st.checkResults[it.id]==='fail').length;
+    const SEV={Minor:{fg:C.amber,bg:C.amberBg},Major:{fg:C.danger,bg:C.dangerBg},Critical:{fg:'#fff',bg:C.danger}};
+    const defects=items.filter((it)=>st.checkResults[it.id]==='fail').map((it)=>{ const d=st.checkDefects[it.id]; const sev=SEV[(d&&d.severity)||'Minor']; return {desc:d?d.desc:it.text,section:it.section,sev:(d&&d.severity)||'Minor',sevFg:sev.fg,sevBg:sev.bg,due:d&&d.due?('Due '+d.due):'',hasDue:!!(d&&d.due)}; });
+    const signer=this.resolvedPerson(); const signerIni=(PEOPLE[signer]||{}).ini||initials(signer);
+    const odoOk=/\d/.test(st.checkOdo||'');
+    const verdict=fail>0?{label:'Defects found',sub:fail+(fail===1?' item failed — logged as defects':' items failed — logged as defects'),color:C.danger,bg:C.dangerBg2,border:C.dangerBorder}:{label:'All clear',sub:'No defects on this walk-around',color:C.green,bg:C.greenBg2,border:C.greenBorderSoft};
+    return {
+      plate, sPhotos:step==='photos', sList:step==='list', sReview:step==='review', sDone:step==='done',
+      photosLabel:'Step 1 of 3 · Photos', photosCount:taken+'/'+ANGLES.length, photosCountColor:taken===ANGLES.length?C.green:C.muted,
+      angles:ANGLES.map((a)=>({name:a,done:!!st.checkPhotos[a],onTap:()=>this.togglePhoto(a),tileStyle:st.checkPhotos[a]?'border:1px solid #1B4D7A;background:#F6F9FC':'border:1px dashed #D3D9DD;background:#fff',metaTxt:st.checkPhotos[a]?'1 · captured':'not taken',metaColor:st.checkPhotos[a]?'#397B43':'#68727A'})),
+      onToList:()=>this.chkToList(),
+      listLabel:'Step 2 of 3 · Checklist · '+doneCount+'/'+items.length,
+      items:items.map((it)=>{ const r=st.checkResults[it.id]; const def=st.checkDefects[it.id]; return {text:it.text,section:it.section,
+        passStyle:r==='pass'?'background:#397B43;border:1px solid #397B43':'background:#fff;border:1px solid #D3D9DD',passColor:r==='pass'?'#fff':'#58626A',
+        failStyle:r==='fail'?'background:#A03428;border:1px solid #A03428':'background:#fff;border:1px solid #D3D9DD',failColor:r==='fail'?'#fff':'#58626A',
+        hasFail:r==='fail',failDesc:def?def.desc:'Defect',onPass:()=>this.passItem(it.id),onFail:()=>this.openFailSheet(it)}; }),
+      onToReview:()=>this.chkToReview(),
+      reviewLabel:'Step 3 of 3 · Review & signature',
+      verdictLabel:verdict.label, verdictSub:verdict.sub, verdictColor:verdict.color, verdictBg:verdict.bg, verdictBorder:verdict.border,
+      pass, fail, photoCount:taken, hasDefects:defects.length>0, defects,
+      driver:st.checkDriver, onDriver:(e)=>this.onChkDriver(e.target.value),
+      odo:st.checkOdo, onOdo:(e)=>this.onChkOdo(e.target.value), odoOk,
+      signed:st.checkSigned, signPrompt:!st.checkSigned&&odoOk, needOdo:!st.checkSigned&&!odoOk, signer, signerIni, onSign:()=>this.signCheck(),
+      signBoxStyle:st.checkSigned?'border:1.5px solid #397B43;background:#F4FAF5':'border:1.5px solid #E7EBEE;background:#fff',
+      submitStyle:st.checkSigned?'background:#1B4D7A':'background:#F1F2F3', submitColor:st.checkSigned?'#fff':'#58626A',
+      onSubmit:()=>this.submitCheck(), onFinish:()=>this.finishCheck(), doneSub:plate+' logged · '+fail+' fault(s) raised.',
+    };
+  }
+  _draw(){
+    const st=this.state; const settled=st.drawSettled; const van=st.drawPlate?this.vanById(st.drawPlate):null;
+    const left=Math.max(0,st.rerolls-st.drawRerolls);
+    return {
+      settled, spinning:!settled, spinPlate:st.drawSpinPlate, plate:st.drawPlate, model:van?van.model:'',
+      hasJobs:!!(van&&van.jobs&&van.jobs.length), pillTxt:van&&van.jobs&&van.jobs.length?(van.jobs.length+' OPEN DEFECT'+(van.jobs.length===1?'':'S')):'NO OPEN DEFECTS',
+      pillFg:van&&van.jobs&&van.jobs.length?C.danger:C.green, pillBg:van&&van.jobs&&van.jobs.length?C.dangerBg:C.greenBg,
+      lastText:van?(van.last===0?'Checked today':'Last checked '+van.last+' day'+(van.last===1?'':'s')+' ago'):'',
+      driverText:van&&van.driver&&van.driver!=='Unassigned'?('Driver · '+van.driver):'No driver on file',
+      rerollText:st.rerolls===0?'No re-rolls allowed':(left?('Again – '+left+' Left'):'No re-rolls left'),
+      rerollColor:left?'#fff':'rgba(255,255,255,.4)',
+      onStart:()=>this.confirmDraw(), onReroll:()=>this.redraw(), onClose:()=>this.closeDraw(),
+    };
+  }
+  _driverSheet(){
+    const st=this.state; const plate=st.driverSheet; const v=this.vanById(plate);
+    const onFile=v&&v.driver&&v.driver!=='Unassigned'?v.driver:null;
+    const noDriver=st.checkNoKeyholder; const typed=(st.checkDriver||'').trim();
+    const shownName=noDriver?'No driver':(typed||onFile||'Not on file');
+    const changed=!noDriver&&!!typed&&typed!==onFile;
+    const canConfirm=noDriver||!!typed||!!onFile;
+    return {
+      plate:plate||'', shownName, ini:initials(shownName), noDriver,
+      meta:noDriver?'Spare / yard vehicle':changed?'Different driver':onFile?'Driver on file':'No driver on file yet',
+      avBg:noDriver?C.chipBlue:C.primary, avColor:noDriver?C.muted2:'#fff',
+      showField:!noDriver&&(!onFile||changed), reassignVal:st.checkDriver, onReassign:(e)=>this.onChkDriver(e.target.value),
+      checkboxStyle:noDriver?'background:#1B4D7A;border:1.6px solid #1B4D7A':'background:#fff;border:1.6px solid #D3D9DD',
+      confirmLabel:noDriver?'Random Check':'Confirm', confirmStyle:canConfirm?'background:#1B4D7A':'background:#F1F2F3', confirmColor:canConfirm?'#fff':'#58626A',
+      onToggleSpare:()=>this.toggleNoKeyholder(),
+      onConfirm:()=>noDriver?this.skipAsSpare():this.confirmDriverStart(), onClose:()=>this.closeDriverSheet(),
+    };
+  }
+  _failSheetVM(){
+    const fs=this.state.failSheet; if(!fs)return {};
+    const SEV={Minor:{fg:C.amber,bg:C.amberBg},Major:{fg:C.danger,bg:C.dangerBg},Critical:{fg:'#fff',bg:C.danger}};
+    const ready=!!(fs.desc||'').trim();
+    return {
+      text:fs.text, desc:fs.desc, onDesc:(e)=>this.failSet({desc:e.target.value}),
+      due:fs.due, onDue:(e)=>this.failSet({due:e.target.value}),
+      sevs:['Minor','Major','Critical'].map((s)=>{ const on=fs.severity===s; const c=SEV[s]; return {label:s,on,style:on?('background:'+c.bg+';border:1px solid '+c.fg):'background:#fff;border:1px solid #D3D9DD',color:on?c.fg:C.muted2,onPress:()=>this.failSet({severity:s})}; }),
+      ready, saveStyle:ready?'background:#A03428':'background:#F1F2F3', saveColor:ready?'#fff':'#58626A',
+      onSave:()=>this.saveFail(), onClose:()=>this.cancelFail(),
+    };
+  }
+  _gate(){
+    const st=this.state; const q=(st.pickQuery||'').trim().toLowerCase();
+    const results=q?st.people.filter((p)=>!p.suspended&&p.name.toLowerCase().includes(q)):[];
+    const av=(role)=>role==='Manager'?{bg:C.chipBlue,fg:C.primary}:role==='Admin'?{bg:C.ink,fg:'#fff'}:{bg:C.border2,fg:C.muted2};
+    const name=st.pinPerson; const prole=this.roleOf(name); const pini=(st.people.find((x)=>x.name===name)||{}).ini||initials(name);
+    return {
+      isPick:st.gatePhase==='pick', isPin:st.gatePhase==='pin',
+      pickQuery:st.pickQuery, onQuery:(e)=>this.onPickQuery(e.target.value), hasResults:!!q,
+      results:results.map((p)=>{ const c=av(p.role); return {name:p.name,role:p.role,ini:p.ini||initials(p.name),avBg:c.bg,avColor:c.fg,onPress:()=>this.choosePerson(p.name)}; }),
+      noMatch:!!q&&results.length===0,
+      onAdmin:()=>this.gateAdmin(),
+      pinName:name, pinRole:prole, pinIni:pini,
+      dots:[0,1,2,3].map((i)=>{ const on=i<st.pinEntry.length; return {on,bg:on?C.primary:'transparent',border:on?C.primary:C.faint}; }),
+      pinError:st.pinError,
+      keys:[1,2,3,4,5,6,7,8,9].map((d)=>({d:String(d),onPress:()=>this.gatePad(d)})),
+      zeroPress:()=>this.gatePad(0), onDel:()=>this.gateBack(), onPickBack:()=>this.gatePickBack(),
+    };
+  }
+  _more(){
+    const admin=this.isAdmin();
+    const roster=this.roster(); const suspended=roster.filter((p)=>p.suspended).length;
+    const peopleSub=plural(roster.length,'person','people')+(suspended?' · '+plural(suspended,'suspended','suspended'):' · all active');
+    const sections=[];
+    if(admin){ sections.push({label:'Management',rows:[
+      {icon:'listCheck',title:'Templates',sub:'',soon:true},
+      {icon:'users',title:'People',sub:peopleSub,soon:false,onPress:()=>this.go('people')},
+    ]}); }
+    sections.push({label:'Fleet',rows:[{icon:'truck',title:'Fleet',sub:this.state.fleet.length+' vehicles',soon:false,onPress:()=>this.go('vans')}]});
+    if(this.isManager())sections.push({label:'Reporting',rows:[{icon:'chart',title:'Weekly depot report',sub:'Coverage, defects, expiring docs',soon:false,isNew:true,onPress:()=>this.go('report')}]});
+    sections.push({label:'Support',rows:[{icon:'help',title:'How to & help',sub:'',soon:false,onPress:()=>this.go('help')}]});
+    if(admin)sections.push({label:'App',rows:[{icon:'gear',title:'Settings',sub:'',soon:false,onPress:()=>this.go('settings')}]});
+    sections.forEach((sec)=>sec.rows=sec.rows.map((r)=>({...r,rowBg:r.soon?C.cardSubtle:'#fff',iconColor:r.soon?C.muted3:C.primary,titleColor:r.soon?C.muted2:C.ink,hasSub:!!r.sub,chev:!r.soon})));
+    return {sections};
+  }
+  _settings(){
+    return {
+      depotName:this.state.depotName,
+      onConfig:()=>this.go('config'),
+      onBackup:()=>this.say('Backup saved on this device.'),
+      onRestore:()=>this.say('No backup on this device yet.'),
+      note:'No backup saved yet.',
+      build:'v30', checklist:'v'+CHECKLIST.version,
+      onReset:()=>this.say('Factory reset needs a confirm — wired in the live app.'),
+    };
+  }
+  _config(){
+    const st=this.state;
+    const ANGLES=['Front','Rear','Nearside','Offside','Dashboard / odometer','Interior / load area'];
+    return {
+      excludeDays:st.excludeDays, forceDays:st.forceDays, rerolls:String(st.rerolls), target:st.target,
+      drawOpen:st.drawRulesOpen, drawChev:st.drawRulesOpen?'chevronDown':'chevronRight', onToggleDraw:()=>this.setState((s)=>({drawRulesOpen:!s.drawRulesOpen})),
+      photosOpen:st.photosOpen, photosChev:st.photosOpen?'chevronDown':'chevronRight', onTogglePhotos:()=>this.setState((s)=>({photosOpen:!s.photosOpen})),
+      rolesOpen:st.rolesOpen, rolesChev:st.rolesOpen?'chevronDown':'chevronRight', onToggleRoles:()=>this.setState((s)=>({rolesOpen:!s.rolesOpen})),
+      angles:ANGLES.map((a,i)=>({n:i+1,name:a})), angleCount:plural(ANGLES.length,'angle','angles'),
+      docTypes:[{name:'Roadworthy',files:'1 file'},{name:'Registration',files:'1 file'},{name:'CTP',files:'1 file'},{name:'Insurance',files:'1 file'}],
+      uses:['PRV','BUS'],
+      groups:st.configGroups.map((g)=>{ const open=st.groupOpen===g.role; const onC=g.caps.length; return {role:this.roleLabel(g.role),open,chev:open?'chevronDown':'chevronRight',count:onC+' of '+g.caps.length,onToggle:()=>this.toggleGroup(g.role),caps:g.caps.map((c)=>({name:c.name,desc:c.desc,seed:c.seed}))}; }),
+    };
+  }
+  _people(){
+    const st=this.state; const me=this.resolvedPerson(); const canManage=this.isManager();
+    const roster=this.roster(); const suspended=roster.filter((p)=>p.suspended).length;
+    const rows=this.peopleList();
+    return {
+      sub:plural(roster.length,'person','people')+' · '+(suspended?plural(suspended,'suspended','suspended'):'all active'),
+      allBorder:st.peopleFilter==='all'?C.primary:C.border, allBg:st.peopleFilter==='all'?C.primary:'#fff', allColor:st.peopleFilter==='all'?'#fff':C.muted2,
+      mgrBorder:st.peopleFilter==='Manager'?C.primary:C.border, mgrBg:st.peopleFilter==='Manager'?C.primary:'#fff', mgrColor:st.peopleFilter==='Manager'?'#fff':C.muted2,
+      inspBorder:st.peopleFilter==='Inspector'?C.primary:C.border, inspBg:st.peopleFilter==='Inspector'?C.primary:'#fff', inspColor:st.peopleFilter==='Inspector'?'#fff':C.muted2,
+      onAll:()=>this.setPeopleFilter('all'), onMgr:()=>this.setPeopleFilter('Manager'), onInsp:()=>this.setPeopleFilter('Inspector'),
+      canManage,
+      rows:rows.map((p,i)=>{ const eff=this.roleOf(p.name); const mgr=eff==='Manager'||eff==='Admin'; const susp=!!p.suspended; const you=p.name===me; return {
+        name:p.name, ini:p.ini, you, last:i===rows.length-1, rowBorder:i===rows.length-1?'':'border-bottom:1px solid #F1F2F3',
+        avStyle:susp?'background:#EEF1F3':mgr?'background:#1B4D7A':'background:#E9F0F6', avColor:susp?'#68727A':mgr?'#fff':'#1B4D7A',
+        dotColor:susp?'#8A6116':'#1B4D7A', status:susp?'Suspended':'Active',
+        chipStyle:mgr?'background:#E9F0F6':'background:#F1F2F3', chipColor:susp?'#8A6116':mgr?'#1B4D7A':'#58626A', chipTxt:susp?'Suspended':this.roleLabel(eff),
+        onPress:()=>{ if(you||canManage)this.openPerson(p.name); else this.say('Only a manager can open another person.'); },
+      }; }),
+    };
+  }
+  _profile(){
+    const st=this.state; const name=st.viewPerson||this.resolvedPerson();
+    const rec=this.state.people.find((p)=>p.name===name)||{name,role:this.roleOf(name),ini:initials(name),suspended:false,since:'—'};
+    const eff=this.roleOf(name); const isAdminRole=eff==='Admin';
+    const p=PEOPLE[name]||{month:0,week:0,defects:0};
+    const vans=this.state.fleet.filter((v)=>v.driver===name);
+    const caps=this.state.configGroups.filter((g)=>{const order=['Inspector','Manager','Admin'];return order.indexOf(g.role)<=order.indexOf(eff==='Admin'?'Admin':eff);}).flatMap((g)=>g.caps.map((c)=>c.name));
+    return {
+      name:rec.name, ini:rec.ini, roleLabel:this.roleLabel(eff), suspended:!!rec.suspended,
+      showTiles:!isAdminRole, month:p.month, week:p.week,
+      since:rec.since||'—',
+      hasVans:vans.length>0, noVans:vans.length===0, vansCount:vans.length===0?'none':plural(vans.length,'vehicle'),
+      vans:vans.map((v,i)=>{ const key=this.statOf(v); const stat=STATUS[key]; const pill=key==='blocked'?'attention':key==='jobs'?plural(v.jobs.length,'def','def'):key==='overdue'?'overdue':'ok'; return {plate:v.plate,sub:v.model+' · '+(v.driverSince?'driver since '+fmtDate(v.driverSince):'current driver'),pill,pillBg:stat.bg,pillColor:stat.c,last:i===vans.length-1,rowBorder:i===vans.length-1?'':'border-bottom:1px solid #F1F2F3',onPress:()=>this.goVan(v.plate)}; }),
+      caps:caps.map((c)=>({name:c})),
+    };
+  }
+  _help(){
+    const st=this.state;
+    return {
+      groups:HELP.map((g,gi)=>({label:g.label,spaced:gi>0,topics:g.topics.map((t)=>{ const open=st.helpOpen===t.id; return {icon:t.icon,title:t.title,sub:t.sub,open,chev:open?'transform:rotate(180deg)':'',onToggle:()=>this.toggleHelp(t.id),body:t.body.map((para)=>({text:para.t,color:para.warn?'#8A6116':'#58626A'}))}; })})),
+    };
+  }
+  _report(){
+    const st=this.state; const fleet=st.fleet;
+    const total=fleet.length;
+    const blocked=fleet.filter((v)=>v.blocked).length;
+    const overdue=fleet.filter((v)=>!v.blocked&&(v.last==null||v.last>=30)).length;
+    const ok=Math.max(0,total-blocked-overdue);
+    const target=parseInt(st.target,10)||12;
+    const weekChecks=st.approved.filter((a)=>a.week).length+st.queue.length;
+    const coveragePct=Math.min(100,Math.round((weekChecks/target)*100));
+    const openDefects=fleet.reduce((n,v)=>n+v.jobs.length,0);
+    const defectVehicles=fleet.filter((v)=>this.hasJobs(v)).length;
+    // documents expiring soon / expired
+    let soon=0, expired=0; const watch=[];
+    fleet.forEach((v)=>v.docs.forEach((d)=>{ const dd=typeof d.dueDays==='number'?d.dueDays:null; if(d.expired||(dd!==null&&dd<0)){expired++;watch.push({plate:v.plate,name:d.name,txt:'expired',bad:true,days:Math.abs(dd||0)});} else if(d.soon&&dd!==null){soon++;watch.push({plate:v.plate,name:d.name,txt:dd+'d left',bad:false,days:dd});} }));
+    watch.sort((a,b)=>(a.bad===b.bad?a.days-b.days:(a.bad?-1:1)));
+    const inspectors=st.people.filter((pp)=>pp.role==='Inspector'&&!pp.suspended);
+    const maxWeek=Math.max(target,...inspectors.map((pp)=>(PEOPLE[pp.name]||{}).week||0));
+    // overdue aging buckets
+    const od=fleet.filter((v)=>this.isOverdue(v)&&!v.blocked);
+    const b1=od.filter((v)=>v.last>=30&&v.last<45).length;
+    const b2=od.filter((v)=>v.last>=45&&v.last<60).length;
+    const b3=od.filter((v)=>v.last>=60).length;
+    const agingMax=Math.max(1,b1,b2,b3);
+    return {
+      periodTitle:'Week of 18–24 Aug 2026', depot:st.depotName,
+      onExport:()=>this.say('Report export (.xlsx / PDF) — coming soon.'),
+      coverageN:weekChecks, coverageTarget:'of '+target+' target', coveragePct:coveragePct+'%',
+      coverageBad:weekChecks<target, coverageColor:weekChecks>=target?C.green:C.primary,
+      coverageNote:weekChecks>=target?'On target this week':((target-weekChecks)+' short of target'),
+      total, ok, overdue, blocked,
+      openDefects, defectSub:openDefects+' open across '+plural(defectVehicles,'vehicle'),
+      docSoon:soon, docExpired:expired, docSub:expired+' expired · '+soon+' expiring soon',
+      watch:watch.slice(0,4).map((w)=>({plate:w.plate,name:w.name,txt:w.txt,bg:w.bad?C.danger:C.amberBg,color:w.bad?'#fff':C.amber})),
+      hasWatch:watch.length>0,
+      bars:inspectors.map((pp)=>{ const w=(PEOPLE[pp.name]||{}).week||0; return {name:pp.name.split(' ')[0],n:w,pct:Math.round((w/maxWeek)*100)+'%'}; }),
+      targetPct:Math.round((target/maxWeek)*100)+'%', targetLeft:'calc('+Math.round((target/maxWeek)*100)+'% - 20px)',
+      aging:[{label:'30–45 days',n:b1,pct:Math.round((b1/agingMax)*100)+'%'},{label:'45–60 days',n:b2,pct:Math.round((b2/agingMax)*100)+'%'},{label:'60+ days',n:b3,pct:Math.round((b3/agingMax)*100)+'%'}],
+    };
+  }
+  _dash(role,person){
+    const fleet=this.state.fleet;
+    const total=fleet.length;
+    const blocked=fleet.filter((v)=>v.blocked).length;
+    const overdue=fleet.filter((v)=>!v.blocked&&(v.last==null||v.last>=30)).length;
+    const ok=Math.max(0,total-blocked-overdue);
+    if(role==='Inspector'){
+      const me=PEOPLE[person]||{week:0,month:0,defects:0};
+      return {
+        isInspector:true, isManager:false,
+        greeting:greeting(), firstName:person.split(' ')[0],
+        overdue, overdueBadgeBg:overdue?C.dangerBg:C.border2, overdueBadgeColor:overdue?C.danger:C.muted2,
+        overdueSub:overdue?'Overdue 30+ days':'Fleet is up to date',
+        stats:[{n:me.week,label:'This week',color:C.ink},{n:me.month,label:'This month',color:C.ink},{n:me.defects,label:'Open defects',color:me.defects?C.danger:C.ink}],
+        onDraw:()=>this.drawCheck(false), onToCheck:()=>this.go('vans'),
+        onToApprove:()=>this.go('approved'), onReport:()=>this.go('report'),
+      };
+    }
+    const mine=this.state.queue.length;
+    const inspectors=this.state.people.filter((p)=>p.role==='Inspector'&&!p.suspended);
+    const maxWeek=Math.max(1,...inspectors.map((p)=>(PEOPLE[p.name]||{}).week||0));
+    return {
+      isInspector:false, isManager:true,
+      heroBg:mine?C.danger:C.primary, heroLabel:mine?(mine+' to approve'):'All approved',
+      total, blocked, overdue, ok,
+      inspectorBars:inspectors.map((p)=>{ const w=(PEOPLE[p.name]||{}).week||0; return {name:p.name.split(' ')[0],n:w,pct:Math.round((w/maxWeek)*100)+'%'}; }),
+      onDraw:()=>this.drawCheck(false), onToApprove:()=>this.go('approved'), onReport:()=>this.go('report'),
+    };
+  }
+}
+</script>
+</body>
+</html>

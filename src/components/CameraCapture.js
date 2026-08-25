@@ -19,7 +19,9 @@ export default function CameraCapture() {
   const camRef = useRef(null);
   const insets = useSafeAreaInsets();
 
-  const title = cam && cam.mode === 'defect' ? 'Defect photo' : (cam && cam.angle) || 'Photo';
+  const title = cam && cam.mode === 'defect' ? 'Defect photo'
+    : cam && cam.mode === 'doc' ? 'Document photo'
+    : (cam && cam.angle) || 'Photo';
   const close = () => s.closeCamera();
 
   const take = async () => {

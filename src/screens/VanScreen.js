@@ -1,11 +1,10 @@
 import React from 'react';
-import { View, Text, Pressable, ScrollView, TextInput, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, TextInput, Image, Modal, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore, STATUS } from '../store';
 import Icon from '../components/Icon';
 import { fmtDate, fmtNum, plural } from '../format';
 import { C, F, CTRL, cardShadow } from '../theme';
-
-const DOC_TYPES = ['Roadworthy', 'Registration', 'CTP', 'Insurance'];
 
 const LOG_DOT = {
   fault: C.danger, fix: C.green, check: C.primary,
@@ -20,6 +19,8 @@ export default function VanScreen() {
   // when you leave the vehicle, same precedent as the Dashboard finder — no Store field needed.
   const [exportOpen, setExportOpen] = React.useState(false);
   const [confirmRemove, setConfirmRemove] = React.useState(false);
+  // Fullscreen photo viewer — a single URI, or null when closed. Screen-local like the two above.
+  const [viewerUri, setViewerUri] = React.useState(null);
   if (!v) return null;
 
   const stat = STATUS[s.statOf(v)];
@@ -125,6 +126,22 @@ export default function VanScreen() {
             <Text style={styles.detailKey}>In service</Text>
             <Text style={styles.detailVal}>{v.inservice || '—'}</Text>
           </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailKey}>Colour</Text>
+            <Text style={styles.detailVal}>{v.color || '—'}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailKey}>Use</Text>
+            <Text style={styles.detailVal}>{v.use || '—'}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailKey}>GVM</Text>
+            <Text style={styles.detailVal}>{v.gvm ? fmtNum(v.gvm) + ' kg' : '—'}</Text>
+          </View>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailKey}>Tare</Text>
+            <Text style={styles.detailVal}>{v.tare ? fmtNum(v.tare) + ' kg' : '—'}</Text>
+          </View>
           <View style={[styles.detailRow, styles.detailRowLast]}>
             <Text style={styles.detailKey}>VIN</Text>
             <Text style={styles.detailVin} numberOfLines={1}>{v.vin || '—'}</Text>
@@ -141,28 +158,40 @@ export default function VanScreen() {
             const isExp = d.expired || (dd !== null && dd < 0);
             const isSoon = !isExp && d.soon && dd !== null;
             const urgent = isSoon && dd <= 7;
+            const files = Array.isArray(d.files) ? d.files : [];
             return (
-              <Pressable
-                key={d.name + i}
-                onPress={() => s.openDocEdit(v.plate, i)}
-                accessibilityRole="button"
-                accessibilityLabel={'Edit ' + d.name}
-                style={styles.docRow}
-              >
-                <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-                  <Text style={styles.docName}>{d.name}</Text>
-                  {!!(d.date && String(d.date).trim()) && <Text style={styles.docDate}>{fmtDate(d.date)}</Text>}
-                  {!!(d.note && d.note.trim()) && <Text numberOfLines={1} style={styles.docNote}>{d.note}</Text>}
-                </View>
-                {(isExp || isSoon) && (
-                  <View style={[styles.badge, { backgroundColor: isExp ? C.danger : urgent ? C.dangerBg : C.amberBg }]}>
-                    <Text style={[styles.badgeTxt, { color: isExp ? '#fff' : urgent ? C.danger : C.amber }]}>
-                      {isExp ? 'overdue ' + Math.abs(dd) + 'd' : dd + 'd left'}
-                    </Text>
+              <View key={d.name + i}>
+                <Pressable
+                  onPress={() => s.openDocEdit(v.plate, i)}
+                  accessibilityRole="button"
+                  accessibilityLabel={'Edit ' + d.name}
+                  style={styles.docRow}
+                >
+                  <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+                    <Text style={styles.docName}>{d.name}</Text>
+                    {!!(d.date && String(d.date).trim()) && <Text style={styles.docDate}>{fmtDate(d.date)}</Text>}
+                    {files.length > 0 && <Text style={styles.docDate}>{plural(files.length, 'file')}</Text>}
+                    {!!(d.note && d.note.trim()) && <Text numberOfLines={1} style={styles.docNote}>{d.note}</Text>}
+                  </View>
+                  {(isExp || isSoon) && (
+                    <View style={[styles.badge, { backgroundColor: isExp ? C.danger : urgent ? C.dangerBg : C.amberBg }]}>
+                      <Text style={[styles.badgeTxt, { color: isExp ? '#fff' : urgent ? C.danger : C.amber }]}>
+                        {isExp ? 'overdue ' + Math.abs(dd) + 'd' : dd + 'd left'}
+                      </Text>
+                    </View>
+                  )}
+                  <Icon name="chevronRight" size={15} color={C.faint} width={2} />
+                </Pressable>
+                {files.length > 0 && (
+                  <View style={styles.docRowThumbs}>
+                    {files.map((uri) => (
+                      <Pressable key={uri} onPress={() => setViewerUri(uri)} accessibilityRole="button" accessibilityLabel={'View ' + d.name + ' photo'}>
+                        <Image source={{ uri }} style={styles.docRowThumb} />
+                      </Pressable>
+                    ))}
                   </View>
                 )}
-                <Icon name="chevronRight" size={15} color={C.faint} width={2} />
-              </Pressable>
+              </View>
             );
           })}
           <Pressable onPress={() => s.openDocSheet(v.plate)} accessibilityRole="button" style={styles.cardFootBtn}>
@@ -257,8 +286,9 @@ export default function VanScreen() {
           onClose={() => setConfirmRemove(false)}
         />
       )}
-      {st.docSheetOpen && st.docSheetVan === v.plate && <DocSheet plate={v.plate} />}
+      {st.docSheetOpen && st.docSheetVan === v.plate && <DocSheet plate={v.plate} onView={setViewerUri} />}
       {st.detailSheetOpen && st.detailVan === v.plate && <DetailSheet plate={v.plate} />}
+      {viewerUri && <PhotoViewer uri={viewerUri} onClose={() => setViewerUri(null)} />}
     </View>
   );
 }
@@ -354,6 +384,29 @@ function RemoveSheet({ plate, model, onConfirm, onClose }) {
 
 const FUELS = ['Diesel', 'Petrol', 'Hybrid', 'Electric'];
 
+// Fullscreen photo viewer — a tap-to-dismiss overlay. Pinch-zoom isn't wired (no gesture lib in
+// the dependency set); this is a plain, honest full-bleed look at one captured file.
+function PhotoViewer({ uri, onClose }) {
+  const insets = useSafeAreaInsets();
+  return (
+    <Modal visible animationType="fade" transparent statusBarTranslucent onRequestClose={onClose}>
+      <View style={styles.viewerRoot}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityRole="button" accessibilityLabel="Close photo" />
+        <Image source={{ uri }} style={StyleSheet.absoluteFill} resizeMode="contain" />
+        <Pressable
+          onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel="Close photo"
+          hitSlop={8}
+          style={[styles.viewerClose, { top: Math.max(12, insets.top) }]}
+        >
+          <Icon name="x" size={20} color="#fff" width={2.2} />
+        </Pressable>
+      </View>
+    </Modal>
+  );
+}
+
 // Edit the vehicle's master facts. Same bottom-sheet idiom as DocSheet, so the screen keeps one
 // editing model. Plate/Bay stay out — the plate keys the vehicle across the store.
 function DetailSheet({ plate }) {
@@ -412,6 +465,59 @@ function DetailSheet({ plate }) {
         </View>
 
         <View style={{ gap: 7 }}>
+          <Text style={styles.fieldLabel}>Colour</Text>
+          <TextInput
+            value={st.edColor}
+            onChangeText={(x) => s.setDetail({ edColor: x })}
+            placeholder="White"
+            placeholderTextColor={C.muted3}
+            accessibilityLabel="Colour"
+            style={styles.input}
+          />
+        </View>
+
+        <View style={{ gap: 7 }}>
+          <Text style={styles.fieldLabel}>Use</Text>
+          <View style={{ flexDirection: 'row', gap: 7, flexWrap: 'wrap' }}>
+            {st.vehicleUses.map((u) => {
+              const on = st.edUse === u;
+              return (
+                <Pressable key={u} onPress={() => s.setDetail({ edUse: on ? '' : u })} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.typeChip, on && styles.typeChipOn]}>
+                  <Text style={[styles.typeChipTxt, on && { color: C.primary }]}>{u}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <View style={{ flex: 1, gap: 7 }}>
+            <Text style={styles.fieldLabel}>GVM <Text style={styles.fieldOpt}>· kg</Text></Text>
+            <TextInput
+              value={st.edGvm}
+              onChangeText={(x) => s.setDetail({ edGvm: x })}
+              keyboardType="number-pad"
+              placeholder="3500"
+              placeholderTextColor={C.muted3}
+              accessibilityLabel="Gross vehicle mass in kilograms"
+              style={styles.input}
+            />
+          </View>
+          <View style={{ flex: 1, gap: 7 }}>
+            <Text style={styles.fieldLabel}>Tare <Text style={styles.fieldOpt}>· kg</Text></Text>
+            <TextInput
+              value={st.edTare}
+              onChangeText={(x) => s.setDetail({ edTare: x })}
+              keyboardType="number-pad"
+              placeholder="2100"
+              placeholderTextColor={C.muted3}
+              accessibilityLabel="Tare weight in kilograms"
+              style={styles.input}
+            />
+          </View>
+        </View>
+
+        <View style={{ gap: 7 }}>
           <Text style={styles.fieldLabel}>VIN</Text>
           <TextInput
             value={st.edVin}
@@ -433,11 +539,15 @@ function DetailSheet({ plate }) {
   );
 }
 
-function DocSheet({ plate }) {
+function DocSheet({ plate, onView }) {
   const s = useStore();
   const st = s.state;
   const editing = st.docEditIdx !== null;
-  const ready = !!(st.docName || '').trim();
+  const named = !!(st.docName || '').trim();
+  const required = s.docTypeFilesFor(st.docName);
+  const have = st.docFiles.length;
+  const enough = have >= required;
+  const ready = named && enough;
 
   return (
     <View style={styles.scrim}>
@@ -464,11 +574,11 @@ function DocSheet({ plate }) {
         </View>
 
         <View style={{ flexDirection: 'row', gap: 7, flexWrap: 'wrap' }}>
-          {DOC_TYPES.map((t) => {
-            const on = st.docName === t;
+          {st.docTypes.map((t) => {
+            const on = st.docName === t.name;
             return (
-              <Pressable key={t} onPress={() => s.setDoc({ docName: t })} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.typeChip, on && styles.typeChipOn]}>
-                <Text style={[styles.typeChipTxt, on && { color: C.primary }]}>{t}</Text>
+              <Pressable key={t.name} onPress={() => s.setDoc({ docName: t.name })} accessibilityRole="button" accessibilityState={{ selected: on }} style={[styles.typeChip, on && styles.typeChipOn]}>
+                <Text style={[styles.typeChipTxt, on && { color: C.primary }]}>{t.name}{t.files > 1 ? '  ·  ' + t.files + ' files' : ''}</Text>
               </Pressable>
             );
           })}
@@ -499,11 +609,41 @@ function DocSheet({ plate }) {
           />
         </View>
 
+        <View style={{ gap: 7 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <Text style={styles.fieldLabel}>Files{required > 0 ? '' : <Text style={styles.fieldOpt}> · optional</Text>}</Text>
+            {required > 0 && (
+              <Text style={[styles.docFileCount, enough ? { color: C.green } : { color: C.amber }]}>
+                {have} of {required} added
+              </Text>
+            )}
+          </View>
+          <View style={styles.docFileStrip}>
+            {st.docFiles.map((uri) => (
+              <View key={uri} style={styles.docThumbWrap}>
+                <Pressable onPress={() => onView && onView(uri)} accessibilityRole="button" accessibilityLabel="View file fullscreen">
+                  <Image source={{ uri }} style={styles.docThumb} />
+                </Pressable>
+                <Pressable onPress={() => s.removeDocFile(uri)} accessibilityRole="button" accessibilityLabel="Remove file" style={styles.docThumbX}>
+                  <Icon name="x" size={12} color="#fff" width={2.4} />
+                </Pressable>
+              </View>
+            ))}
+            <Pressable onPress={() => s.captureDocPhoto()} accessibilityRole="button" accessibilityLabel="Add a file photo" style={styles.docAddTile}>
+              <Icon name="camera" size={20} color={C.primary} width={1.7} />
+              <Text style={styles.docAddTxt}>Add</Text>
+            </Pressable>
+          </View>
+          {required > 0 && !enough && (
+            <Text style={styles.docFileHint}>{st.docName} needs {required} {required === 1 ? 'file' : 'files'} before it can be saved.</Text>
+          )}
+        </View>
+
         <Pressable
           onPress={() => s.saveDoc(plate)}
           accessibilityRole="button"
           accessibilityState={{ disabled: !ready }}
-          accessibilityHint={ready ? undefined : 'Name the document first'}
+          accessibilityHint={ready ? undefined : (named ? 'Add the required files first' : 'Name the document first')}
           style={[styles.sheetSave, { backgroundColor: ready ? C.primary : C.disabledBg }]}
         >
           <Text style={[styles.sheetSaveTxt, !ready && { color: C.disabledTxt }]}>{editing ? 'Save changes' : 'Add document'}</Text>
@@ -618,6 +758,18 @@ const styles = StyleSheet.create({
   typeChipTxt: { fontFamily: F.sansSemi, fontSize: 13, color: C.muted2 },
   sheetSave: { minHeight: CTRL.lg, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   sheetSaveTxt: { fontFamily: F.sansSemi, fontSize: 16, color: '#fff' },
+  docFileCount: { fontFamily: F.monoSemi, fontSize: 11.5 },
+  docFileStrip: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  docThumbWrap: { width: 64, height: 64, borderRadius: 12, overflow: 'visible' },
+  docThumb: { width: 64, height: 64, borderRadius: 12, borderWidth: 1, borderColor: C.border, backgroundColor: C.inputBg },
+  docThumbX: { position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: 999, backgroundColor: C.danger, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: C.card },
+  docAddTile: { width: 64, height: 64, borderRadius: 12, borderWidth: 1.5, borderStyle: 'dashed', borderColor: C.border3, backgroundColor: C.chipBlue, alignItems: 'center', justifyContent: 'center', gap: 2 },
+  docAddTxt: { fontFamily: F.sansSemi, fontSize: 11, color: C.primary },
+  docFileHint: { fontFamily: F.sans, fontSize: 12.5, lineHeight: 18, color: C.amber },
+  docRowThumbs: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 14, paddingBottom: 12, marginTop: -2 },
+  docRowThumb: { width: 56, height: 56, borderRadius: 10, borderWidth: 1, borderColor: C.border, backgroundColor: C.inputBg },
+  viewerRoot: { flex: 1, backgroundColor: 'rgba(0,0,0,0.92)' },
+  viewerClose: { position: 'absolute', right: 14, width: 40, height: 40, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,.16)' },
   sheetRemove: { minHeight: 44, borderRadius: 13, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
   sheetRemoveTxt: { fontFamily: F.sansSemi, fontSize: 14, color: C.danger },
 });

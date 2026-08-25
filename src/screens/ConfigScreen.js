@@ -77,6 +77,71 @@ export default function ConfigScreen() {
           </View>
         </View>
 
+        <View style={styles.rowBetween}>
+          <Text style={styles.label}>Document types</Text>
+          <Text style={styles.count}>{plural(st.docTypes.length, 'type', 'types')}</Text>
+        </View>
+        <View style={styles.card}>
+          {st.docTypes.map((d, i) => (
+            <View key={d.name} style={[styles.angleRow, styles.hairline]}>
+              <Text style={styles.angleName} numberOfLines={1}>{d.name}</Text>
+              <Text style={styles.count}>{plural(d.files, 'file', 'files')}</Text>
+              <IconBtn name="trash" label={'Remove ' + d.name} color={C.danger} onPress={() => s.removeDocType(i)} />
+            </View>
+          ))}
+          <View style={styles.addRow}>
+            <TextInput
+              value={st.docTypeNew}
+              onChangeText={(v) => s.onDocTypeNew(v)}
+              placeholder="Add a document type…"
+              placeholderTextColor={C.muted3}
+              accessibilityLabel="New document type"
+              style={styles.addInput}
+            />
+            <TextInput
+              value={st.docTypeFiles}
+              onChangeText={(v) => s.onDocTypeFiles(v)}
+              keyboardType="number-pad"
+              maxLength={2}
+              placeholder="1"
+              placeholderTextColor={C.muted3}
+              accessibilityLabel="Files required"
+              style={styles.filesInput}
+            />
+            <Pressable onPress={() => s.addDocType()} accessibilityRole="button" style={styles.addBtn}>
+              <Text style={styles.addBtnTxt}>Add</Text>
+            </Pressable>
+          </View>
+        </View>
+        <Text style={styles.hint}>Name is required. The number is how many files that type expects on upload.</Text>
+
+        <View style={styles.rowBetween}>
+          <Text style={styles.label}>Vehicle use</Text>
+          <Text style={styles.count}>{plural(st.vehicleUses.length, 'type', 'types')}</Text>
+        </View>
+        <View style={styles.card}>
+          {st.vehicleUses.map((u, i) => (
+            <View key={u} style={[styles.angleRow, styles.hairline]}>
+              <Text style={styles.angleName} numberOfLines={1}>{u}</Text>
+              <IconBtn name="trash" label={'Remove ' + u} color={C.danger} onPress={() => s.removeUse(i)} />
+            </View>
+          ))}
+          <View style={styles.addRow}>
+            <TextInput
+              value={st.useNew}
+              onChangeText={(v) => s.onUseNew(v)}
+              placeholder="Add a use type… (e.g. PRV, BUS)"
+              placeholderTextColor={C.muted3}
+              autoCapitalize="characters"
+              accessibilityLabel="New use type"
+              style={styles.addInput}
+            />
+            <Pressable onPress={() => s.addUse()} accessibilityRole="button" style={styles.addBtn}>
+              <Text style={styles.addBtnTxt}>Add</Text>
+            </Pressable>
+          </View>
+        </View>
+
         <Text style={[styles.label, { paddingTop: 10 }]}>Fleet setup</Text>
         <Pressable
           onPress={() => s.say('Makes & models — coming in a later pass.')}
@@ -250,6 +315,11 @@ const styles = StyleSheet.create({
   },
   addBtn: { minHeight: 44, paddingHorizontal: 16, borderRadius: 11, backgroundColor: C.primary, alignItems: 'center', justifyContent: 'center' },
   addBtnTxt: { fontFamily: F.sansSemi, fontSize: 14, color: '#fff' },
+  filesInput: {
+    width: 52, minHeight: 44, borderWidth: 1, borderColor: C.border3, borderRadius: 11,
+    paddingHorizontal: 10, fontFamily: F.sansMed, fontSize: 15, color: C.ink, textAlign: 'center',
+  },
+  hint: { fontFamily: F.sans, fontSize: 12.5, lineHeight: 18, color: C.muted3 },
 
   navRow: {
     backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: 16,

@@ -23,10 +23,20 @@ const BACKUP_KEY = 'spotcheck:backup:v2';
 // State that survives a reload. Transient UI (gate/draw/check) is not persisted.
 const PERSIST_KEYS = ['depotName', 'excludeDays', 'forceDays', 'rerolls', 'target',
   'fleet', 'people', 'queue', 'approved', 'returned', 'photoAngles', 'clVersion',
-  'configGroups', 'capOff'];
+  'configGroups', 'capOff', 'docTypes', 'vehicleUses'];
 
 const DEFAULT_ANGLES = ['Front', 'Rear', 'Nearside', 'Offside', 'Dashboard / odometer', 'Interior / load area'];
 const DEFAULT_RULES = { excludeDays: '7', forceDays: '30', rerolls: '2', target: '12' };
+// Document types a depot files against a vehicle: a name and how many files that type expects.
+// Configurable in Config — a depot adds its own on top of these.
+const DEFAULT_DOC_TYPES = [
+  { name: 'Roadworthy', files: 1 },
+  { name: 'Registration', files: 1 },
+  { name: 'CTP', files: 1 },
+  { name: 'Insurance', files: 1 },
+];
+// What a vehicle is used for. Starts with these; a depot adds its own in Config.
+const DEFAULT_USES = ['PRV', 'BUS'];
 const capKey = (role, name) => role + '\u0000' + name;
 
 let uid = 0;
@@ -57,9 +67,10 @@ class Store {
       timelineOpen: '',
       vanLogOpen: false,
       docSheetOpen: false, docSheetVan: '', docEditIdx: null,
-      docName: '', docDate: '', docNote: '',
+      docName: '', docDate: '', docNote: '', docFiles: [],
       detailSheetOpen: false, detailVan: '',
       edYear: '', edFuel: '', edService: '', edVin: '',
+      edColor: '', edGvm: '', edTare: '', edUse: '',
       // --- defects ---
       faultsQuery: '',
       faultOpen: {},
@@ -73,6 +84,10 @@ class Store {
       ...DEFAULT_RULES,
       configGroups: seedCapGroups(),
       capOff: {},               // { 'Role Cap name': true } — switched-off capabilities
+      docTypes: [...DEFAULT_DOC_TYPES],
+      docTypeNew: '', docTypeFiles: '1',  // draft for the add-a-doc-type row
+      vehicleUses: [...DEFAULT_USES],
+      useNew: '',                         // draft for the add-a-use row
       groupOpen: '',            // which role accordion is expanded
       showAddValue: false,      // hidden edit mode (long-press / triple-tap the Config header)
       angleNew: '',
@@ -317,22 +332,36 @@ class Store {
 
   // ---- documents ----
   openDocSheet(plate) {
-    this.setState({ docSheetOpen: true, docSheetVan: plate, docEditIdx: null, docName: '', docDate: '', docNote: '' });
+    this.setState({ docSheetOpen: true, docSheetVan: plate, docEditIdx: null, docName: '', docDate: '', docNote: '', docFiles: [] });
   }
   openDocEdit(plate, idx) {
     const v = this.vanById(plate); const d = v && v.docs[idx];
     if (!d) return;
-    this.setState({ docSheetOpen: true, docSheetVan: plate, docEditIdx: idx, docName: d.name || '', docDate: d.date || '', docNote: d.note || '' });
+    this.setState({ docSheetOpen: true, docSheetVan: plate, docEditIdx: idx, docName: d.name || '', docDate: d.date || '', docNote: d.note || '', docFiles: Array.isArray(d.files) ? d.files : [] });
   }
   closeDocSheet() { this.setState({ docSheetOpen: false, docEditIdx: null }); }
   setDoc(patch) { this.setState(patch); }
+  // How many files a named document type expects. 0 when the name isn't a
+  // configured type (free-typed names aren't gated).
+  docTypeFilesFor(name) {
+    const t = this.state.docTypes.find((d) => d.name.toLowerCase() === String(name || '').trim().toLowerCase());
+    return t ? t.files : 0;
+  }
+  // Attach a photo to the document being added/edited (camera mode 'doc').
+  captureDocPhoto() { this.setState({ camera: { mode: 'doc', angle: null } }); }
+  removeDocFile(uri) { this.setState((s) => ({ docFiles: s.docFiles.filter((u) => u !== uri) })); }
   saveDoc(plate) {
     const name = (this.state.docName || '').trim();
     if (!name) return this.say('Name the document first.');
+    const required = this.docTypeFilesFor(name);
+    const files = [...this.state.docFiles];
+    if (files.length < required) {
+      return this.say(name + ' needs ' + required + (required === 1 ? ' file' : ' files') + ' — ' + files.length + ' attached.');
+    }
     const date = (this.state.docDate || '').trim();
     const note = (this.state.docNote || '').trim();
     const dd = daysUntil(date);
-    const doc = { name, date, note, dueDays: dd, soon: dd !== null && dd >= 0 && dd <= 30, expired: dd !== null && dd < 0 };
+    const doc = { name, date, note, files, dueDays: dd, soon: dd !== null && dd >= 0 && dd <= 30, expired: dd !== null && dd < 0 };
     const idx = this.state.docEditIdx;
     const who = this.resolvedPerson();
     this.setState((s) => ({
@@ -370,6 +399,8 @@ class Store {
     this.setState({
       detailSheetOpen: true, detailVan: plate,
       edYear: String(v.year || ''), edFuel: v.fuel || '', edService: v.inservice || '', edVin: v.vin || '',
+      edColor: v.color || '', edGvm: v.gvm != null ? String(v.gvm) : '',
+      edTare: v.tare != null ? String(v.tare) : '', edUse: v.use || '',
     });
   }
   closeDetailSheet() { this.setState({ detailSheetOpen: false }); }
@@ -379,10 +410,14 @@ class Store {
     const fuel = (this.state.edFuel || '').trim();
     const inservice = (this.state.edService || '').trim();
     const vin = (this.state.edVin || '').trim().toUpperCase();
+    const color = (this.state.edColor || '').trim();
+    const gvm = (this.state.edGvm || '').replace(/[^0-9]/g, '');
+    const tare = (this.state.edTare || '').replace(/[^0-9]/g, '');
+    const use = (this.state.edUse || '').trim();
     const who = this.resolvedPerson();
     this.setState((s) => ({
       fleet: s.fleet.map((v) => (v.plate !== plate ? v : {
-        ...v, year, fuel, inservice, vin,
+        ...v, year, fuel, inservice, vin, color, gvm, tare, use,
         log: [{ when: TODAY, who, what: 'Vehicle details updated', kind: 'note' }, ...(v.log || [])],
       })),
       detailSheetOpen: false,
@@ -555,6 +590,13 @@ class Store {
       }), () => this.say('Photo attached to the defect.'));
       return;
     }
+    if (cam.mode === 'doc') {
+      this.setState((s) => ({
+        docFiles: [...s.docFiles, uri],
+        camera: null,
+      }), () => this.say('File attached to the document.'));
+      return;
+    }
     this.setState((s) => ({
       checkPhotoMap: { ...s.checkPhotoMap, [cam.angle]: [...(s.checkPhotoMap[cam.angle] || []), uri] },
       camera: null,
@@ -704,6 +746,10 @@ class Store {
       photoAngles: [...DEFAULT_ANGLES],
       configGroups: seedCapGroups(),
       capOff: {},
+      docTypes: [...DEFAULT_DOC_TYPES],
+      docTypeNew: '', docTypeFiles: '1',
+      vehicleUses: [...DEFAULT_USES],
+      useNew: '',
       clVersion: CHECKLIST.version,
       resetModal: false, resetReason: '',
       viewPerson: null, draftRole: null, peopleSheet: null, peopleFilter: 'all',
@@ -740,6 +786,36 @@ class Store {
   removeAngle(i) {
     if (this.state.photoAngles.length <= 1) return this.say('Keep at least one photo angle.');
     this.setState((s) => ({ photoAngles: s.photoAngles.filter((a, k) => k !== i) }), () => { this.saveState(); this.say('Angle removed.'); });
+  }
+
+  // ---- config: document types (name + how many files the type expects) ----
+  onDocTypeNew(v) { this.setState({ docTypeNew: v }); }
+  onDocTypeFiles(v) { this.setState({ docTypeFiles: v.replace(/[^0-9]/g, '') }); }
+  addDocType() {
+    const name = (this.state.docTypeNew || '').trim();
+    if (!name) return this.say('Name the document type first.');
+    if (this.state.docTypes.some((d) => d.name.toLowerCase() === name.toLowerCase())) return this.say('That document type already exists.');
+    const n = parseInt(this.state.docTypeFiles, 10);
+    const files = isNaN(n) || n < 1 ? 1 : n;
+    this.setState((s) => ({
+      docTypes: [...s.docTypes, { name, files }], docTypeNew: '', docTypeFiles: '1',
+    }), () => { this.saveState(); this.say('Document type added.'); });
+  }
+  removeDocType(i) {
+    this.setState((s) => ({ docTypes: s.docTypes.filter((d, k) => k !== i) }), () => { this.saveState(); this.say('Document type removed.'); });
+  }
+
+  // ---- config: vehicle use types (PRV, BUS, and whatever a depot adds) ----
+  onUseNew(v) { this.setState({ useNew: v }); }
+  addUse() {
+    const name = (this.state.useNew || '').trim();
+    if (!name) return this.say('Name the use type first.');
+    if (this.state.vehicleUses.some((u) => u.toLowerCase() === name.toLowerCase())) return this.say('That use type already exists.');
+    this.setState((s) => ({ vehicleUses: [...s.vehicleUses, name], useNew: '' }), () => { this.saveState(); this.say('Use type added.'); });
+  }
+  removeUse(i) {
+    if (this.state.vehicleUses.length <= 1) return this.say('Keep at least one use type.');
+    this.setState((s) => ({ vehicleUses: s.vehicleUses.filter((u, k) => k !== i) }), () => { this.saveState(); this.say('Use type removed.'); });
   }
 
   // ---- config: hidden edit gesture (550ms hold, or three taps inside 600ms) ----
