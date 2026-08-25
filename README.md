@@ -6,6 +6,23 @@ step, no framework, no server-side anything: `index.html` loads `app.css`,
 the phone's own `localStorage`; walk-around photos are downscaled and their blobs
 live in `IndexedDB` (only the photo ids sit on the check record).
 
+## ⚠️ This repo holds two different codebases
+
+`checkup-van` contains **two separate implementations** of the same product on different branches.
+They share a name and a few filenames (`store.js`, `PROGRESS.md`) but are **not** the same code —
+don't try to merge one into the other.
+
+| Branch | Stack | What it is |
+|---|---|---|
+| [`main`](../../tree/main) | Vanilla PWA (`index.html` / `app.js` / `sw.js`) | **This branch** — the original build, v37 |
+| [`expo-rewrite`](../../tree/expo-rewrite) | React Native + Expo (`react-native-web`) | The ground-up native rewrite |
+
+You are reading the **`main`** README. See the [`expo-rewrite` branch](../../tree/expo-rewrite) for the rewrite.
+
+**Hosting:** only this branch's app is hosted — **live at <https://checkup-van.netlify.app>** (below).
+The `expo-rewrite` branch is backed up on GitHub but not yet hosted; its web build is one command
+away (`npx expo export --platform web`) once that rewrite is feature-complete.
+
 ```
 index.html            shell
 app.css               all styling
