@@ -418,7 +418,7 @@
               <sc-if value="{{ van.oDetails }}" hint-placeholder-val="{{ false }}">
                 <div>
                   <sc-for list="{{ van.details }}" as="d" hint-placeholder-count="8"><div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid #F1F2F3;min-height:46px"><span style="font-family:'Fustat';font-weight:500;font-size:14px;color:#616B73;width:92px">{{ d.k }}</span><span style="flex:1;min-width:0;font-family:'Fustat';font-weight:600;font-size:14px;color:#1B2126;text-align:right">{{ d.val }}</span></div></sc-for>
-                  <div onClick="{{ van.onExport }}" style="cursor:pointer;background:#FAFBFC;padding:12px 14px;min-height:46px;display:flex;align-items:center;justify-content:center;gap:7px"><dc-import name="Icon" hint-size="15px,15px" iconname="pen" size="15" color="#1B4D7A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#1B4D7A">Edit details</span></div>
+                  <div onClick="{{ van.onEditDetails }}" style="cursor:pointer;background:#FAFBFC;padding:12px 14px;min-height:46px;display:flex;align-items:center;justify-content:center;gap:7px"><dc-import name="Icon" hint-size="15px,15px" iconname="pen" size="15" color="#1B4D7A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#1B4D7A">Edit details</span></div>
                 </div>
               </sc-if>
             </div>
@@ -619,6 +619,32 @@
               <sc-if value="{{ config.photosOpen }}" hint-placeholder-val="{{ false }}">
                 <div style="border-top:1px solid #F1F2F3">
                   <sc-for list="{{ config.angles }}" as="a" hint-placeholder-count="6"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="width:24px;height:24px;border-radius:7px;background:#EEF1F3;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#616B73">{{ a.n }}</span></div><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ a.name }}</span></div></sc-for>
+                </div>
+              </sc-if>
+            </div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div onClick="{{ config.onToggleDocTypes }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ config.docTypesChev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">Document types</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">{{ config.docTypesCount }}</span></div>
+              <sc-if value="{{ config.docTypesOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="border-top:1px solid #F1F2F3">
+                  <sc-for list="{{ config.docTypes }}" as="d" hint-placeholder-count="4"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="width:24px;height:24px;border-radius:7px;background:#EEF1F3;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#616B73">{{ d.n }}</span></div><span style="flex:1;min-width:0;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ d.name }}</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11.5px;color:#68727A">{{ d.files }}</span><div onClick="{{ d.onRemove }}" style="cursor:pointer;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#FBEEEC"><dc-import name="Icon" hint-size="15px,15px" iconname="trash" size="15" color="#A03428" sw="1.9"></dc-import></div></div></sc-for>
+                  <div style="padding:12px 14px;display:flex;gap:8px;background:#FAFBFC">
+                    <input value="{{ config.newDocName }}" onInput="{{ config.onNewDocName }}" placeholder="Add a document type…" style="flex:1;min-width:0;border:1px solid #D3D9DD;border-radius:11px;min-height:44px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126;background:#fff;outline:none">
+                    <input value="{{ config.newDocFiles }}" onInput="{{ config.onNewDocFiles }}" inputmode="numeric" maxlength="2" style="width:50px;text-align:center;border:1px solid #D3D9DD;border-radius:11px;min-height:44px;padding:0 6px;font-family:'IBM Plex Mono';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none">
+                    <div onClick="{{ config.onAddDocType }}" style="cursor:pointer;min-height:44px;padding:0 16px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#1B4D7A"><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:#fff">Add</span></div>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+            <sc-if value="{{ config.docTypesOpen }}" hint-placeholder-val="{{ false }}"><div style="font-family:'Fustat';font-size:12.5px;line-height:18px;color:#616B73;margin-top:-4px;padding:0 4px">Name is required. The number is how many files that type expects on upload.</div></sc-if>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div onClick="{{ config.onToggleUses }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ config.usesChev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">Vehicle use</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">{{ config.usesCount }}</span></div>
+              <sc-if value="{{ config.usesOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="border-top:1px solid #F1F2F3">
+                  <sc-for list="{{ config.uses }}" as="u" hint-placeholder-count="2"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="width:24px;height:24px;border-radius:7px;background:#EEF1F3;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#616B73">{{ u.n }}</span></div><span style="flex:1;min-width:0;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ u.name }}</span><div onClick="{{ u.onRemove }}" style="cursor:pointer;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#FBEEEC"><dc-import name="Icon" hint-size="15px,15px" iconname="trash" size="15" color="#A03428" sw="1.9"></dc-import></div></div></sc-for>
+                  <div style="padding:12px 14px;display:flex;gap:8px;background:#FAFBFC">
+                    <input value="{{ config.newUse }}" onInput="{{ config.onNewUse }}" placeholder="Add a use type… (e.g. PRV, BUS)" style="flex:1;min-width:0;border:1px solid #D3D9DD;border-radius:11px;min-height:44px;padding:0 13px;font-family:'Fustat';font-weight:600;font-size:14.5px;letter-spacing:.4px;color:#1B2126;background:#fff;outline:none">
+                    <div onClick="{{ config.onAddUse }}" style="cursor:pointer;min-height:44px;padding:0 16px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#1B4D7A"><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:#fff">Add</span></div>
+                  </div>
                 </div>
               </sc-if>
             </div>
@@ -856,6 +882,33 @@
         </div>
       </sc-if>
 
+      <!-- EDIT DETAILS SHEET -->
+      <sc-if value="{{ editSheetOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:65;background:rgba(27,33,38,.4);display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ editSheet.onCancel }}" style="position:absolute;inset:0"></div>
+          <div style="position:relative;background:#fff;border-top-left-radius:22px;border-top-right-radius:22px;padding:8px 16px 24px;display:flex;flex-direction:column;gap:14px;max-height:88%">
+            <div style="align-self:center;width:36px;height:5px;border-radius:3px;background:#D3D9DD"></div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="min-width:0"><div style="font-family:'IBM Plex Mono';font-weight:700;font-size:15px;letter-spacing:1.2px;color:#58626A">{{ editSheet.plate }}</div><div style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126">Edit details</div></div><div onClick="{{ editSheet.onCancel }}" style="cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="x" size="16" color="#58626A" sw="2.2"></dc-import></div></div>
+            <div style="display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-bottom:2px">
+              <sc-for list="{{ editSheet.fields }}" as="f" hint-placeholder-count="7"><div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">{{ f.label }}</span><input value="{{ f.val }}" onInput="{{ f.onInput }}" inputmode="{{ f.kb }}" placeholder="{{ f.ph }}" style="border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div></sc-for>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Use</span>
+                <div onClick="{{ editSheet.onToggleUse }}" style="cursor:pointer;border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;display:flex;align-items:center;gap:10px;background:#fff"><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15px;color:{{ editSheet.useColor }}">{{ editSheet.use }}</span><div style="{{ editSheet.useChev }}"><dc-import name="Icon" hint-size="16px,16px" iconname="chevronDown" size="16" color="#8B9197" sw="2"></dc-import></div></div>
+                <sc-if value="{{ editSheet.usePickerOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-wrap:wrap;gap:8px">
+                    <sc-for list="{{ editSheet.useOptions }}" as="o" hint-placeholder-count="2"><div onClick="{{ o.onPress }}" style="cursor:pointer;min-height:40px;padding:0 16px;border-radius:10px;display:flex;align-items:center;justify-content:center;{{ o.style }}"><span style="font-family:'Fustat';font-weight:600;font-size:13.5px;letter-spacing:.4px;color:{{ o.color }}">{{ o.label }}</span></div></sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <div onClick="{{ editSheet.onCancel }}" style="cursor:pointer;flex:1;min-height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;border:1px solid #D3D9DD;background:#fff"><span style="font-family:'Fustat';font-weight:600;font-size:15.5px;color:#58626A">Cancel</span></div>
+              <div onClick="{{ editSheet.onSave }}" style="cursor:pointer;flex:1;min-height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#1B4D7A"><span style="font-family:'Fustat';font-weight:600;font-size:15.5px;color:#fff">Save</span></div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
     </div>
   </div>
   </div>
@@ -1011,6 +1064,9 @@ class Component extends DCLogic {
       // driver sheet + check
       driverSheet:null, checkVan:null, checkStep:'photos', checkNoKeyholder:false, checkDriver:'',
       checkPhotos:{}, checkResults:{}, checkDefects:{}, failSheet:null, checkSigned:false, checkOdo:'',
+      docTypesData:[{name:'Roadworthy',files:1},{name:'Registration',files:1},{name:'CTP',files:1},{name:'Insurance',files:1}],
+      useTypes:['PRV','BUS'],
+      docTypesOpen:false, usesOpen:false, newDocName:'', newDocFiles:'1', newUse:'', editSheet:null,
       depotName:'Chullora CPDC',
       peopleFilter:'all',
       helpOpen:'',
@@ -1093,6 +1149,21 @@ class Component extends DCLogic {
   cancelFail(){ this.setState({failSheet:null}); }
   saveFail(){ const fs=this.state.failSheet; if(!fs)return; const desc=(fs.desc||'').trim(); if(!desc)return this.say('Describe what is wrong first.'); this.setState((s)=>({checkResults:{...s.checkResults,[fs.itemId]:'fail'},checkDefects:{...s.checkDefects,[fs.itemId]:{desc,severity:fs.severity,due:fs.due}},failSheet:null}),()=>this.say('Defect noted.')); }
   onChkOdo(v){ this.setState({checkOdo:v}); }
+  toggleDocTypes(){ this.setState((s)=>({docTypesOpen:!s.docTypesOpen})); }
+  toggleUses(){ this.setState((s)=>({usesOpen:!s.usesOpen})); }
+  onNewDocName(v){ this.setState({newDocName:v}); }
+  onNewDocFiles(v){ this.setState({newDocFiles:(v||'').replace(/[^0-9]/g,'').slice(0,2)}); }
+  addDocType(){ const st=this.state; const name=(st.newDocName||'').trim(); if(!name)return this.say('Give the document type a name first.'); if(st.docTypesData.some((d)=>d.name.toLowerCase()===name.toLowerCase()))return this.say('“'+name+'” is already a document type.'); const files=Math.max(1,parseInt(st.newDocFiles,10)||1); this.setState((s)=>({docTypesData:[...s.docTypesData,{name,files}],newDocName:'',newDocFiles:'1'})); }
+  removeDocType(name){ this.setState((s)=>({docTypesData:s.docTypesData.filter((d)=>d.name!==name)})); }
+  onNewUse(v){ this.setState({newUse:(v||'').toUpperCase()}); }
+  addUse(){ const st=this.state; const name=(st.newUse||'').trim(); if(!name)return this.say('Type a use before adding it.'); if(st.useTypes.some((u)=>u.toLowerCase()===name.toLowerCase()))return this.say('“'+name+'” is already in the list.'); this.setState((s)=>({useTypes:[...s.useTypes,name],newUse:''})); }
+  removeUse(name){ this.setState((s)=>({useTypes:s.useTypes.filter((u)=>u!==name)})); }
+  openEditSheet(){ const v=this.vanById(this.state.vanId)||this.state.fleet[0]; if(!v)return; this.setState({editSheet:{plate:v.plate,year:v.year==null?'':String(v.year),fuel:v.fuel||'',inservice:v.inservice||'',vin:v.vin||'',color:v.color||'',gvm:v.gvm==null||v.gvm===''?'':String(v.gvm),tare:v.tare==null||v.tare===''?'':String(v.tare),use:v.use||'',usePickerOpen:false}}); }
+  editSet(patch){ this.setState((s)=>({editSheet:{...s.editSheet,...patch}})); }
+  toggleUsePicker(){ this.setState((s)=>({editSheet:{...s.editSheet,usePickerOpen:!s.editSheet.usePickerOpen}})); }
+  pickUse(u){ this.setState((s)=>({editSheet:{...s.editSheet,use:u,usePickerOpen:false}})); }
+  cancelEdit(){ this.setState({editSheet:null}); }
+  saveEdit(){ const es=this.state.editSheet; if(!es)return; const num=(x)=>{ const n=parseInt(String(x).replace(/[^0-9]/g,''),10); return isNaN(n)?'':n; }; this.setState((s)=>({fleet:s.fleet.map((v)=>v.plate===es.plate?{...v,year:es.year.trim(),fuel:es.fuel.trim(),inservice:es.inservice.trim(),vin:es.vin.trim().toUpperCase(),color:es.color.trim(),gvm:num(es.gvm),tare:num(es.tare),use:es.use.trim()}:v),editSheet:null}),()=>this.say('Details saved.')); }
   signCheck(){ this.setState((s)=>({checkSigned:!s.checkSigned})); }
   liveItems(){ return CHECKLIST.sections.flatMap((sec)=>sec.items.map((it)=>({...it,section:sec.name}))); }
   submitCheck(){ if(!this.state.checkSigned)return this.say('Sign the declaration first.'); this.setState({checkStep:'done'}); }
@@ -1180,6 +1251,7 @@ class Component extends DCLogic {
       drawOpen:st.drawOpen, draw:this._draw(),
       driverSheetOpen:!!st.driverSheet&&!st.drawOpen, driverSheet:this._driverSheet(),
       failSheetOpen:!!st.failSheet, failSheet:this._failSheetVM(),
+      editSheetOpen:!!st.editSheet, editSheet:this._editSheet(),
       isMore:screen==='more', isSettings:screen==='settings', isConfig:screen==='config', isPeople:screen==='people', isProfile:screen==='profile', isHelp:screen==='help', isReport:screen==='report',
       more:this._more(), settings:this._settings(), config:this._config(), people:this._people(), profile:this._profile(), help:this._help(), report:this._report(),
     };
@@ -1295,6 +1367,7 @@ class Component extends DCLogic {
       cDetails:cardOpen('details')?'transform:rotate(180deg)':'', cDocs:cardOpen('docs')?'transform:rotate(180deg)':'', cHist:cardOpen('hist')?'transform:rotate(180deg)':'', cLog:cardOpen('log')?'transform:rotate(180deg)':'',
       detailsHeadBorder:cardOpen('details')?'border-bottom:1px solid #F1F2F3':'',
       onExport:()=>this.say('Export coming soon — PDF is on the way.'),
+      onEditDetails:()=>this.openEditSheet(),
       onRemove:()=>this.say('Remove needs a confirm — wired in the live app.'),
     };
   }
@@ -1377,6 +1450,25 @@ class Component extends DCLogic {
       onSave:()=>this.saveFail(), onClose:()=>this.cancelFail(),
     };
   }
+  _editSheet(){
+    const es=this.state.editSheet; if(!es)return {};
+    const fields=[
+      {key:'year',label:'Year',ph:'e.g. 2021',kb:'numeric'},
+      {key:'fuel',label:'Fuel',ph:'e.g. Diesel',kb:'text'},
+      {key:'inservice',label:'In service',ph:'e.g. March 2021',kb:'text'},
+      {key:'vin',label:'VIN',ph:'17-character VIN',kb:'text',upper:true},
+      {key:'color',label:'Colour',ph:'e.g. White',kb:'text'},
+      {key:'gvm',label:'GVM (kg)',ph:'e.g. 3500',kb:'numeric'},
+      {key:'tare',label:'Tare (kg)',ph:'e.g. 2100',kb:'numeric'},
+    ].map((f)=>({...f,val:es[f.key],onInput:(e)=>this.editSet({[f.key]:f.upper?e.target.value.toUpperCase():e.target.value})}));
+    return {
+      plate:es.plate, fields,
+      use:es.use||'Select', usePlaceholder:!es.use, useColor:es.use?'#1B2126':'#8B9197', onToggleUse:()=>this.toggleUsePicker(),
+      usePickerOpen:!!es.usePickerOpen, useChev:es.usePickerOpen?'transform:rotate(180deg)':'',
+      useOptions:this.state.useTypes.map((u)=>({label:u,on:u===es.use,style:u===es.use?'background:#F6F9FC;border:1px solid #1B4D7A':'background:#fff;border:1px solid #D3D9DD',color:u===es.use?C.primary:C.muted2,onPress:()=>this.pickUse(u)})),
+      onCancel:()=>this.cancelEdit(), onSave:()=>this.saveEdit(),
+    };
+  }
   _gate(){
     const st=this.state; const q=(st.pickQuery||'').trim().toLowerCase();
     const results=q?st.people.filter((p)=>!p.suspended&&p.name.toLowerCase().includes(q)):[];
@@ -1431,8 +1523,14 @@ class Component extends DCLogic {
       photosOpen:st.photosOpen, photosChev:st.photosOpen?'chevronDown':'chevronRight', onTogglePhotos:()=>this.setState((s)=>({photosOpen:!s.photosOpen})),
       rolesOpen:st.rolesOpen, rolesChev:st.rolesOpen?'chevronDown':'chevronRight', onToggleRoles:()=>this.setState((s)=>({rolesOpen:!s.rolesOpen})),
       angles:ANGLES.map((a,i)=>({n:i+1,name:a})), angleCount:plural(ANGLES.length,'angle','angles'),
-      docTypes:[{name:'Roadworthy',files:'1 file'},{name:'Registration',files:'1 file'},{name:'CTP',files:'1 file'},{name:'Insurance',files:'1 file'}],
-      uses:['PRV','BUS'],
+      docTypesOpen:st.docTypesOpen, docTypesChev:st.docTypesOpen?'chevronDown':'chevronRight', onToggleDocTypes:()=>this.toggleDocTypes(),
+      docTypesCount:plural(st.docTypesData.length,'type'),
+      docTypes:st.docTypesData.map((d,i)=>({n:i+1,name:d.name,files:plural(d.files,'file'),onRemove:()=>this.removeDocType(d.name)})),
+      newDocName:st.newDocName, onNewDocName:(e)=>this.onNewDocName(e.target.value), newDocFiles:st.newDocFiles, onNewDocFiles:(e)=>this.onNewDocFiles(e.target.value), onAddDocType:()=>this.addDocType(),
+      usesOpen:st.usesOpen, usesChev:st.usesOpen?'chevronDown':'chevronRight', onToggleUses:()=>this.toggleUses(),
+      usesCount:plural(st.useTypes.length,'type'),
+      uses:st.useTypes.map((u,i)=>({n:i+1,name:u,onRemove:()=>this.removeUse(u)})),
+      newUse:st.newUse, onNewUse:(e)=>this.onNewUse(e.target.value), onAddUse:()=>this.addUse(),
       groups:st.configGroups.map((g)=>{ const open=st.groupOpen===g.role; const onC=g.caps.length; return {role:this.roleLabel(g.role),open,chev:open?'chevronDown':'chevronRight',count:onC+' of '+g.caps.length,onToggle:()=>this.toggleGroup(g.role),caps:g.caps.map((c)=>({name:c.name,desc:c.desc,seed:c.seed}))}; }),
     };
   }
