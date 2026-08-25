@@ -32,27 +32,28 @@ export default function ConfigScreen() {
         onPress={() => s.tapOpen()}
         style={{ gap: 12 }}
       >
-        <Text style={styles.label}>Draw rules</Text>
-        <View style={styles.pair}>
-          <Field cap="Exclude if checked within (days)" value={st.excludeDays} onChange={(v) => s.setRule('excludeDays', v)} />
-          <Field cap="Force any vehicle past (days)" value={st.forceDays} onChange={(v) => s.setRule('forceDays', v)} />
-        </View>
-        <View style={styles.pair}>
-          <Field cap="Re-rolls per check" value={st.rerolls} onChange={(v) => s.setRule('rerolls', v)} />
-          <Field cap="Target per week (checks)" value={st.target} onChange={(v) => s.setRule('target', v)} />
-        </View>
-        {bad && (
-          <Text style={styles.bad}>
-            The force-past number has to be larger than the exclusion window, or every vehicle is
-            excluded and forced at the same time.
-          </Text>
-        )}
+        {/* Draw rules */}
+        <Section title="Draw rules" count={plural(4, 'rule', 'rules')} open={st.drawRulesOpen} onToggle={() => s.toggleCfg('drawRulesOpen')}>
+          <View style={styles.drawBody}>
+            <View style={styles.pair}>
+              <Field cap="Exclude if checked within (days)" value={st.excludeDays} onChange={(v) => s.setRule('excludeDays', v)} />
+              <Field cap="Force any vehicle past (days)" value={st.forceDays} onChange={(v) => s.setRule('forceDays', v)} />
+            </View>
+            <View style={styles.pair}>
+              <Field cap="Re-rolls per check" value={st.rerolls} onChange={(v) => s.setRule('rerolls', v)} />
+              <Field cap="Target per week (checks)" value={st.target} onChange={(v) => s.setRule('target', v)} />
+            </View>
+            {bad && (
+              <Text style={styles.bad}>
+                The force-past number has to be larger than the exclusion window, or every vehicle is
+                excluded and forced at the same time.
+              </Text>
+            )}
+          </View>
+        </Section>
 
-        <View style={styles.rowBetween}>
-          <Text style={styles.label}>Check photos</Text>
-          <Text style={styles.count}>{plural(st.photoAngles.length, 'angle', 'angles')}</Text>
-        </View>
-        <View style={styles.card}>
+        {/* Check photos */}
+        <Section title="Check photos" count={plural(st.photoAngles.length, 'angle', 'angles')} open={st.photosOpen} onToggle={() => s.toggleCfg('photosOpen')}>
           {st.photoAngles.map((a, i) => (
             <View key={a} style={[styles.angleRow, styles.hairline]}>
               <View style={styles.num}><Text style={styles.numTxt}>{i + 1}</Text></View>
@@ -75,13 +76,10 @@ export default function ConfigScreen() {
               <Text style={styles.addBtnTxt}>Add</Text>
             </Pressable>
           </View>
-        </View>
+        </Section>
 
-        <View style={styles.rowBetween}>
-          <Text style={styles.label}>Document types</Text>
-          <Text style={styles.count}>{plural(st.docTypes.length, 'type', 'types')}</Text>
-        </View>
-        <View style={styles.card}>
+        {/* Document types */}
+        <Section title="Document types" count={plural(st.docTypes.length, 'type', 'types')} open={st.docTypesOpen} onToggle={() => s.toggleCfg('docTypesOpen')}>
           {st.docTypes.map((d, i) => (
             <View key={d.name} style={[styles.angleRow, styles.hairline]}>
               <Text style={styles.angleName} numberOfLines={1}>{d.name}</Text>
@@ -112,14 +110,11 @@ export default function ConfigScreen() {
               <Text style={styles.addBtnTxt}>Add</Text>
             </Pressable>
           </View>
-        </View>
-        <Text style={styles.hint}>Name is required. The number is how many files that type expects on upload.</Text>
+          <Text style={styles.hintIn}>Name is required. The number is how many files that type expects on upload.</Text>
+        </Section>
 
-        <View style={styles.rowBetween}>
-          <Text style={styles.label}>Vehicle use</Text>
-          <Text style={styles.count}>{plural(st.vehicleUses.length, 'type', 'types')}</Text>
-        </View>
-        <View style={styles.card}>
+        {/* Vehicle use */}
+        <Section title="Vehicle use" count={plural(st.vehicleUses.length, 'type', 'types')} open={st.usesOpen} onToggle={() => s.toggleCfg('usesOpen')}>
           {st.vehicleUses.map((u, i) => (
             <View key={u} style={[styles.angleRow, styles.hairline]}>
               <Text style={styles.angleName} numberOfLines={1}>{u}</Text>
@@ -140,7 +135,7 @@ export default function ConfigScreen() {
               <Text style={styles.addBtnTxt}>Add</Text>
             </Pressable>
           </View>
-        </View>
+        </Section>
 
         <Text style={[styles.label, { paddingTop: 10 }]}>Fleet setup</Text>
         <Pressable
@@ -155,23 +150,45 @@ export default function ConfigScreen() {
           <Icon name="chevronRight" size={16} color={C.faint} width={2} />
         </Pressable>
 
-        <Text style={[styles.label, { paddingTop: 10 }]}>Roles &amp; capabilities</Text>
-        {st.configGroups.map((g) => (
-          <Group key={g.role} group={g} />
-        ))}
+        {/* Roles & capabilities — one outer card holding the per-role accordions */}
+        <Section title="Roles &amp; capabilities" count={plural(st.configGroups.length, 'role', 'roles')} open={st.rolesOpen} onToggle={() => s.toggleCfg('rolesOpen')}>
+          {st.configGroups.map((g, i) => (
+            <Group key={g.role} group={g} nested first={i === 0} />
+          ))}
+        </Section>
       </Pressable>
     </ScrollView>
   );
 }
 
-function Group({ group }) {
+function Section({ title, count, open, onToggle, children }) {
+  return (
+    <View style={styles.card}>
+      <Pressable
+        onPress={onToggle}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: open }}
+        style={styles.groupHead}
+      >
+        <Icon name={open ? 'chevronDown' : 'chevronRight'} size={15} color={C.faint} width={2} />
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={styles.groupRole}>{title}</Text>
+        </View>
+        <Text style={styles.count}>{count}</Text>
+      </Pressable>
+      {open && <View style={styles.sectionOpen}>{children}</View>}
+    </View>
+  );
+}
+
+function Group({ group, nested, first }) {
   const s = useStore();
   const st = s.state;
   const open = st.groupOpen === group.role;
   const onCount = group.caps.filter((c) => s.capOn(group.role, c.name)).length;
 
-  return (
-    <View style={styles.card}>
+  const inner = (
+    <>
       <Pressable onPress={() => s.toggleGroup(group.role)} accessibilityRole="button" style={styles.groupHead}>
         <Icon name={open ? 'chevronDown' : 'chevronRight'} size={15} color={C.faint} width={2} />
         <View style={{ flex: 1, minWidth: 0 }}>
@@ -243,8 +260,11 @@ function Group({ group }) {
           )}
         </View>
       )}
-    </View>
+    </>
   );
+
+  if (nested) return <View style={[styles.nestedGroup, first && { borderTopWidth: 0 }]}>{inner}</View>;
+  return <View style={styles.card}>{inner}</View>;
 }
 
 function Field({ cap, value, onChange }) {
@@ -301,6 +321,9 @@ const styles = StyleSheet.create({
     backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: 16,
     overflow: 'hidden', ...cardShadow,
   },
+  sectionOpen: { borderTopWidth: 1, borderTopColor: C.hair },
+  drawBody: { padding: 12, gap: 8 },
+  nestedGroup: { borderTopWidth: 1, borderTopColor: C.hair },
   hairline: { borderBottomWidth: 1, borderBottomColor: C.hair },
 
   angleRow: { paddingLeft: 14, paddingRight: 8, paddingVertical: 10, minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -320,6 +343,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10, fontFamily: F.sansMed, fontSize: 15, color: C.ink, textAlign: 'center',
   },
   hint: { fontFamily: F.sans, fontSize: 12.5, lineHeight: 18, color: C.muted3 },
+  hintIn: { fontFamily: F.sans, fontSize: 12.5, lineHeight: 18, color: C.muted3, paddingHorizontal: 14, paddingTop: 2, paddingBottom: 12 },
 
   navRow: {
     backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: 16,
