@@ -19,6 +19,9 @@
     "web": {
       "bundler": "metro"
     },
+    "experiments": {
+      "baseUrl": "/checkup-van"
+    },
     "plugins": [
       "expo-asset",
       [
