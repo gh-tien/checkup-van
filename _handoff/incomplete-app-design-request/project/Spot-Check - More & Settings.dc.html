@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fustat:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>body{margin:0;background:#F0EEE9;font-family:Fustat,system-ui,sans-serif}a{color:#1B4D7A;text-decoration:none}a:hover{color:#123A5C}.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1B2126;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 Fustat,sans-serif;color:#1B2126}.dv-tnote{margin:0 0 20px;max-width:760px;font:400 13px/1.55 Fustat,sans-serif;color:rgba(0,0,0,.55);text-wrap:pretty}.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px;max-width:420px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1B2126;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 Fustat,sans-serif;color:rgba(0,0,0,.55)}.dv-ocap{margin:2px 0 0;font:400 12px/1.5 Fustat,sans-serif;color:rgba(0,0,0,.5);text-wrap:pretty}.dv-opt:target .dv-oid{background:#1B4D7A;color:#fff}.dv-next{margin:22px 0 0;font:12px/1.5 Fustat,sans-serif;color:rgba(0,0,0,.5)}</style></helmet>
+
+<section class="dv-turn" id="t2">
+  <div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">New direction — More as the depot's state, Settings as sentences</span></div>
+  <p class="dv-tnote">All three are live: tap the numbers, the peek rows, the arm-to-empty. Nothing new is invented visually — dashed = provisional or needs you, navy = the one accent, red = a defect or a loss, mono = machine values. What changes is what the screen is <em>for</em>: More stops being a list of destinations and starts saying what is on you.</p>
+  <div class="dv-opts">
+    <div class="dv-opt" id="2a">
+      <div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>More — "on you" first, then peek-in-place</div>
+      <dc-import name="SpotCheckPhone" start="moreA" open-locked="false" hint-size="402px,874px"></dc-import>
+      <p class="dv-ocap">The two things blocking work are lifted out of the list and given the verb: <strong>Publish v5</strong>, <strong>Draw one of these next</strong>. Coverage's one alarming number becomes the grid it describes, in the row itself. The quiet rows below expand in place instead of navigating — three names is enough to answer "who's on?" without losing your place on More.</p>
+    </div>
+    <div class="dv-opt" id="2b">
+      <div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>More — tiles, one screen, no scroll</div>
+      <dc-import name="SpotCheckPhone" start="moreB" open-locked="false" hint-size="402px,874px"></dc-import>
+      <p class="dv-ocap">Same information, read as a board: number first, name second. Dashed tiles are the ones waiting on you, so "what needs me" is a glance rather than a read. Cheaper to build than <a class="dv-oid" href="#2a">2a</a> and it fits without scrolling — but it loses the verb, so every tile still costs a tap to act on.</p>
+    </div>
+    <div class="dv-opt" id="2c">
+      <div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Settings — the draw rules as one sentence</div>
+      <dc-import name="SpotCheckPhone" start="settingsNew" open-locked="false" hint-size="402px,874px"></dc-import>
+      <p class="dv-ocap">Four labelled boxes became one sentence with the numbers tappable inside it, so the rule reads as the rule instead of as a form. Tapping a number opens a thumb-sized stepper that clamps to the allowed range — the invalid state the current screen has to explain in red can no longer be typed. Backup becomes a state ("12 days ago, 31 checks since") rather than a pair of buttons, and Empty is folded away until asked for.</p>
+    </div>
+  </div>
+  <p class="dv-next">Try next: "take <a class="dv-oid" href="#2a">2a</a>'s on-you band but keep the plain list under it" · "make <a class="dv-oid" href="#2c">2c</a>'s sentence editable inline with the keypad" · "show <a class="dv-oid" href="#2b">2b</a> with nothing overdue"</p>
+</section>
+
+<section class="dv-turn" id="t1">
+  <div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">As built — recreated from app.js / app.css (v30)</span></div>
+  <p class="dv-tnote">Faithful recreation of <code>viewMore()</code> and <code>viewSettings()</code> with the real chrome: three-track header with the build stamp in the empty left gutter, centred title, navy avatar with the amber waiting badge, four tabs with a red and a quiet badge. Live: the avatar menu, More → Settings, Restore (shows the dashed-red summary card), and the two-tap Empty.</p>
+  <div class="dv-opts">
+    <div class="dv-opt" id="1a">
+      <div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>More</div>
+      <dc-import name="SpotCheckPhone" start="more" open-locked="false" hint-size="402px,874px"></dc-import>
+      <p class="dv-ocap">Seven rows under five headings — Depot setup, Records, Device, Fleet — plus the standing "one depot, two roles" note. The alarming bits (3 changes not live, 3 vans past 30 days) are sub-lines in red at the bottom of a 66px row.</p>
+    </div>
+    <div class="dv-opt" id="1b">
+      <div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Settings</div>
+      <dc-import name="SpotCheckPhone" start="settings" open-locked="false" hint-size="402px,874px"></dc-import>
+      <p class="dv-ocap">Depot name, the four draw-rule fields, the backup pair with its three paragraphs of consequence, the armed reset, and the About line. The prose is doing the work the layout can't — which is what <a class="dv-oid" href="#2c">2c</a> goes after.</p>
+    </div>
+  </div>
+  <p class="dv-next">Try next: "recreate the Check queue too" · "what would More look like for an inspector, not a manager"</p>
+</section>
+</x-dc>
+</body>
+</html>

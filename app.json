@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Vehicle Full Inspection",
+    "slug": "vehicle-spotcheck",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1B4D7A"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-asset",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Vehicle Full Inspection uses the camera to photograph vehicles and defects during a full inspection.",
+          "recordAudioAndroid": false
+        }
+      ]
+    ],
+    "backgroundColor": "#1B4D7A"
+  }
+}

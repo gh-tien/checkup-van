@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"><style>
+body{margin:0;background:#f0eee9;font-family:Nunito,system-ui,sans-serif}
+a{text-decoration:none}
+.dv-turn{padding:40px 44px 40px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px}
+.dv-tname{font:800 14px/1.2 Nunito,sans-serif;color:#1a1a1a}
+.dv-tnote{margin:0 0 24px;max-width:820px;font:400 13px/1.6 Nunito,sans-serif;color:rgba(0,0,0,.6);text-wrap:pretty}
+.dv-opts{display:flex;flex-wrap:wrap;gap:34px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:11px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:700 12px/1.3 Nunito,sans-serif;color:rgba(0,0,0,.6)}
+.dv-ocap{margin:3px 0 0;max-width:340px;font:400 12px/1.55 Nunito,sans-serif;color:rgba(0,0,0,.5);text-wrap:pretty}
+.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}
+.dv-next{margin:26px 0 0;font:400 12px/1.6 Nunito,sans-serif;color:rgba(0,0,0,.5)}
+.dv-next a{font:600 10.5px ui-monospace,Menlo,monospace;padding:2px 6px;background:rgba(0,0,0,.06);color:#1a1a1a;border-radius:4px}
+
+/* phone shell */
+.wf{width:340px;background:#fff;border:2px solid #1a1a1a;border-radius:22px;overflow:hidden;box-shadow:5px 6px 0 rgba(0,0,0,.12)}
+.wf-bar{height:30px;background:#f4f2ee;border-bottom:1.5px solid #1a1a1a;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:700 11px Nunito,sans-serif;color:#555}
+.wf-top{padding:12px 14px 8px;display:flex;align-items:center;gap:8px;border-bottom:1.5px solid #e4e1da}
+.wf-back{font:700 13px Nunito,sans-serif;color:#1a1a1a}
+.wf-title{font:800 20px/1 Gaegu,cursive;color:#1a1a1a;letter-spacing:.3px}
+.wf-body{padding:12px 14px 16px;display:flex;flex-direction:column;gap:10px;background:#fff}
+.wf-sub{display:flex;justify-content:space-between;font:400 11px Nunito,sans-serif;color:#8a8a8a}
+.wf-ver{font-family:ui-monospace,Menlo,monospace}
+/* banner */
+.wf-banner{border:1.5px dashed #c0392b;border-radius:11px;padding:10px 11px;display:flex;flex-direction:column;gap:8px}
+.wf-brow{display:flex;justify-content:space-between;align-items:baseline}
+.wf-bt{font:800 13px Nunito,sans-serif;color:#1a1a1a}
+.wf-bc{font:700 10px ui-monospace,Menlo,monospace;color:#c0392b}
+.wf-bnote{font:400 11px/1.4 Nunito,sans-serif;color:#777}
+.wf-pub{height:38px;border-radius:9px;background:#1a3f63;color:#fff;display:flex;align-items:center;justify-content:center;font:800 13px Nunito,sans-serif}
+/* section card */
+.wf-sec{border:1.5px solid #1a1a1a;border-radius:11px;overflow:hidden}
+.wf-shead{display:flex;align-items:center;gap:8px;padding:10px 10px;background:#fff}
+.wf-chev{font:700 13px Nunito,sans-serif;color:#999;width:16px}
+.wf-sname{flex:1;font:700 15px/1 Gaegu,cursive;color:#1a1a1a;border-bottom:1.5px dashed #cfcbc2;padding-bottom:2px}
+.wf-scount{font:700 9.5px ui-monospace,Menlo,monospace;color:#9a9a9a}
+.wf-bin{width:24px;height:24px;border:1.5px solid #c0392b;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#c0392b;font-size:12px;flex:none}
+.wf-items{border-top:1.5px solid #e4e1da}
+.wf-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-bottom:1px solid #eee}
+.wf-item:last-child{border-bottom:0}
+.wf-dot{width:12px;height:12px;border:1.5px solid #bbb;border-radius:50%;flex:none}
+.wf-dot.new{border-color:#1a3f63;background:#dce8f2}
+.wf-itxt{flex:1;font:400 12.5px/1.2 Nunito,sans-serif;color:#333;border-bottom:1px dashed #ddd;padding-bottom:2px}
+.wf-badge{font:800 8px ui-monospace,Menlo,monospace;letter-spacing:.5px;padding:2px 5px;border-radius:4px}
+.wf-badge.new{background:#dce8f2;color:#1a3f63}
+.wf-badge.ret{background:#f7dcd8;color:#c0392b}
+.wf-addrow{padding:9px 10px;display:flex;align-items:center;gap:8px;font:700 12px Nunito,sans-serif;color:#1a3f63}
+.wf-plus{width:18px;height:18px;border:1.5px dashed #1a3f63;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex:none}
+/* holding */
+.wf-hold{border:1.5px solid #c0392b;border-radius:11px;overflow:hidden}
+.wf-hhead{display:flex;align-items:center;gap:8px;padding:10px;background:#fbeeec}
+.wf-hname{flex:1;font:800 14px Nunito,sans-serif;color:#c0392b}
+.wf-hitem{display:flex;align-items:center;gap:8px;padding:9px 10px;border-top:1px solid #f3ddd8}
+.wf-htxt{flex:1;font:400 12px Nunito,sans-serif;color:#a08;color:#8a6b66;text-decoration:line-through}
+.wf-hsec{font:400 9.5px Nunito,sans-serif;color:#b49992;text-decoration:none}
+.wf-restore{border:1.5px solid #1a3f63;border-radius:20px;padding:4px 11px;font:700 10px Nunito,sans-serif;color:#1a3f63;flex:none}
+.wf-x{width:22px;height:22px;border:1.5px solid #c0392b;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c0392b;font-size:12px;flex:none}
+.wf-addsec{height:38px;border:1.5px dashed #1a3f63;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:6px;font:700 12px Nunito,sans-serif;color:#1a3f63}
+/* callout */
+.co{margin-top:4px;background:#fffce8;border:1.5px solid #e6d98a;border-radius:9px;padding:9px 11px;font:400 11px/1.5 Nunito,sans-serif;color:#6b5e12;max-width:340px}
+.co b{font-weight:800}
+/* flow map */
+.flow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;max-width:340px;margin-top:2px}
+.flow .node{border:1.5px solid #1a1a1a;border-radius:7px;padding:5px 9px;font:700 10.5px Nunito,sans-serif;background:#fff}
+.flow .node.hold{border-color:#c0392b;color:#c0392b;background:#fbeeec}
+.flow .node.gone{border-style:dashed;color:#999}
+.flow .arr{font:700 12px Nunito,sans-serif;color:#666}
+.flow .lbl{font:400 9px Nunito,sans-serif;color:#888}
+</style></helmet>
+
+<section class="dv-turn" id="t5">
+  <div class="dv-thd"><a class="dv-tid" href="#t5">5</a><span class="dv-tname">Draft changes — three ways to make it less confusing</span></div>
+  <p class="dv-tnote">What confuses today: two verbs (Undo vs Restore), three coloured badges, and a mixed list with no plain statement of what publishing will actually do. All three fixes below: <b>plain-English summary at the top</b>, <b>one verb</b>, and a clear primary <b>Publish</b>. <a class="dv-oid" href="#5a">5a</a> groups by action, <a class="dv-oid" href="#5b">5b</a> reads as plain sentences, <a class="dv-oid" href="#5c">5c</a> is a compact before&rarr;after diff.</p>
+  <div class="dv-opts">
+
+    <!-- 5a -->
+    <div class="dv-opt" id="5a">
+      <div class="dv-olabel"><a class="dv-oid" href="#5a">5a</a>Grouped by action &mdash; &ldquo;Adding / Removing / Editing&rdquo;</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>&#9727; &#9626; &#9646;</span></div>
+        <div class="wf-top"><span class="wf-back">&lsaquo; Back</span><span class="wf-title">Review changes</span></div>
+        <div class="wf-body">
+          <div style="border:1.5px solid #1a3f63;border-radius:11px;padding:11px 12px;background:#f2f6fa;font:600 13px/1.5 Nunito,sans-serif;color:#1a3f63">Publishing makes these <b>3 changes</b> live as <b>v5</b>. The crew walk v4 until you do.</div>
+          <div style="font:800 10px Nunito,sans-serif;letter-spacing:.06em;color:#3a7d44;text-transform:uppercase;margin-top:2px">Adding &middot; 2</div>
+          <div class="wf-sec"><div class="wf-item" style="border:0"><span class="wf-dot new"></span><span class="wf-itxt" style="border:0;display:flex;flex-direction:column;gap:1px"><span>Brake &amp; reverse lights work</span><span style="font:400 9.5px Nunito,sans-serif;color:#999">Lights &amp; signals</span></span><span style="font:700 11px Nunito,sans-serif;color:#1a3f63">Undo</span></div></div>
+          <div class="wf-sec"><div class="wf-item" style="border:0"><span class="wf-dot new"></span><span class="wf-itxt" style="border:0;display:flex;flex-direction:column;gap:1px"><span>Tail-lift raises &amp; holds</span><span style="font:400 9.5px Nunito,sans-serif;color:#999">Load area</span></span><span style="font:700 11px Nunito,sans-serif;color:#1a3f63">Undo</span></div></div>
+          <div style="font:800 10px Nunito,sans-serif;letter-spacing:.06em;color:#c0392b;text-transform:uppercase;margin-top:6px">Removing &middot; 1</div>
+          <div class="wf-sec"><div class="wf-item" style="border:0"><span class="wf-dot" style="border-color:#c0392b"></span><span class="wf-itxt" style="border:0;display:flex;flex-direction:column;gap:1px"><span style="text-decoration:line-through;color:#8a6b66">Fire extinguisher charged</span><span style="font:400 9.5px Nunito,sans-serif;color:#b49992">Safety equipment</span></span><span style="font:700 11px Nunito,sans-serif;color:#1a3f63">Undo</span></div></div>
+        </div>
+        <div style="border-top:1.5px solid #e4e1da;padding:11px 14px;display:flex;flex-direction:column;gap:8px;background:#fff">
+          <div class="wf-pub" style="height:44px">Publish v5</div>
+          <div style="text-align:center;font:700 12px Nunito,sans-serif;color:#c0392b">Discard all changes</div>
+        </div>
+      </div>
+      <p class="dv-ocap">Headings tell the story before you read a single row (&ldquo;Adding 2, Removing 1&rdquo;), so the coloured badges become redundant. One verb everywhere: <b>Undo</b>. Publish is pinned to the bottom, out of the scroll. Clearest for longer diffs.</p>
+    </div>
+
+    <!-- 5b -->
+    <div class="dv-opt" id="5b">
+      <div class="dv-olabel"><a class="dv-oid" href="#5b">5b</a>Plain sentences &mdash; each change reads like English</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>&#9727; &#9626; &#9646;</span></div>
+        <div class="wf-top"><span class="wf-back">&lsaquo; Back</span><span class="wf-title">Review changes</span></div>
+        <div class="wf-body">
+          <div style="font:700 13px/1.5 Nunito,sans-serif;color:#1a1a1a">3 changes waiting to publish</div>
+          <div class="wf-sec"><div style="padding:11px 12px;display:flex;gap:10px;align-items:flex-start"><span style="width:22px;height:22px;border-radius:50%;background:#e9f0f6;color:#1a3f63;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800">+</span><span style="flex:1;font:400 12.5px/1.5 Nunito,sans-serif;color:#333"><b>Added</b> &ldquo;Brake &amp; reverse lights work&rdquo; to Lights &amp; signals</span><span style="font:700 11px Nunito,sans-serif;color:#1a3f63;flex:none">Undo</span></div></div>
+          <div class="wf-sec"><div style="padding:11px 12px;display:flex;gap:10px;align-items:flex-start"><span style="width:22px;height:22px;border-radius:50%;background:#e9f0f6;color:#1a3f63;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800">+</span><span style="flex:1;font:400 12.5px/1.5 Nunito,sans-serif;color:#333"><b>Added</b> &ldquo;Tail-lift raises &amp; holds&rdquo; to Load area</span><span style="font:700 11px Nunito,sans-serif;color:#1a3f63;flex:none">Undo</span></div></div>
+          <div class="wf-sec"><div style="padding:11px 12px;display:flex;gap:10px;align-items:flex-start"><span style="width:22px;height:22px;border-radius:50%;background:#fbeeec;color:#c0392b;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800">&minus;</span><span style="flex:1;font:400 12.5px/1.5 Nunito,sans-serif;color:#333"><b>Removed</b> &ldquo;Fire extinguisher charged&rdquo; from Safety equipment</span><span style="font:700 11px Nunito,sans-serif;color:#1a3f63;flex:none">Undo</span></div></div>
+          <div class="co">A row is a sentence: <b>verb + what + where</b>. No badge to decode &mdash; the sentence already says it. One <b>Undo</b> takes the sentence back out.</div>
+          <div class="wf-pub" style="height:44px;margin-top:2px">Publish v5</div>
+          <div style="text-align:center;font:700 12px Nunito,sans-serif;color:#c0392b">Discard all changes</div>
+        </div>
+      </div>
+      <p class="dv-ocap">Most human of the three &mdash; anyone can read it aloud and understand. Trades a little density for clarity; best when changes are usually few. Edits read &ldquo;<b>Reworded</b> &lsquo;X&rsquo; &rarr; &lsquo;Y&rsquo;&rdquo;.</p>
+    </div>
+
+    <!-- 5c -->
+    <div class="dv-opt" id="5c">
+      <div class="dv-olabel"><a class="dv-oid" href="#5c">5c</a>Compact diff &mdash; before &rarr; after, minimal colour</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>&#9727; &#9626; &#9646;</span></div>
+        <div class="wf-top"><span class="wf-back">&lsaquo; Back</span><span class="wf-title">Review changes</span></div>
+        <div class="wf-body">
+          <div class="wf-sub"><span>3 changes &middot; publishing makes v5</span><span class="wf-ver">v4 &rarr; v5</span></div>
+          <div class="wf-sec"><div style="padding:10px 12px;display:flex;align-items:center;gap:10px"><span style="width:16px;font:800 15px Nunito,sans-serif;color:#3a7d44">+</span><span style="flex:1;font:400 12.5px Nunito,sans-serif;color:#333">Brake &amp; reverse lights work</span><span style="font:700 11px Nunito,sans-serif;color:#1a3f63">Undo</span></div></div>
+          <div class="wf-sec"><div style="padding:10px 12px;display:flex;align-items:center;gap:10px"><span style="width:16px;font:800 15px Nunito,sans-serif;color:#3a7d44">+</span><span style="flex:1;font:400 12.5px Nunito,sans-serif;color:#333">Tail-lift raises &amp; holds</span><span style="font:700 11px Nunito,sans-serif;color:#1a3f63">Undo</span></div></div>
+          <div class="wf-sec"><div style="padding:10px 12px;display:flex;align-items:center;gap:10px"><span style="width:16px;font:800 15px Nunito,sans-serif;color:#c0392b">&minus;</span><span style="flex:1;font:400 12.5px Nunito,sans-serif;color:#8a6b66;text-decoration:line-through">Fire extinguisher charged</span><span style="font:700 11px Nunito,sans-serif;color:#1a3f63">Undo</span></div></div>
+          <div class="wf-sec"><div style="padding:10px 12px;display:flex;align-items:flex-start;gap:10px"><span style="width:16px;font:800 15px Nunito,sans-serif;color:#8a6116">&sim;</span><span style="flex:1;font:400 12px/1.45 Nunito,sans-serif;color:#333"><span style="color:#999;text-decoration:line-through">Check tyre tread</span><br>Check tread &amp; sidewalls</span><span style="font:700 11px Nunito,sans-serif;color:#1a3f63">Undo</span></div></div>
+          <div class="wf-pub" style="height:44px;margin-top:2px">Publish v5</div>
+          <div style="text-align:center;font:700 12px Nunito,sans-serif;color:#c0392b">Discard all changes</div>
+        </div>
+      </div>
+      <p class="dv-ocap">Tightest. A single glyph carries the type &mdash; <b>+</b> add, <b>&minus;</b> remove, <b>&sim;</b> edit (old struck above new). No badge chips at all. Best when someone reviews a long list quickly; leans on symbols, so slightly less obvious than <a class="dv-oid" href="#5b">5b</a>.</p>
+    </div>
+
+  </div>
+  <p class="dv-next">Try next: &ldquo;build <a href="#5a">5a</a>&rdquo; &middot; &ldquo;<a href="#5b">5b</a> but pin Publish to the bottom like <a href="#5a">5a</a>&rdquo; &middot; &ldquo;show <a href="#5c">5c</a> with an edit that changed the response type&rdquo;</p>
+</section>
+
+<section class="dv-turn" id="t4">
+  <div class="dv-thd"><a class="dv-tid" href="#t4">4</a><span class="dv-tname">Templates hub — the builder generalised (Checklist becomes card #1)</span></div>
+  <p class="dv-tnote">Your checklist screen IS a form/template builder. A van intake form, a defect form, a handover form are the same shape (sections &rarr; items &rarr; response types &rarr; draft/publish/version). So the pattern is <b>More &rarr; Templates &rarr; [card] &rarr; the builder you already have</b>. <a class="dv-oid" href="#4a">4a</a> is the hub, <a class="dv-oid" href="#4b">4b</a> the card opened (= the current Checklist), <a class="dv-oid" href="#4c">4c</a> where version history (gap #5) lives per template. Build the hub thin now (one real card &rarr; existing builder); add template <em>kinds</em> only when the van form actually lands.</p>
+  <div class="dv-opts">
+
+    <!-- 4a -->
+    <div class="dv-opt" id="4a">
+      <div class="dv-olabel"><a class="dv-oid" href="#4a">4a</a>Templates hub &mdash; one card per form</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>&#9727; &#9626; &#9646;</span></div>
+        <div class="wf-top"><span class="wf-back">&lsaquo; Back</span><span class="wf-title">Templates</span></div>
+        <div class="wf-body">
+          <div class="wf-sub"><span>Forms the crew fill in</span><span class="wf-ver">admin only</span></div>
+          <div class="wf-sec">
+            <div class="wf-shead" style="gap:10px"><span style="width:30px;height:30px;border:1.5px solid #1a3f63;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#1a3f63;font-size:14px">&#10003;</span><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font:800 14px Nunito,sans-serif;color:#1a1a1a">Van walk-around</span><span style="font:400 10.5px Nunito,sans-serif;color:#999">Checklist &middot; used on every walk</span></span><span style="font:700 9px ui-monospace,Menlo,monospace;color:#c0392b;border:1px solid #e6bcb4;border-radius:5px;padding:3px 6px">3 draft</span></div>
+          </div>
+          <div class="wf-sec">
+            <div class="wf-shead" style="gap:10px"><span style="width:30px;height:30px;border:1.5px solid #888;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#888;font-size:13px">&#9888;</span><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font:800 14px Nunito,sans-serif;color:#1a1a1a">Defect report</span><span style="font:400 10.5px Nunito,sans-serif;color:#999">Intake &middot; raised from a failed item</span></span><span style="font:700 9px ui-monospace,Menlo,monospace;color:#3a7d44;border:1px solid #bcd9c2;border-radius:5px;padding:3px 6px">v2 live</span></div>
+          </div>
+          <div class="wf-sec" style="opacity:.65">
+            <div class="wf-shead" style="gap:10px"><span style="width:30px;height:30px;border:1.5px solid #888;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#888;font-size:13px">&#128666;</span><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font:800 14px Nunito,sans-serif;color:#1a1a1a">Vehicle handover</span><span style="font:400 10.5px Nunito,sans-serif;color:#999">Intake &middot; not in use yet</span></span><span style="font:700 9px ui-monospace,Menlo,monospace;color:#999;border:1px solid #ddd;border-radius:5px;padding:3px 6px">draft</span></div>
+          </div>
+          <div class="wf-addsec">&#65291; New template</div>
+        </div>
+      </div>
+      <p class="dv-ocap">More &rarr; <b>Templates</b>. Each card = one form, showing its kind, live version and any pending draft. This is where the &ldquo;Checklist&rdquo; row on More moves to; the van module and defects read their own cards from the same hub.</p>
+    </div>
+
+    <!-- 4b -->
+    <div class="dv-opt" id="4b">
+      <div class="dv-olabel"><a class="dv-oid" href="#4b">4b</a>Card opened &mdash; it&rsquo;s the builder you already have</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>&#9727; &#9626; &#9646;</span></div>
+        <div class="wf-top"><span class="wf-back">&lsaquo; Back</span><span class="wf-title">Van walk-around</span></div>
+        <div class="wf-body">
+          <div class="wf-sub"><span>19 items &middot; 7 sections</span><span class="wf-ver">v4 &middot; live</span></div>
+          <div style="border:1.5px solid #1a3f63;border-radius:11px;padding:10px 11px;display:flex;align-items:center;gap:9px;background:#f2f6fa">
+            <span style="width:26px;height:26px;border-radius:50%;background:#1a3f63;color:#fff;display:flex;align-items:center;justify-content:center;font:800 11px Nunito,sans-serif;flex:none">3</span>
+            <span style="flex:1;font:700 12.5px Nunito,sans-serif;color:#1a3f63">Draft changes to review</span><span style="font:700 11px Nunito,sans-serif;color:#1a3f63">Review &rsaquo;</span>
+          </div>
+          <div class="wf-sec">
+            <div class="wf-shead"><span class="wf-chev">&#8964;</span><span style="flex:1;font:800 14px Nunito,sans-serif;color:#1a1a1a">Lights &amp; signals</span><span class="wf-scount">3</span><span style="color:#1a3f63;font-size:14px">&#9998;</span></div>
+            <div class="wf-items">
+              <div class="wf-item"><span class="wf-dot"></span><span class="wf-itxt" style="border:0">Headlights &amp; full beam</span><span style="color:#bbb">&#8250;</span></div>
+              <div class="wf-item"><span class="wf-dot new"></span><span class="wf-itxt" style="border:0">Brake &amp; reverse lights</span><span class="wf-badge new">NEW</span><span style="color:#bbb">&#8250;</span></div>
+            </div>
+          </div>
+          <div class="co">Same sections, items, response types, draft bar and Publish. Nothing new to learn &mdash; the hub just gave it a home and a name.</div>
+        </div>
+      </div>
+      <p class="dv-ocap">The card is a thin wrapper: tapping it opens the exact editor from turns <a class="dv-oid" href="#2a">2a</a>&ndash;<a class="dv-oid" href="#3b">3b</a>. One engine, many templates &mdash; no duplicated builder per module.</p>
+    </div>
+
+    <!-- 4c -->
+    <div class="dv-opt" id="4c">
+      <div class="dv-olabel"><a class="dv-oid" href="#4c">4c</a>Version history (gap #5) &mdash; per template</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>&#9727; &#9626; &#9646;</span></div>
+        <div class="wf-top"><span class="wf-back">&lsaquo; Back</span><span class="wf-title">Version history</span></div>
+        <div class="wf-body">
+          <div class="wf-sub"><span>Van walk-around</span><span class="wf-ver">4 versions</span></div>
+          <div class="wf-sec">
+            <div class="wf-hitem" style="border:0;padding:11px 12px"><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font:800 13px Nunito,sans-serif;color:#1a1a1a">v4 &middot; live</span><span style="font:400 10.5px Nunito,sans-serif;color:#999">Published 12 Aug &middot; by Tien</span></span><span style="font:700 9px ui-monospace,Menlo,monospace;color:#3a7d44;border:1px solid #bcd9c2;border-radius:5px;padding:3px 6px">current</span></div>
+          </div>
+          <div class="wf-sec">
+            <div class="wf-hitem" style="border:0;padding:11px 12px"><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font:800 13px Nunito,sans-serif;color:#1a1a1a">v3</span><span style="font:400 10.5px Nunito,sans-serif;color:#999">Published 2 Jun &middot; by Tien</span></span><span class="wf-restore">Restore</span></div>
+          </div>
+          <div class="wf-sec">
+            <div class="wf-hitem" style="border:0;padding:11px 12px"><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span style="font:800 13px Nunito,sans-serif;color:#1a1a1a">v2</span><span style="font:400 10.5px Nunito,sans-serif;color:#999">Published 3 Mar &middot; by Michael</span></span><span class="wf-restore">Restore</span></div>
+          </div>
+          <div class="co" style="background:#f2f6fa;border-color:#a9c4dd;color:#33506b">Every publish is a version. <b>Restore</b> loads an old version back into the draft &mdash; you then review &amp; publish it as the new v5. Nothing is lost.</div>
+        </div>
+      </div>
+      <p class="dv-ocap">Now that each form is a template with its own publish history, rollback has an obvious home &mdash; reachable from the card&rsquo;s overflow (&ldquo;History&rdquo;). This is where gap #5 belongs; no need for it inside the editor.</p>
+    </div>
+
+  </div>
+  <p class="dv-next">Try next: &ldquo;build the Templates hub thin &mdash; one card &rarr; existing builder&rdquo; &middot; &ldquo;name the nav <a href="#4a">4a</a> &lsquo;Forms&rsquo; instead of Templates&rdquo; &middot; &ldquo;wireframe the New template flow&rdquo;</p>
+</section>
+
+<section class="dv-turn" id="t3">
+  <div class="dv-thd"><a class="dv-tid" href="#t3">3</a><span class="dv-tname">Section (group) name — tap header to edit, + Add section</span></div>
+  <p class="dv-tnote">Same idea as the item sheet in <a class="dv-oid" href="#2b">2b</a>, applied to the group. The header is a tap target, not an inline input — tapping it opens <a class="dv-oid" href="#3b">3b</a> to rename / reorder / remove. <a class="dv-oid" href="#3a">3a</a> shows where Add lives; <a class="dv-oid" href="#3c">3c</a> is the guardrail when a section still holds items.</p>
+  <div class="dv-opts">
+
+    <!-- 3a -->
+    <div class="dv-opt" id="3a">
+      <div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a>In the list — header taps to edit, Add at the end</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>▟ ▚ ▮</span></div>
+        <div class="wf-top"><span class="wf-back">‹ Back</span><span class="wf-title">Checklist</span><span style="margin-left:auto;font:700 12px Nunito,sans-serif;color:#1a3f63">Done</span></div>
+        <div class="wf-body">
+          <div class="wf-sub"><span>Editing draft</span><span class="wf-ver">→ v5</span></div>
+          <div class="wf-sec">
+            <div class="wf-shead" style="gap:9px"><span style="color:#bbb;font-size:15px;cursor:grab">⠿</span><span class="wf-chev">⌄</span><span style="flex:1;font:800 14px Nunito,sans-serif;color:#1a1a1a">Lights &amp; signals</span><span class="wf-scount">3</span><span style="color:#1a3f63;font-size:14px">✎</span></div>
+            <div class="wf-items">
+              <div class="wf-item"><span style="color:#ccc;font-size:14px">⠿</span><span class="wf-dot"></span><span class="wf-itxt" style="border:0">Headlights & full beam</span><span style="color:#bbb">›</span></div>
+              <div class="wf-item"><span style="color:#ccc;font-size:14px">⠿</span><span class="wf-dot new"></span><span class="wf-itxt" style="border:0">Brake & reverse lights</span><span style="color:#bbb">›</span></div>
+            </div>
+          </div>
+          <div class="wf-sec" style="opacity:.6">
+            <div class="wf-shead" style="gap:9px"><span style="color:#bbb;font-size:15px">⠿</span><span class="wf-chev">›</span><span style="flex:1;font:800 14px Nunito,sans-serif;color:#1a1a1a">Cab & controls</span><span class="wf-scount">3</span><span style="color:#1a3f63;font-size:14px">✎</span></div>
+          </div>
+          <div class="wf-addsec">＋ Add section</div>
+        </div>
+      </div>
+      <p class="dv-ocap">In edit mode each header gains a drag handle and a ✎ (both open <a class="dv-oid" href="#3b">3b</a>). Add section sits at the very bottom. In the calm read view (<a class="dv-oid" href="#2a">2a</a>) the ✎ and handles are hidden — headers only collapse.</p>
+    </div>
+
+    <!-- 3b -->
+    <div class="dv-opt" id="3b">
+      <div class="dv-olabel"><a class="dv-oid" href="#3b">3b</a>Edit section sheet</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>▟ ▚ ▮</span></div>
+        <div style="height:70px;background:#efece6;border-bottom:1.5px solid #d8d4cc"></div>
+        <div style="padding:14px 15px 16px;display:flex;flex-direction:column;gap:12px;border-top-left-radius:16px;border-top-right-radius:16px;margin-top:-14px;background:#fff">
+          <div style="width:38px;height:4px;border-radius:3px;background:#d8d4cc;align-self:center"></div>
+          <div style="font:800 17px Gaegu,cursive;color:#1a1a1a">Edit section</div>
+          <div style="display:flex;flex-direction:column;gap:5px"><span style="font:700 10px Nunito,sans-serif;color:#8a8a8a;text-transform:uppercase;letter-spacing:.5px">Name</span><div style="border:1.5px solid #1a1a1a;border-radius:9px;padding:10px;font:400 13px Nunito,sans-serif;color:#333">Lights &amp; signals</div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;border:1.5px solid #ccc;border-radius:9px;padding:10px 11px"><span style="font:700 12px Nunito,sans-serif;color:#333">Position</span><span style="font:400 12px Nunito,sans-serif;color:#888">3rd of 7 &nbsp;⌄</span></div>
+          <div style="height:42px;border-radius:10px;background:#1a3f63;color:#fff;display:flex;align-items:center;justify-content:center;font:800 13px Nunito,sans-serif">Save to draft</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:7px;color:#c0392b;font:700 12px Nunito,sans-serif">🗑 Remove section</div>
+        </div>
+      </div>
+      <p class="dv-ocap">Name, position, remove — one place. Save writes to the draft (shows as an EDITED / NEW change in <a class="dv-oid" href="#2c">2c</a>). Add section opens this same sheet with an empty name. Rename is a draft change like any other.</p>
+    </div>
+
+    <!-- 3c -->
+    <div class="dv-opt" id="3c">
+      <div class="dv-olabel"><a class="dv-oid" href="#3c">3c</a>Remove a non-empty section — the guardrail</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>▟ ▚ ▮</span></div>
+        <div style="height:110px;background:#efece6"></div>
+        <div style="padding:16px;display:flex;align-items:center;justify-content:center">
+          <div style="width:100%;border:2px solid #1a1a1a;border-radius:14px;background:#fff;padding:16px;display:flex;flex-direction:column;gap:11px;box-shadow:3px 4px 0 rgba(0,0,0,.12)">
+            <div style="font:800 16px Gaegu,cursive;color:#c0392b">Remove “Load area”?</div>
+            <div style="font:400 12px/1.5 Nunito,sans-serif;color:#555">It still has <b>3 items</b>. What should happen to them?</div>
+            <div style="border:1.5px solid #1a3f63;border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px;font:700 12px Nunito,sans-serif;color:#1a3f63"><span style="width:14px;height:14px;border-radius:50%;border:4px solid #1a3f63"></span>Move them to another section ⌄</div>
+            <div style="border:1.5px solid #ddd;border-radius:9px;padding:10px;display:flex;align-items:center;gap:8px;font:700 12px Nunito,sans-serif;color:#c0392b"><span style="width:14px;height:14px;border-radius:50%;border:1.5px solid #ccc"></span>Remove section &amp; its 3 items</div>
+            <div style="display:flex;gap:8px;margin-top:2px"><div style="flex:1;height:38px;border:1.5px solid #ccc;border-radius:9px;display:flex;align-items:center;justify-content:center;font:700 12px Nunito,sans-serif;color:#777">Cancel</div><div style="flex:1;height:38px;border-radius:9px;background:#c0392b;color:#fff;display:flex;align-items:center;justify-content:center;font:800 12px Nunito,sans-serif">Remove</div></div>
+          </div>
+        </div>
+      </div>
+      <p class="dv-ocap">Never silently drop items. If the section is empty, Remove is immediate; if not, this asks first — move the items or remove them too. Either way it lands as a draft change you can undo before Publish.</p>
+    </div>
+
+  </div>
+  <p class="dv-next">Try next: “build <a href="#2a">2a</a>+<a href="#2b">2b</a>+<a href="#3b">3b</a> together” · “make Add section inline instead of a sheet” · “drop <a href="#3c">3c</a>, always move items to a default section”</p>
+</section>
+
+<section class="dv-turn" id="t2">
+  <div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">The conventional pattern — clean read-list + one Draft changes bucket</span></div>
+  <p class="dv-tnote">How form/checklist builders (SafetyCulture, Process Street, Notion, most CMSs) actually do it: the list is a calm <b>read view</b>, editing is a <b>mode</b> you enter per row, and every pending change — added, edited, removed — collects in ONE <b>draft changes</b> place that <b>Publish</b> promotes to a new version. This folds your Holding bay + “not yet live” banner into a single idea and the restore round-trip bug disappears (removed is just a change you can undo). <a class="dv-oid" href="#2a">2a</a> is the list, <a class="dv-oid" href="#2b">2b</a> the tap-to-edit sheet, <a class="dv-oid" href="#2c">2c</a> the draft review.</p>
+  <div class="dv-opts">
+
+    <!-- 2a -->
+    <div class="dv-opt" id="2a">
+      <div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Read-list — calm by default, one “Review changes” bar</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>▟ ▚ ▮</span></div>
+        <div class="wf-top"><span class="wf-back">‹ Back</span><span class="wf-title">Checklist</span><span style="margin-left:auto;font:700 12px Nunito,sans-serif;color:#1a3f63">Edit</span></div>
+        <div class="wf-body">
+          <div class="wf-sub"><span>19 items · 7 sections</span><span class="wf-ver">v4 · live</span></div>
+          <div style="border:1.5px solid #1a3f63;border-radius:11px;padding:10px 11px;display:flex;align-items:center;gap:9px;background:#f2f6fa">
+            <span style="width:26px;height:26px;border-radius:50%;background:#1a3f63;color:#fff;display:flex;align-items:center;justify-content:center;font:800 11px Nunito,sans-serif;flex:none">3</span>
+            <span style="flex:1;font:700 12.5px/1.2 Nunito,sans-serif;color:#1a3f63">Draft changes to review</span>
+            <span style="font:700 11px Nunito,sans-serif;color:#1a3f63">Review ›</span>
+          </div>
+          <div class="wf-sec">
+            <div class="wf-shead"><span class="wf-chev">⌄</span><span class="wf-sname" style="border:0;font-family:Nunito;font-weight:800;font-size:14px">Lights & signals</span><span class="wf-scount">3 items</span></div>
+            <div class="wf-items">
+              <div class="wf-item"><span class="wf-dot"></span><span class="wf-itxt" style="border:0">Headlights & full beam work</span><span style="color:#bbb;font-size:13px">›</span></div>
+              <div class="wf-item"><span class="wf-dot new"></span><span class="wf-itxt" style="border:0">Brake & reverse lights</span><span class="wf-badge new">NEW</span><span style="color:#bbb;font-size:13px">›</span></div>
+              <div class="wf-item"><span class="wf-dot" style="border-color:#c0392b"></span><span class="wf-itxt" style="border:0;text-decoration:line-through;color:#a99">Old fog-lamp check</span><span class="wf-badge ret">REMOVED</span><span style="color:#bbb;font-size:13px">›</span></div>
+            </div>
+          </div>
+          <div class="co"><b>Read, not forms.</b> No inline inputs. Rows show state (NEW / EDITED / REMOVED) as a quiet badge. Tap any row → <a class="dv-oid" href="#2b">2b</a>. “Edit” top-right just reveals reorder handles + Add.</div>
+        </div>
+      </div>
+      <p class="dv-ocap">The everyday view stays walkable. Nothing destructive is one tap away; a removed item is only struck through until Publish, and its row still opens so you can bring it back.</p>
+    </div>
+
+    <!-- 2b -->
+    <div class="dv-opt" id="2b">
+      <div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Tap-to-edit sheet — the editing mode</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>▟ ▚ ▮</span></div>
+        <div style="height:70px;background:#efece6;border-bottom:1.5px solid #d8d4cc"></div>
+        <div style="padding:14px 15px 16px;display:flex;flex-direction:column;gap:12px;border-top-left-radius:16px;border-top-right-radius:16px;margin-top:-14px;background:#fff;position:relative">
+          <div style="width:38px;height:4px;border-radius:3px;background:#d8d4cc;align-self:center"></div>
+          <div style="font:800 17px Gaegu,cursive;color:#1a1a1a">Edit item</div>
+          <div style="display:flex;flex-direction:column;gap:5px"><span style="font:700 10px Nunito,sans-serif;color:#8a8a8a;text-transform:uppercase;letter-spacing:.5px">Wording</span><div style="border:1.5px solid #1a1a1a;border-radius:9px;padding:10px;font:400 13px Nunito,sans-serif;color:#333">Brake & reverse lights work</div></div>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:5px"><span style="font:700 10px Nunito,sans-serif;color:#8a8a8a;text-transform:uppercase;letter-spacing:.5px">Section</span><div style="border:1.5px solid #ccc;border-radius:9px;padding:10px;font:400 12px Nunito,sans-serif;color:#333;display:flex;justify-content:space-between">Lights & signals <span style="color:#aaa">⌄</span></div></div>
+            <div style="width:96px;display:flex;flex-direction:column;gap:5px"><span style="font:700 10px Nunito,sans-serif;color:#8a8a8a;text-transform:uppercase;letter-spacing:.5px">Required</span><div style="border:1.5px solid #ccc;border-radius:9px;padding:9px;display:flex;align-items:center;justify-content:flex-end"><span style="width:34px;height:20px;border-radius:12px;background:#1a3f63;position:relative"><span style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#fff"></span></span></div></div>
+          </div>
+          <div style="height:42px;border-radius:10px;background:#1a3f63;color:#fff;display:flex;align-items:center;justify-content:center;font:800 13px Nunito,sans-serif">Save to draft</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:7px;color:#c0392b;font:700 12px Nunito,sans-serif">🗑 Remove item</div>
+        </div>
+      </div>
+      <p class="dv-ocap">One place to change wording, section, required flag — and to remove. “Remove” here just flags the item removed-in-draft; the sheet closes and its row goes struck-through in <a class="dv-oid" href="#2a">2a</a>. Re-open the row → <b>Restore</b> replaces Remove. That single toggle is what kills the round-trip bug.</p>
+    </div>
+
+    <!-- 2c -->
+    <div class="dv-opt" id="2c">
+      <div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Draft review — the diff, then Publish</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>▟ ▚ ▮</span></div>
+        <div class="wf-top"><span class="wf-back">‹ Back</span><span class="wf-title">Review changes</span></div>
+        <div class="wf-body">
+          <div class="wf-sub"><span>Draft → v5</span><span class="wf-ver">3 changes</span></div>
+          <div style="border:1.5px solid #1a3f63;border-radius:10px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;border-bottom:1px solid #eee"><span class="wf-badge new" style="flex:none">NEW</span><span style="flex:1;font:400 12px Nunito,sans-serif;color:#333">Brake & reverse lights work</span><span style="font:700 10px Nunito,sans-serif;color:#999">Undo</span></div>
+            <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;border-bottom:1px solid #eee"><span class="wf-badge new" style="flex:none">NEW</span><span style="flex:1;font:400 12px Nunito,sans-serif;color:#333">Tail-lift raises & holds</span><span style="font:700 10px Nunito,sans-serif;color:#999">Undo</span></div>
+            <div style="display:flex;align-items:center;gap:9px;padding:9px 10px"><span class="wf-badge ret" style="flex:none">REMOVED</span><span style="flex:1;font:400 12px Nunito,sans-serif;color:#8a6b66;text-decoration:line-through">Fire extinguisher charged</span><span style="font:700 10px Nunito,sans-serif;color:#1a3f63">Restore</span></div>
+          </div>
+          <div class="co" style="background:#f2f6fa;border-color:#a9c4dd;color:#33506b">Every pending change in one list — added, edited, removed — each with a single <b>Undo/Restore</b>. This is your “Holding bay” generalised to all change types.</div>
+          <div class="wf-pub" style="height:44px">Publish v5 · crew walk the new list</div>
+        </div>
+      </div>
+      <p class="dv-ocap">Publish is a deliberate, reviewable step: see exactly what changes, undo any one, then promote draft→v5 in a single action. After publishing, the diff is empty and editing simply starts building v6.</p>
+    </div>
+
+  </div>
+  <p class="dv-next">Try next: “build the real screen as <a href="#2a">2a</a> + <a href="#2b">2b</a> + <a href="#2c">2c</a>” · “keep <a href="#1a">1a</a>’s single-screen holding card but adopt <a href="#2b">2b</a>’s tap-to-edit” · “add drag-to-reorder to <a href="#2a">2a</a>”</p>
+</section>
+
+<section class="dv-turn" id="t1">
+  <div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Checklist — retire → holding → restore → remove</span></div>
+  <p class="dv-tnote">The bug in the built screen: retire an item → it lands in Holding; Restore it → it goes back; retire it again → it does <b>not</b> return to Holding. Cause: “retire”, “restore” and “delete for good” share one status field, so restore leaves the item in a state the retire button no longer recognises. Below are three ways to model the flow so it round-trips cleanly. Each phone shows one state; the strip under it is the state machine it implies.</p>
+  <div class="dv-opts">
+
+    <!-- 1a -->
+    <div class="dv-opt" id="1a">
+      <div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Holding bay — one status, three transitions</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>▟ ▚ ▮</span></div>
+        <div class="wf-top"><span class="wf-back">‹ Back</span><span class="wf-title">Checklist</span></div>
+        <div class="wf-body">
+          <div class="wf-sub"><span>19 items · 7 sections</span><span class="wf-ver">v4 · live</span></div>
+          <div class="wf-banner"><div class="wf-brow"><span class="wf-bt">Changes not yet live</span><span class="wf-bc">3 changes</span></div><div class="wf-bnote">2 added · 1 retiring since v4</div><div class="wf-pub">Publish v5</div></div>
+          <div class="wf-sec">
+            <div class="wf-shead"><span class="wf-chev">⌄</span><span class="wf-sname">Lights & signals</span><span class="wf-scount">3 items</span><span class="wf-bin">🗑</span></div>
+            <div class="wf-items">
+              <div class="wf-item"><span class="wf-dot"></span><span class="wf-itxt">Headlights & full beam work</span><span class="wf-bin">🗑</span></div>
+              <div class="wf-item"><span class="wf-dot new"></span><span class="wf-itxt">Brake & reverse lights</span><span class="wf-badge new">NEW</span><span class="wf-bin">🗑</span></div>
+            </div>
+          </div>
+          <div class="wf-hold">
+            <div class="wf-hhead"><span class="wf-chev" style="color:#c88">⌄</span><span class="wf-hname">Holding — retiring in v5</span><span class="wf-scount" style="color:#c07a6e">1 item</span></div>
+            <div class="wf-hitem"><span style="flex:1;display:flex;flex-direction:column;gap:1px"><span class="wf-htxt">Fire extinguisher charged</span><span class="wf-hsec">Safety equipment</span></span><span class="wf-restore">Restore</span><span class="wf-x">✕</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="flow">
+        <span class="node">On list</span><span class="arr">→</span><span class="node hold">Holding</span><span class="arr">→</span><span class="node gone">Gone</span>
+      </div>
+      <div class="flow" style="margin-top:0"><span class="lbl">🗑 retire &nbsp;·&nbsp; Restore ⟲ back to list &nbsp;·&nbsp; ✕ delete for good &nbsp;·&nbsp; Publish drops all Holding</span></div>
+      <p class="dv-ocap"><b>Fix for the bug:</b> Restore must return the item all the way to <b>On list</b> (a normal active item), so the same 🗑 can retire it again. Publish is the only thing that turns Holding → Gone in bulk. Closest to what’s built.</p>
+    </div>
+
+    <!-- 1b -->
+    <div class="dv-opt" id="1b">
+      <div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Stay in place — strike-through + Undo</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>▟ ▚ ▮</span></div>
+        <div class="wf-top"><span class="wf-back">‹ Back</span><span class="wf-title">Checklist</span></div>
+        <div class="wf-body">
+          <div class="wf-sub"><span>19 items · 7 sections</span><span class="wf-ver">v4 · live</span></div>
+          <div class="wf-banner"><div class="wf-brow"><span class="wf-bt">Changes not yet live</span><span class="wf-bc">3 changes</span></div><div class="wf-bnote">Retiring items stay in place, struck out</div><div class="wf-pub">Publish v5</div></div>
+          <div class="wf-sec">
+            <div class="wf-shead"><span class="wf-chev">⌄</span><span class="wf-sname">Safety equipment</span><span class="wf-scount">3 items</span><span class="wf-bin">🗑</span></div>
+            <div class="wf-items">
+              <div class="wf-item"><span class="wf-dot"></span><span class="wf-itxt">First-aid kit in date</span><span class="wf-bin">🗑</span></div>
+              <div class="wf-item" style="background:#fbf3f2"><span class="wf-dot" style="border-color:#c0392b"></span><span class="wf-itxt" style="text-decoration:line-through;color:#a99">Fire extinguisher charged</span><span class="wf-badge ret">RETIRING</span><span class="wf-restore" style="padding:3px 9px">Undo</span></div>
+            </div>
+          </div>
+          <div class="co"><b>No separate group.</b> A retiring item greys out where it sits, with Undo right there. “Delete for good” lives behind a small <b>Trash</b> tab (top-right), reviewed separately.</div>
+        </div>
+      </div>
+      <div class="flow">
+        <span class="node">On list</span><span class="arr">⇄</span><span class="node hold">Retiring (in place)</span><span class="arr">→</span><span class="node gone">Trash tab</span>
+      </div>
+      <p class="dv-ocap">Round-trips by construction — retire and Undo just flip one flag on an item that never leaves its row, so the bug can’t happen. Cost: a long list with several retiring items gets noisy, and “gone for good” needs its own screen.</p>
+    </div>
+
+    <!-- 1c -->
+    <div class="dv-opt" id="1c">
+      <div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Two explicit lists — Active vs Retiring tabs</div>
+      <div class="wf">
+        <div class="wf-bar"><span>9:41</span><span>▟ ▚ ▮</span></div>
+        <div class="wf-top"><span class="wf-back">‹ Back</span><span class="wf-title">Checklist</span></div>
+        <div class="wf-body">
+          <div class="wf-sub"><span>v4 · live</span><span class="wf-ver">edit → v5</span></div>
+          <div style="display:flex;gap:6px">
+            <div style="flex:1;height:32px;border:1.5px solid #1a1a1a;border-radius:8px;background:#1a1a1a;color:#fff;display:flex;align-items:center;justify-content:center;font:800 12px Nunito,sans-serif">Active · 18</div>
+            <div style="flex:1;height:32px;border:1.5px solid #1a1a1a;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 12px Nunito,sans-serif;color:#c0392b">Retiring · 1</div>
+          </div>
+          <div class="wf-sec">
+            <div class="wf-shead"><span class="wf-chev">⌄</span><span class="wf-sname">Load area</span><span class="wf-scount">3 items</span><span class="wf-bin">🗑</span></div>
+            <div class="wf-items">
+              <div class="wf-item"><span class="wf-dot"></span><span class="wf-itxt">Floor & shelving secure</span><span class="wf-bin">🗑</span></div>
+              <div class="wf-item"><span class="wf-dot new"></span><span class="wf-itxt">Tail-lift raises & holds</span><span class="wf-badge new">NEW</span><span class="wf-bin">🗑</span></div>
+            </div>
+          </div>
+          <div class="co"><b>Bin</b> moves an item to the <b>Retiring</b> tab. That tab is the only place with <b>Restore</b> (→ back to Active) and <b>Delete for good</b>. Two clean lists, one item is only ever in one of them.</div>
+        </div>
+      </div>
+      <div class="flow">
+        <span class="node">Active tab</span><span class="arr">→</span><span class="node hold">Retiring tab</span><span class="arr">⟲/→</span><span class="node gone">Gone</span>
+      </div>
+      <p class="dv-ocap">Strongest separation: Active stays short and walkable, all the retire/restore/delete lives on its own tab. Restore always targets Active, so the round-trip is unambiguous. Cost: two places to look, and moving between tabs to manage retirements.</p>
+    </div>
+
+  </div>
+  <p class="dv-next">Try next: <a href="#1a">1a</a> is closest to what’s built — “rebuild the screen as 1a and fix Restore to send items fully back to the list” · “combine 1c tabs with 1a holding card” · “show 1b’s Trash tab”</p>
+</section>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet"><style>
+body{margin:0;background:#f0eee9;font-family:'Kalam',system-ui,sans-serif}
+a{color:#2a78d6}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:700 14px/1.2 'Kalam',system-ui,sans-serif;color:#1a1a1a}
+.dv-tnote{margin:0 0 20px;max-width:820px;font:400 13.5px/1.55 'Kalam',sans-serif;color:rgba(0,0,0,.6);text-wrap:pretty}
+.dv-opts{display:flex;flex-wrap:wrap;gap:30px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 12px/1.3 'Kalam',sans-serif;color:rgba(0,0,0,.55);max-width:300px}
+.dv-ocap{margin:1px 0 0;font:400 12px/1.5 'Kalam',sans-serif;color:rgba(0,0,0,.5);max-width:300px;text-wrap:pretty}
+.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}
+.dv-next{margin:24px 0 0;font:400 13px/1.6 'Kalam',sans-serif;color:rgba(0,0,0,.55)}
+
+/* phone frame */
+.ph{width:300px;height:600px;background:#fff;border:2.5px solid #1a1a1a;border-radius:26px;overflow:hidden;display:flex;flex-direction:column;box-shadow:3px 4px 0 rgba(0,0,0,.12)}
+.ph-stat{height:26px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:700 10px 'Gaegu',sans-serif;color:#555}
+.ph-body{flex:1 1 auto;overflow:hidden;padding:12px;display:flex;flex-direction:column;gap:10px;background:#fbfbf9}
+.ph-tab{height:52px;flex:none;border-top:2px solid #1a1a1a;display:flex;background:#fff}
+.ph-tab div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:400 8px 'Gaegu',sans-serif;color:#888}
+.ph-tab .on{color:#1a1a1a;font-weight:700}
+.dot{width:16px;height:16px;border:1.5px solid currentColor;border-radius:5px}
+.dot.c{border-radius:50%}
+
+.hd{font:700 17px 'Kalam',sans-serif;color:#1a1a1a}
+.sub{font:400 11px 'Gaegu',sans-serif;color:#999}
+.lbl{font:700 9px 'Gaegu',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#aaa}
+.card{border:1.5px solid #1a1a1a;border-radius:12px;padding:11px;background:#fff;display:flex;flex-direction:column;gap:6px}
+.line{height:7px;background:#e4e2dc;border-radius:4px}
+.chip{border:1.4px solid #1a1a1a;border-radius:20px;padding:4px 10px;font:400 10px 'Gaegu',sans-serif;display:inline-flex;align-items:center;gap:5px;background:#fff}
+.btn{border:2px solid #1a1a1a;border-radius:11px;padding:11px;text-align:center;font:700 13px 'Kalam',sans-serif;background:#ffd54a}
+.btnq{border:1.6px solid #1a1a1a;border-radius:10px;padding:9px;text-align:center;font:400 11px 'Gaegu',sans-serif;background:#fff}
+.red{color:#c0392b}.amb{color:#b8860b}.grn{color:#2e7d32}.blu{color:#2a78d6}
+.pill{font:700 8px 'Gaegu',sans-serif;padding:3px 6px;border-radius:5px;border:1.3px solid currentColor}
+.row{display:flex;align-items:center;gap:8px}
+.sq{width:34px;height:34px;border:1.5px solid #1a1a1a;border-radius:8px;flex:none;display:grid;place-items:center;font:700 11px 'Gaegu';background:#f2f0ea}
+.big{font:700 30px 'Kalam';line-height:1;color:#1a1a1a}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ring{width:56px;height:56px;border-radius:50%;border:6px solid #e4e2dc;border-top-color:#2e7d32;border-right-color:#2e7d32;flex:none}
+</style></helmet>
+
+<section class="dv-turn" id="t2">
+  <div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Inspector home — new directions</span></div>
+  <p class="dv-tnote">Three fresh angles on the same job, further from the card-list pattern of turn <a class="dv-oid" href="#t1">1</a>. One frames the yard spatially, one turns the draw into a single swipeable vehicle, one treats the shift as a clock. Naming follows the convention: Vehicle, Spot-check, Draw, Approvals.</p>
+  <div class="dv-opts">
+
+    <!-- 2a : YARD MAP -->
+    <div class="dv-opt" id="2a">
+      <div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Yard map — vehicles by bay</div>
+      <div class="ph">
+        <div class="ph-stat"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="ph-body">
+          <div class="row" style="justify-content:space-between">
+            <div><div class="hd">The yard</div><div class="sub">tap a bay to walk it</div></div>
+            <div class="sq c" style="border-radius:50%">PL</div>
+          </div>
+          <div class="card" style="padding:9px;gap:6px">
+            <div class="grid2" style="grid-template-columns:1fr 1fr 1fr;gap:6px">
+              <div class="sq" style="width:100%;height:44px;background:#eaf3ec;border-color:#2e7d32">B1</div>
+              <div class="sq" style="width:100%;height:44px;background:#eaf3ec;border-color:#2e7d32">B2</div>
+              <div class="sq" style="width:100%;height:44px;background:#fff7e0;border-color:#b8860b">B3</div>
+              <div class="sq" style="width:100%;height:44px;background:#fdecea;border-color:#c0392b">B4</div>
+              <div class="sq" style="width:100%;height:44px;background:#f2f0ea;color:#bbb">B5</div>
+              <div class="sq" style="width:100%;height:44px;background:#eaf3ec;border-color:#2e7d32">B6</div>
+            </div>
+            <div class="row" style="gap:10px;flex-wrap:wrap;margin-top:2px">
+              <span class="sub grn">■ done</span><span class="sub amb">■ due</span><span class="sub red">■ overdue</span><span class="sub" style="color:#bbb">■ empty</span>
+            </div>
+          </div>
+          <div class="card" style="border-color:#c0392b">
+            <div class="row" style="justify-content:space-between"><b style="font:700 12px Kalam">Bay 4 · GK19 TRZ</b><span class="pill red">61d</span></div>
+            <div class="sub">overdue · Ford Transit</div>
+            <div class="btnq" style="background:#ffd54a;border-width:2px">Walk this vehicle →</div>
+          </div>
+          <div class="btn">🔀 Draw one for me</div>
+        </div>
+        <div class="ph-tab"><div class="on"><div class="dot"></div>Check</div><div><div class="dot"></div>Defects</div><div><div class="dot"></div>Fleet</div><div><div class="dot"></div>Approve</div><div><div class="dot c"></div>More</div></div>
+      </div>
+      <p class="dv-ocap">Maps onto how inspectors actually move through the yard. Colour = check status per bay; tap a bay to open that vehicle. Needs bay data to be reliable.</p>
+    </div>
+
+    <!-- 2b : SWIPE CARD -->
+    <div class="dv-opt" id="2b">
+      <div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Next vehicle — one big swipeable card</div>
+      <div class="ph">
+        <div class="ph-stat"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="ph-body" style="justify-content:center;gap:14px">
+          <div class="lbl" style="text-align:center">Your next spot-check</div>
+          <div class="card" style="border-width:2.5px;padding:16px;gap:10px;box-shadow:3px 4px 0 rgba(0,0,0,.1)">
+            <div class="row" style="justify-content:space-between"><b style="font:700 20px Kalam">LX21 KDV</b><span class="pill blu">DUE</span></div>
+            <div style="height:70px;background:#f2f0ea;border:1.4px dashed #bbb;border-radius:8px;display:grid;place-items:center" class="sub">vehicle photo</div>
+            <div class="sub">Mercedes Sprinter · Bay 2</div>
+            <div class="sub">last walked 34d ago · keyholder S. Okafor</div>
+            <div class="btn" style="margin-top:2px">▶  Start this spot-check</div>
+          </div>
+          <div class="row" style="justify-content:center;gap:14px">
+            <div class="btnq" style="width:120px">↩ Skip</div>
+            <div class="btnq" style="width:120px">🔀 Redraw</div>
+          </div>
+        </div>
+        <div class="ph-tab"><div class="on"><div class="dot"></div>Check</div><div><div class="dot"></div>Defects</div><div><div class="dot"></div>Fleet</div><div><div class="dot"></div>Approve</div><div><div class="dot c"></div>More</div></div>
+      </div>
+      <p class="dv-ocap">Zero decisions — the app proposes one vehicle, you start, skip, or redraw. Fastest for high-volume shifts; hides the bigger picture (use Fleet for that).</p>
+    </div>
+
+    <!-- 2c : SHIFT CLOCK -->
+    <div class="dv-opt" id="2c">
+      <div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Shift clock — checks against the night</div>
+      <div class="ph">
+        <div class="ph-stat"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="ph-body">
+          <div class="row" style="justify-content:space-between">
+            <div><div class="hd">Tonight</div><div class="sub">22:00 – 06:00 · 3 of 5 done</div></div>
+            <div class="sq c" style="border-radius:50%">PL</div>
+          </div>
+          <div class="card" style="gap:9px">
+            <div class="row"><span class="sq" style="width:26px;height:26px;background:#eaf3ec;border-color:#2e7d32">✓</span><div style="flex:1"><b style="font:700 11px Kalam">22:40 · YT19 ODP</b><div class="sub grn">passed</div></div></div>
+            <div class="row"><span class="sq" style="width:26px;height:26px;background:#fdecea;border-color:#c0392b">!</span><div style="flex:1"><b style="font:700 11px Kalam">23:55 · BV70 XPO</b><div class="sub red">1 defect</div></div></div>
+            <div class="row"><span class="sq" style="width:26px;height:26px;background:#eaf3ec;border-color:#2e7d32">✓</span><div style="flex:1"><b style="font:700 11px Kalam">01:20 · GK19 TRZ</b><div class="sub grn">passed</div></div></div>
+            <div class="row"><span class="sq" style="width:26px;height:26px;border-style:dashed;color:#bbb">•</span><div style="flex:1"><b style="font:700 11px Kalam;color:#999">next slot</b><div class="sub">~03:00</div></div></div>
+          </div>
+          <div class="btn">▶  Start next spot-check</div>
+        </div>
+        <div class="ph-tab"><div class="on"><div class="dot"></div>Check</div><div><div class="dot"></div>Defects</div><div><div class="dot"></div>Fleet</div><div><div class="dot"></div>Approve</div><div><div class="dot c"></div>More</div></div>
+      </div>
+      <p class="dv-ocap">Reads as a running log of the shift — good for accountability and pacing. Doubles as “what have I done tonight” without leaving home.</p>
+    </div>
+
+  </div>
+  <p class="dv-next">Try next: “build <a class="dv-oid" href="#2b">2b</a>” · “<a class="dv-oid" href="#2a">2a</a> yard map but list view” · “merge <a class="dv-oid" href="#2c">2c</a> log into <a class="dv-oid" href="#1b">1b</a>” · “wireframe the check-flow steps”</p>
+</section>
+
+<section class="dv-turn" id="t1">
+  <div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Inspector module — home screen directions</span></div>
+  <p class="dv-tnote">Three takes on what an inspector sees when they open the app. The job is narrow — walk a van, log faults — so every direction leads with the one action (start a check) and differs in what surrounds it: a calm action-first card, a progress/streak dashboard, or a prioritised worklist. Same nav on all three (Check · Defects · Fleet · Approvals · More). Pick a direction and I'll build it into the real app.</p>
+  <div class="dv-opts">
+
+    <!-- 1a : ACTION FIRST -->
+    <div class="dv-opt" id="1a">
+      <div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Action-first — one big “Start” and nothing in the way</div>
+      <div class="ph">
+        <div class="ph-stat"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="ph-body">
+          <div class="row" style="justify-content:space-between">
+            <div><div class="hd">Evening, Phuog</div><div class="sub">Chullora CPDC · night shift</div></div>
+            <div class="sq c" style="border-radius:50%">PL</div>
+          </div>
+          <div class="card" style="background:#fff7e0;align-items:center;gap:10px;padding:18px 12px">
+            <div class="lbl">Ready to walk</div>
+            <div class="btn" style="width:100%;padding:15px">▶  Start a spot-check</div>
+            <div class="sub">Picks a van for you by the draw rules</div>
+          </div>
+          <div class="row" style="gap:8px">
+            <div class="chip">🔀 Random pick</div>
+            <div class="chip">🔎 Choose a van</div>
+          </div>
+          <div class="lbl" style="margin-top:2px">Carrying over</div>
+          <div class="card" style="border-color:#c0392b;border-style:dashed">
+            <div class="row" style="justify-content:space-between"><b style="font:700 12px Kalam">BV70 XPO</b><span class="pill red">REDO</span></div>
+            <div class="sub">Sent back — “retake rear photo”</div>
+          </div>
+          <div class="card">
+            <div class="row" style="justify-content:space-between"><span class="sub">Your walks tonight</span><b style="font:700 13px Kalam">3</b></div>
+          </div>
+        </div>
+        <div class="ph-tab"><div class="on"><div class="dot"></div>Check</div><div><div class="dot"></div>Defects</div><div><div class="dot"></div>Fleet</div><div><div class="dot"></div>Approve</div><div><div class="dot c"></div>More</div></div>
+      </div>
+      <p class="dv-ocap">Least to read. The whole screen is “press start.” Redo items and a tiny tally sit below the fold. Best if inspectors mostly just churn through checks.</p>
+    </div>
+
+    <!-- 1b : DASHBOARD -->
+    <div class="dv-opt" id="1b">
+      <div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Dashboard — shift stats + progress</div>
+      <div class="ph">
+        <div class="ph-stat"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="ph-body">
+          <div class="row" style="justify-content:space-between">
+            <div><div class="hd">Evening, Phuog</div><div class="sub">Wed 23 Aug · night shift</div></div>
+            <div class="sq c" style="border-radius:50%">PL</div>
+          </div>
+          <div class="card">
+            <div class="row" style="gap:12px">
+              <div class="ring"></div>
+              <div style="flex:1">
+                <div class="lbl">Shift target</div>
+                <div class="big">3<span style="font:400 15px Gaegu;color:#999"> / 5</span></div>
+                <div class="line" style="margin-top:5px"></div>
+              </div>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="card" style="gap:2px"><div class="big grn">2</div><div class="sub">Passed</div></div>
+            <div class="card" style="gap:2px"><div class="big red">1</div><div class="sub">Fault found</div></div>
+          </div>
+          <div class="btn">▶  Start a spot-check</div>
+          <div class="lbl" style="margin-top:2px">Reminders</div>
+          <div class="card" style="border-style:dashed"><div class="row"><span class="amb">⏰</span><span class="sub">2 vans overdue in your zone</span></div></div>
+        </div>
+        <div class="ph-tab"><div class="on"><div class="dot"></div>Check</div><div><div class="dot"></div>Defects</div><div><div class="dot"></div>Fleet</div><div><div class="dot"></div>Approve</div><div><div class="dot c"></div>More</div></div>
+      </div>
+      <p class="dv-ocap">Motivating — progress ring, pass/fault split, overdue nudges. More to parse before acting. Closest to what’s in the app now.</p>
+    </div>
+
+    <!-- 1c : WORKLIST -->
+    <div class="dv-opt" id="1c">
+      <div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Worklist — a prioritised queue of vans</div>
+      <div class="ph">
+        <div class="ph-stat"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="ph-body">
+          <div class="row" style="justify-content:space-between">
+            <div><div class="hd">Vans to walk</div><div class="sub">sorted by priority</div></div>
+            <div class="sq c" style="border-radius:50%">PL</div>
+          </div>
+          <div class="card" style="border-color:#c0392b;border-style:dashed">
+            <div class="row" style="justify-content:space-between"><b style="font:700 13px Kalam">BV70 XPO</b><span class="pill red">REDO</span></div>
+            <div class="sub">sent back · retake rear photo</div>
+            <div class="btnq" style="background:#ffd54a;border-width:2px">Walk now →</div>
+          </div>
+          <div class="card">
+            <div class="row" style="justify-content:space-between"><b style="font:700 13px Kalam">GK19 TRZ</b><span class="pill amb">61d</span></div>
+            <div class="sub">overdue · never walked</div>
+          </div>
+          <div class="card">
+            <div class="row" style="justify-content:space-between"><b style="font:700 13px Kalam">LX21 KDV</b><span class="pill blu">DUE</span></div>
+            <div class="sub">last walked 34d ago</div>
+          </div>
+          <div class="row" style="gap:8px;margin-top:2px">
+            <div class="btn" style="flex:1">🔀 Draw</div>
+            <div class="btnq" style="flex:1;padding:11px">Choose</div>
+          </div>
+        </div>
+        <div class="ph-tab"><div class="on"><div class="dot"></div>Check</div><div><div class="dot"></div>Defects</div><div><div class="dot"></div>Fleet</div><div><div class="dot"></div>Approve</div><div><div class="dot c"></div>More</div></div>
+      </div>
+      <p class="dv-ocap">Most transparent about what needs attention — redo first, then overdue, then due. Risks feeling like a to-do pile; draw button still there for “just give me one.”</p>
+    </div>
+
+  </div>
+  <p class="dv-next">Try next: “build <a class="dv-oid" href="#1a">1a</a> into the app” · “<a class="dv-oid" href="#1b">1b</a> but with <a class="dv-oid" href="#1c">1c</a>’s redo card on top” · “show the check-flow steps as wireframes” · “new directions”</p>
+</section>
+</x-dc>
+</body>
+</html>
