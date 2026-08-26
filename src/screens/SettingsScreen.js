@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, TextInput, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useStore } from '../store';
 import { APP_BUILD } from '../data/model';
 import Icon from '../components/Icon';
@@ -12,17 +12,12 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
+      {/* Read-only here: the depot's name and address are edited together in Depot configuration's
+          "Depot & access" card, so there is one place to change them rather than two. */}
       <Text style={styles.label}>Depot</Text>
       <View style={styles.field}>
         <Text style={styles.fieldCap}>Depot name</Text>
-        <TextInput
-          value={st.depotName}
-          onChangeText={(v) => s.setDepot(v)}
-          onBlur={() => s.commitDepot()}
-          maxLength={40}
-          accessibilityLabel="Depot name"
-          style={styles.fieldInput}
-        />
+        <Text style={styles.fieldVal}>{st.depotName}</Text>
       </View>
 
       <Text style={[styles.label, { paddingTop: 8 }]}>App</Text>
@@ -115,7 +110,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 6, minHeight: 52, justifyContent: 'center', gap: 2,
   },
   fieldCap: { fontFamily: F.sansMed, fontSize: 12, color: C.muted },
-  fieldInput: { fontFamily: F.sansMed, fontSize: 16, color: C.primary, padding: 0, minHeight: 24 },
+  fieldVal: { fontFamily: F.sansMed, fontSize: 16, color: C.primary },
 
   navRow: {
     backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: 16,

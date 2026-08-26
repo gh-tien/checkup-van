@@ -720,24 +720,24 @@
 
         <!-- PEOPLE -->
         <sc-if value="{{ isPeople }}" hint-placeholder-val="{{ false }}">
-          <div style="padding:16px;padding-bottom:28px;display:flex;flex-direction:column;gap:14px">
-            <div style="font-family:'Fustat';font-size:13.5px;line-height:19px;color:#616B73">{{ people.sub }}</div>
-            <div style="display:flex;gap:8px">
-              <div onClick="{{ people.onAll }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid {{ people.allBorder }};background:{{ people.allBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ people.allColor }}">All</span></div>
-              <div onClick="{{ people.onMgr }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid {{ people.mgrBorder }};background:{{ people.mgrBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ people.mgrColor }}">Managers</span></div>
-              <div onClick="{{ people.onInsp }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid {{ people.inspBorder }};background:{{ people.inspBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ people.inspColor }}">Inspectors</span></div>
+          <div style="padding:16px;padding-bottom:28px;display:flex;flex-direction:column;gap:16px">
+            <div style="font-family:'Fustat';font-weight:500;font-size:12.5px;letter-spacing:.2px;color:#68727A">{{ people.sub }}</div>
+            <div style="display:flex;gap:3px;background:#EEF1F3;border-radius:12px;padding:3px">
+              <div onClick="{{ people.onAll }}" style="cursor:pointer;flex:1;min-height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;{{ people.allSeg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ people.allSegC }}">All</span></div>
+              <div onClick="{{ people.onMgr }}" style="cursor:pointer;flex:1;min-height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;{{ people.mgrSeg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ people.mgrSegC }}">Managers</span></div>
+              <div onClick="{{ people.onInsp }}" style="cursor:pointer;flex:1;min-height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;{{ people.inspSeg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ people.inspSegC }}">Inspectors</span></div>
             </div>
             <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
               <sc-for list="{{ people.rows }}" as="p" hint-placeholder-count="5">
                 <div style="display:flex;align-items:center;{{ p.rowBorder }}">
-                  <div onClick="{{ p.onPress }}" style="cursor:pointer;flex:1;min-width:0;min-height:66px;padding:0 4px 0 14px;display:flex;align-items:center;gap:12px">
-                    <div style="width:40px;height:40px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:14px;{{ p.avStyle }};color:{{ p.avColor }}">{{ p.ini }}</div>
+                  <div onClick="{{ p.onPress }}" style="cursor:pointer;flex:1;min-width:0;min-height:68px;padding:0 6px 0 14px;display:flex;align-items:center;gap:13px">
+                    <div style="width:42px;height:42px;border-radius:999px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:14.5px;{{ p.avStyle }};color:{{ p.avColor }}">{{ p.ini }}</div>
                     <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
-                      <div style="display:flex;align-items:center;gap:7px"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">{{ p.name }}</span><sc-if value="{{ p.you }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:9.5px;color:#1B4D7A;background:#E9F0F6;padding:3px 5px;border-radius:5px">YOU</span></sc-if></div>
-                      <div style="display:flex;align-items:center;gap:7px"><div style="width:7px;height:7px;border-radius:999px;background:{{ p.dotColor }}"></div><span style="font-family:'Fustat';font-weight:500;font-size:12.5px;color:#616B73">{{ p.status }}</span><span style="font-family:'Fustat';font-size:12.5px;color:#C6D2DC">/</span><span style="font-family:'Fustat';font-weight:700;font-size:12.5px;color:{{ p.chipColor }}">{{ p.chipTxt }}</span></div>
+                      <div style="display:flex;align-items:center;gap:7px"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</span><sc-if value="{{ p.you }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:9.5px;color:#1B4D7A;background:#E9F0F6;padding:3px 5px;border-radius:5px">YOU</span></sc-if></div>
+                      <div style="display:flex;align-items:center;gap:7px"><div style="width:7px;height:7px;border-radius:999px;flex-shrink:0;background:{{ p.dotColor }}"></div><span style="font-family:'Fustat';font-weight:500;font-size:12.5px;color:#616B73">{{ p.status }}</span><span style="font-family:'Fustat';font-size:12.5px;color:#C6D2DC">/</span><span style="font-family:'Fustat';font-weight:700;font-size:12.5px;color:{{ p.chipColor }}">{{ p.chipTxt }}</span></div>
                     </div>
                   </div>
-                  <sc-if value="{{ p.showDots }}" hint-placeholder-val="{{ false }}"><div onClick="{{ p.onManage }}" style="cursor:pointer;width:44px;height:66px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="18px,18px" iconname="dots" size="18" color="#68727A" sw="2"></dc-import></div></sc-if>
+                  <sc-if value="{{ p.showDots }}" hint-placeholder-val="{{ false }}"><div onClick="{{ p.onManage }}" style="cursor:pointer;width:46px;height:68px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="18px,18px" iconname="dots" size="18" color="#8B9197" sw="2"></dc-import></div></sc-if>
                 </div>
               </sc-for>
             </div>
@@ -746,21 +746,26 @@
 
         <!-- PROFILE -->
         <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
-          <div style="padding:16px;padding-bottom:32px;display:flex;flex-direction:column;gap:14px">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:4px">
-              <div style="width:76px;height:76px;border-radius:999px;background:#1B4D7A;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:700;font-size:26px;color:#fff;letter-spacing:.5px">{{ profile.ini }}</span></div>
-              <span style="font-family:'Fustat';font-weight:700;font-size:23px;color:#1B2126;letter-spacing:-.4px">{{ profile.name }}</span>
-              <div style="padding:5px 12px;border-radius:999px;background:#E9F0F6"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#1B4D7A">{{ profile.roleLabel }}</span></div>
-              <sc-if value="{{ profile.suspended }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:#FBF3E7"><dc-import name="Icon" hint-size="18px,18px" iconname="lock" size="18" color="#8A6116" sw="2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#8A6116">Suspended</span></div></sc-if>
-              <sc-if value="{{ profile.canManage }}" hint-placeholder-val="{{ false }}"><div onClick="{{ profile.onManage }}" style="cursor:pointer;margin-top:2px;min-height:44px;padding:0 18px;display:flex;align-items:center;gap:8px;border-radius:999px;border:1px solid #1B4D7A;background:#fff"><dc-import name="Icon" hint-size="16px,16px" iconname="gear" size="16" color="#1B4D7A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:#1B4D7A">Manage</span></div></sc-if>
+          <div style="padding:16px;padding-bottom:32px;display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="width:60px;height:60px;border-radius:999px;flex-shrink:0;background:#1B4D7A;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:700;font-size:21px;color:#fff;letter-spacing:.4px">{{ profile.ini }}</span></div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
+                <span style="font-family:'Fustat';font-weight:700;font-size:21px;color:#1B2126;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ profile.name }}</span>
+                <div style="display:flex;align-items:center;gap:7px">
+                  <span style="font-family:'Fustat';font-weight:700;font-size:13px;color:#1B4D7A">{{ profile.roleLabel }}</span>
+                  <sc-if value="{{ profile.suspended }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Fustat';font-size:13px;color:#C6D2DC">·</span><div style="display:flex;align-items:center;gap:5px"><dc-import name="Icon" hint-size="14px,14px" iconname="lock" size="14" color="#8A6116" sw="2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#8A6116">Suspended</span></div></sc-if>
+                </div>
+              </div>
+              <sc-if value="{{ profile.canManage }}" hint-placeholder-val="{{ false }}"><div onClick="{{ profile.onManage }}" style="cursor:pointer;flex-shrink:0;min-height:42px;padding:0 16px;display:flex;align-items:center;gap:7px;border-radius:999px;border:1px solid #1B4D7A;background:#fff"><dc-import name="Icon" hint-size="15px,15px" iconname="gear" size="15" color="#1B4D7A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:#1B4D7A">Manage</span></div></sc-if>
             </div>
             <sc-if value="{{ profile.showTiles }}" hint-placeholder-val="{{ true }}">
-              <div style="display:flex;gap:10px">
-                <div onClick="{{ profile.onMonth }}" style="cursor:pointer;flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:24px;color:#1B2126">{{ profile.month }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#1B4D7A;margin-top:3px">This month</span></div>
-                <div onClick="{{ profile.onWeek }}" style="cursor:pointer;flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:24px;color:#1B2126">{{ profile.week }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#1B4D7A;margin-top:3px">This week</span></div>
+              <div style="display:flex;align-items:stretch;background:#fff;border:1px solid #E7EBEE;border-radius:16px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                <div onClick="{{ profile.onMonth }}" style="cursor:pointer;flex:1;padding:16px 18px;display:flex;flex-direction:column;gap:3px"><span style="font-family:'Fustat';font-weight:700;font-size:28px;color:#1B2126;letter-spacing:-.6px;line-height:1">{{ profile.month }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12.5px;color:#68727A">Checks this month</span></div>
+                <div style="width:1px;background:#F1F2F3;margin:14px 0"></div>
+                <div onClick="{{ profile.onWeek }}" style="cursor:pointer;flex:1;padding:16px 18px;display:flex;flex-direction:column;gap:3px"><span style="font-family:'Fustat';font-weight:700;font-size:28px;color:#1B2126;letter-spacing:-.6px;line-height:1">{{ profile.week }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12.5px;color:#68727A">This week</span></div>
               </div>
             </sc-if>
-            <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:6px">Details</div>
+            <div style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#8B9197;padding-left:2px">Details</div>
             <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:0 14px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
               <sc-if value="{{ profile.editable }}" hint-placeholder-val="{{ false }}">
                 <div style="padding:12px 0 14px;border-bottom:1px solid #F1F2F3;display:flex;flex-direction:column;gap:10px">
@@ -988,15 +993,15 @@
             </sc-if>
             <sc-if value="{{ peopleSheetVM.isManage }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;flex-direction:column;gap:16px">
-                <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:2px">
-                  <div style="width:60px;height:60px;border-radius:999px;background:#1B4D7A;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:700;font-size:20px;color:#fff;letter-spacing:.4px">{{ peopleSheetVM.ini }}</span></div>
-                  <span style="font-family:'Fustat';font-weight:700;font-size:20px;color:#1B2126">{{ peopleSheetVM.name }}</span>
-                  <div style="padding:4px 12px;border-radius:999px;background:#E9F0F6"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#1B4D7A">{{ peopleSheetVM.chipLabel }}</span></div>
-                  <sc-if value="{{ peopleSheetVM.suspended }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:#FBF3E7"><dc-import name="Icon" hint-size="18px,18px" iconname="lock" size="18" color="#8A6116" sw="2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#8A6116">Suspended</span></div></sc-if>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="width:46px;height:46px;border-radius:999px;flex-shrink:0;background:#1B4D7A;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:700;font-size:16px;color:#fff;letter-spacing:.3px">{{ peopleSheetVM.ini }}</span></div>
+                  <div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ peopleSheetVM.name }}</div><div style="font-family:'Fustat';font-weight:700;font-size:12.5px;color:#1B4D7A">{{ peopleSheetVM.chipLabel }}</div></div>
+                  <div onClick="{{ peopleSheetVM.onClose }}" style="cursor:pointer;width:34px;height:34px;border-radius:999px;background:#F1F2F3;display:flex;align-items:center;justify-content:center;flex-shrink:0"><dc-import name="Icon" hint-size="15px,15px" iconname="x" size="15" color="#58626A" sw="2.2"></dc-import></div>
                 </div>
                 <sc-if value="{{ peopleSheetVM.canEditRole }}" hint-placeholder-val="{{ false }}">
+                  <div style="height:1px;background:#F1F2F3"></div>
                   <div style="display:flex;flex-direction:column;gap:10px">
-                    <span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#68727A">Role</span>
+                    <span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#8B9197">Role</span>
                     <div style="display:flex;gap:8px">
                       <div onClick="{{ peopleSheetVM.onRoleInsp }}" style="cursor:pointer;flex:1;min-height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;border:1px solid {{ peopleSheetVM.baseInspBorder }};background:{{ peopleSheetVM.baseInspBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:14.5px;color:{{ peopleSheetVM.baseInspColor }}">Inspector</span></div>
                       <div onClick="{{ peopleSheetVM.onRoleMgr }}" style="cursor:pointer;flex:1;min-height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;border:1px solid {{ peopleSheetVM.baseMgrBorder }};background:{{ peopleSheetVM.baseMgrBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:14.5px;color:{{ peopleSheetVM.baseMgrColor }}">Manager</span></div>
@@ -1007,9 +1012,11 @@
                   </div>
                 </sc-if>
                 <div style="height:1px;background:#F1F2F3"></div>
-                <div onClick="{{ peopleSheetVM.onSuspend }}" style="cursor:pointer;min-height:56px;border-radius:14px;border:1px solid #E7EBEE;background:#fff;display:flex;align-items:center;gap:12px;padding:0 16px"><dc-import name="Icon" hint-size="19px,19px" iconname="lock" size="19" color="#8A6116" sw="1.8"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:15.5px;color:#8A6116">{{ peopleSheetVM.suspendLabel }}</span></div>
-                <sc-if value="{{ peopleSheetVM.notSelf }}" hint-placeholder-val="{{ true }}"><div onClick="{{ peopleSheetVM.onDelete }}" style="cursor:pointer;min-height:56px;border-radius:14px;background:{{ peopleSheetVM.deleteBg }};display:flex;align-items:center;gap:12px;padding:0 16px"><dc-import name="Icon" hint-size="19px,19px" iconname="trash" size="19" color="{{ peopleSheetVM.deleteColor }}" sw="1.9"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:15.5px;color:{{ peopleSheetVM.deleteColor }}">{{ peopleSheetVM.deleteLabel }}</span></div></sc-if>
-                <sc-if value="{{ peopleSheetVM.self }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Fustat';font-size:12.5px;color:#68727A;text-align:center">You can't delete your own account</span></sc-if>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <sc-if value="{{ peopleSheetVM.canSuspend }}" hint-placeholder-val="{{ true }}"><div onClick="{{ peopleSheetVM.onSuspend }}" style="cursor:pointer;min-height:56px;border-radius:14px;border:1px solid #E7EBEE;background:#fff;display:flex;align-items:center;gap:12px;padding:0 16px"><dc-import name="Icon" hint-size="19px,19px" iconname="lock" size="19" color="#8A6116" sw="1.8"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:15.5px;color:#8A6116">{{ peopleSheetVM.suspendLabel }}</span></div></sc-if>
+                  <sc-if value="{{ peopleSheetVM.notSelf }}" hint-placeholder-val="{{ true }}"><div onClick="{{ peopleSheetVM.onDelete }}" style="cursor:pointer;min-height:56px;border-radius:14px;background:{{ peopleSheetVM.deleteBg }};display:flex;align-items:center;gap:12px;padding:0 16px"><dc-import name="Icon" hint-size="19px,19px" iconname="trash" size="19" color="{{ peopleSheetVM.deleteColor }}" sw="1.9"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:15.5px;color:{{ peopleSheetVM.deleteColor }}">{{ peopleSheetVM.deleteLabel }}</span></div></sc-if>
+                  <sc-if value="{{ peopleSheetVM.self }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Fustat';font-size:12.5px;color:#68727A;text-align:center;padding-top:2px">You can't delete your own account</span></sc-if>
+                </div>
               </div>
             </sc-if>
           </div>
@@ -1397,7 +1404,7 @@ class Component extends DCLogic {
   onPeopleNew(v){ this.setState({peopleNew:v}); }
   setNewRole(r){ this.setState({peopleNewRole:r}); }
   addPerson(){ const st=this.state; const name=(st.peopleNew||'').trim(); if(!name)return this.say('Enter a name.'); if(st.people.some((p)=>p.name.toLowerCase()===name.toLowerCase()))return this.say('That person is already on the depot.'); const role=st.peopleNewRole||'Inspector'; this.setState((s)=>({people:[...s.people,{name,role,ini:initials(name),suspended:false,since:'August 2026'}],peopleSheet:null,peopleNew:''}),()=>this.say(name+' added as '+(role==='Manager'?'a Manager':'an Inspector')+'.')); }
-  toggleSuspend(name){ let now=false; this.setState((s)=>({people:s.people.map((p)=>{ if(p.name!==name)return p; now=!p.suspended; return {...p,suspended:now}; }),peopleSheet:null,peopleDelArm:false}),()=>this.say(now?name+" suspended \u2014 they can't sign in.":name+' reinstated.')); }
+  toggleSuspend(name){ if(name===this.resolvedPerson())return this.say("You can't suspend your own account."); let now=false; this.setState((s)=>({people:s.people.map((p)=>{ if(p.name!==name)return p; now=!p.suspended; return {...p,suspended:now}; }),peopleSheet:null,peopleDelArm:false}),()=>this.say(now?name+" suspended \u2014 they can't sign in.":name+' reinstated.')); }
   deletePerson(name){ if(name===this.resolvedPerson())return this.say("You can't delete your own account."); this.setState((s)=>({people:s.people.filter((p)=>p.name!==name),peopleSheet:null,viewPerson:s.viewPerson===name?null:s.viewPerson,screen:s.viewPerson===name?'people':s.screen}),()=>this.say(name+' removed from the depot.')); }
   setPersonRole(name,base){ this.setState((s)=>({people:s.people.map((p)=>p.name===name?{...p,role:base}:p),peopleDelArm:false}),()=>this.say(name+' is now '+this.roleLabel(base)+'.')); }
   togglePersonAdmin(name){ this.setState((s)=>({people:s.people.map((p)=>p.name===name?{...p,role:p.role==='Admin'?'Manager':'Admin'}:p),peopleDelArm:false}),()=>this.say(this.roleOf(name)==='Admin'?(name+' now has system admin access.'):(name+' — system admin access removed.'))); }
@@ -1730,14 +1737,14 @@ class Component extends DCLogic {
     const eff=this.roleOf(name); const isAdminRole=eff==='Admin'; const base=isAdminRole?'Manager':eff;
     const canEditRole=this.isAdmin()&&!self;
     return {isAdd:false,isManage:true,name,self,notSelf:!self,
-      ini:initials(name), chipLabel:this.roleLabel(eff), suspended:!!person.suspended,
+      ini:initials(name), chipLabel:this.roleLabel(eff), showRoleChip:!canEditRole, suspended:!!person.suspended,
       canEditRole, roleLabel:this.roleLabel(eff),
       baseInspBg:base==='Inspector'?'#1B4D7A':'#fff', baseInspBorder:base==='Inspector'?'#1B4D7A':'#E7EBEE', baseInspColor:base==='Inspector'?'#fff':'#58626A',
       baseMgrBg:base==='Manager'?'#1B4D7A':'#fff', baseMgrBorder:base==='Manager'?'#1B4D7A':'#E7EBEE', baseMgrColor:base==='Manager'?'#fff':'#58626A',
       onRoleInsp:()=>this.setPersonRole(name,'Inspector'), onRoleMgr:()=>this.setPersonRole(name,'Manager'),
       canGrantAdmin:canEditRole&&base==='Manager', adminOn:isAdminRole, onToggleAdmin:()=>this.togglePersonAdmin(name),
       adminTrack:isAdminRole?'background:#1B4D7A':'background:#CBD2D8', adminKnob:isAdminRole?'right:3px':'left:3px', adminLabelColor:isAdminRole?'#1B2126':'#58626A',
-      suspendLabel:person.suspended?('Reinstate '+name):('Suspend '+name),
+      suspendLabel:person.suspended?('Reinstate '+name):('Suspend '+name), canSuspend:!self,
       delArmed:st.peopleDelArm, deleteLabel:st.peopleDelArm?('Tap again to delete '+name):'Delete from depot', deleteBg:st.peopleDelArm?'#A03428':'#FBEEEC', deleteColor:st.peopleDelArm?'#fff':'#A03428',
       onSuspend:()=>this.toggleSuspend(name), onDelete:()=>this.armDelete(name), onClose:()=>this.closePeopleSheet()};
   }

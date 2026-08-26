@@ -10,9 +10,10 @@ export default function MoreScreen() {
   const st = s.state;
   const admin = s.isAdmin();
 
-  // Match what the People screen actually lists: the roster excludes Admins, and "active" is
-  // only true when nobody is suspended.
-  const roster = s.roster();
+  // Count the same list Personnel Management actually shows — everyone, System Admin included.
+  // The prototype still counts an Admin-filtered roster here, which makes this row disagree with
+  // the screen it opens; see DECISIONS.md (2026-08-26).
+  const roster = st.people;
   const suspended = roster.filter((p) => p.suspended).length;
   const peopleSub = plural(roster.length, 'person', 'people')
     + (suspended ? ' · ' + plural(suspended, 'suspended', 'suspended') : ' · all active');
@@ -29,7 +30,7 @@ export default function MoreScreen() {
           />
           <Row
             icon="users"
-            title="People"
+            title="Personnel Management"
             sub={peopleSub}
             onPress={() => s.go('people')}
           />

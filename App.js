@@ -18,6 +18,7 @@ import Toast from './src/components/Toast';
 import CameraCapture from './src/components/CameraCapture';
 import DriverSheet from './src/components/DriverSheet';
 import ResetModal from './src/components/ResetModal';
+import PersonSheet from './src/components/PersonSheet';
 import GateScreen from './src/screens/GateScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import CheckScreen from './src/screens/CheckScreen';
@@ -76,6 +77,8 @@ function Shell() {
       <Toast />
       {st.drawOpen && <DrawOverlay />}
       {st.resetModal && <ResetModal />}
+      {/* Add / manage a person — reachable from Personnel Management and from Profile's Manage pill. */}
+      <PersonSheet />
       {/* Driver-confirm launch gate — pops over the launching screen; steps aside for the camera. */}
       {!!st.driverSheet && !st.camera && <DriverSheet />}
       {!!st.camera && <CameraCapture />}

@@ -7,7 +7,7 @@ import { C, F } from '../theme';
 
 const TITLES = {
   checkhome: 'Dashboard', faults: 'Defects', vans: 'Fleet', more: 'More', check: 'Full Inspection',
-  settings: 'Settings', config: 'Depot configuration', people: 'People', help: 'How to & help',
+  settings: 'Settings', config: 'Depot configuration', people: 'Personnel Management', help: 'How to & help',
 };
 // Screens reached from another screen rather than the tab bar: title only, plus a back chevron.
 // Each one goes back the way it was opened, not to a fixed home.

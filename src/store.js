@@ -110,6 +110,8 @@ class Store {
       peopleSheet: null,        // { mode: 'add' | 'manage', name }
       peopleNew: '',
       peopleNewRole: 'Inspector',
+      // Delete from the manage sheet is two-tap: the first arms it, the second commits.
+      peopleDelArm: false,
       // --- profile ---
       viewPerson: null,
       draftRole: null,
@@ -914,8 +916,10 @@ class Store {
 
   // ---- people ----
   roster() { return this.state.people.filter((p) => this.roleOf(p.name) !== 'Admin'); }
+  // The roster shows everyone, System Admin included — hiding the account that holds the most
+  // power made the list read as complete when it wasn't.
   peopleList() {
-    const r = this.roster();
+    const r = this.state.people;
     const mgrs = r.filter((p) => this.roleOf(p.name) !== 'Inspector');
     const insps = r.filter((p) => this.roleOf(p.name) === 'Inspector');
     const all = [...mgrs, ...insps];
@@ -924,8 +928,8 @@ class Store {
   }
   setPeopleFilter(f) { this.setState({ peopleFilter: f }); }
   openAddPerson() { this.setState({ peopleSheet: { mode: 'add', name: '' }, peopleNew: '', peopleNewRole: 'Inspector' }); }
-  openManagePerson(name) { this.setState({ peopleSheet: { mode: 'manage', name } }); }
-  closePeopleSheet() { this.setState({ peopleSheet: null, peopleNew: '' }); }
+  openManagePerson(name) { this.setState({ peopleSheet: { mode: 'manage', name }, peopleDelArm: false }); }
+  closePeopleSheet() { this.setState({ peopleSheet: null, peopleNew: '', peopleDelArm: false }); }
   onPeopleNew(v) { this.setState({ peopleNew: v }); }
   setNewRole(r) { this.setState({ peopleNewRole: r }); }
   addPerson() {
@@ -939,6 +943,7 @@ class Store {
     }), () => { this.saveState(); this.say(name + ' added as ' + (role === 'Manager' ? 'a Manager' : 'an Inspector') + '.'); });
   }
   toggleSuspend(name) {
+    if (name === this.resolvedPerson()) return this.say("You can't suspend your own account.");
     let now = false;
     this.setState((s) => ({
       people: s.people.map((p) => {
@@ -946,17 +951,39 @@ class Store {
         now = !p.suspended;
         return { ...p, suspended: now };
       }),
-      peopleSheet: null,
+      peopleSheet: null, peopleDelArm: false,
     }), () => { this.saveState(); this.say(now ? name + " suspended — they can't sign in." : name + ' reinstated.'); });
   }
   deletePerson(name) {
     if (name === this.resolvedPerson()) return this.say("You can't delete your own account.");
     this.setState((s) => ({
       people: s.people.filter((p) => p.name !== name),
-      peopleSheet: null,
+      peopleSheet: null, peopleDelArm: false,
       viewPerson: s.viewPerson === name ? null : s.viewPerson,
       screen: s.viewPerson === name ? 'people' : s.screen,
     }), () => { this.saveState(); this.say(name + ' removed from the depot.'); });
+  }
+  // Two-tap confirm rather than a second modal on top of a sheet: the button becomes the warning.
+  armDelete(name) {
+    if (this.state.peopleDelArm) return this.deletePerson(name);
+    this.setState({ peopleDelArm: true }, () => this.say('Tap delete again to confirm.'));
+  }
+  setPersonRole(name, base) {
+    this.setState((s) => ({
+      people: s.people.map((p) => (p.name === name ? { ...p, role: base } : p)),
+      peopleDelArm: false,
+    }), () => { this.saveState(); this.say(name + ' is now ' + this.roleLabel(base) + '.'); });
+  }
+  togglePersonAdmin(name) {
+    this.setState((s) => ({
+      people: s.people.map((p) => (p.name === name ? { ...p, role: p.role === 'Admin' ? 'Manager' : 'Admin' } : p)),
+      peopleDelArm: false,
+    }), () => {
+      this.saveState();
+      this.say(this.roleOf(name) === 'Admin'
+        ? name + ' now has system admin access.'
+        : name + ' — system admin access removed.');
+    });
   }
 
   // ---- profile ----
