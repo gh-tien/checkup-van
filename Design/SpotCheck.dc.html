@@ -16,6 +16,7 @@
     ::-webkit-scrollbar{width:0;height:0}
     .scroll{scrollbar-width:none;-ms-overflow-style:none}
     a{color:#1B4D7A}a:hover{color:#14375A}
+    @keyframes toastIn{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
   </style>
 </helmet>
 <div style="min-height:100vh;background:#EAECEE;display:flex;align-items:flex-start;justify-content:center;gap:26px;padding:34px 20px;font-family:'Fustat',system-ui,sans-serif;flex-wrap:wrap">
@@ -103,6 +104,14 @@
                 </sc-if>
                 <div style="margin-top:16px"><div onClick="{{ gate.onAdmin }}" style="cursor:pointer;min-height:48px;border-radius:14px;border:1.5px solid #1B4D7A;display:flex;align-items:center;justify-content:center;gap:7px"><dc-import name="Icon" hint-size="17px,17px" iconname="shield" size="17" color="#1B4D7A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:500;font-size:14px;color:#1B4D7A">Admin</span></div></div>
                 <div style="margin-top:16px;font-family:'IBM Plex Mono';font-size:11.5px;color:#68727A;text-align:center">Search a name to sign in · Demo PIN 1234</div>
+                <sc-if value="{{ gate.showStaff }}" hint-placeholder-val="{{ true }}">
+                  <div style="margin-top:16px">
+                    <div style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#68727A;margin-bottom:8px">Active staff</div>
+                    <div style="background:#fff;border:1px solid #E7EBEE;border-radius:14px;overflow:hidden">
+                      <sc-for list="{{ gate.staff }}" as="r" hint-placeholder-count="4"><div onClick="{{ r.onPress }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 14px;min-height:58px;border-bottom:1px solid #F1F2F3"><div style="width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:13px;background:{{ r.avBg }};color:{{ r.avColor }}">{{ r.ini }}</div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15.5px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div><div style="font-family:'Fustat';font-size:12px;color:#616B73">{{ r.role }}</div></div><dc-import name="Icon" hint-size="15px,15px" iconname="chevronRight" size="15" color="#8B9197" sw="2"></dc-import></div></sc-for>
+                    </div>
+                  </div>
+                </sc-if>
               </div>
             </sc-if>
 
@@ -122,7 +131,7 @@
                 <div onClick="{{ gate.onPickBack }}" style="cursor:pointer;margin-top:18px;min-height:44px;display:flex;align-items:center"><span style="font-family:'Fustat';font-weight:500;font-size:14px;color:#616B73">← Choose someone else</span></div>
               </div>
             </sc-if>
-          <div style="font-size: 16px; line-height: 1; position: absolute; left: 151px; top: 629px">Testing</div></div>
+          </div>
         </sc-if>
         <!-- @@SCREENS@@ -->
 
@@ -428,8 +437,8 @@
               <div onClick="{{ van.tDocs }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:0 14px;min-height:48px"><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:14px;color:#1B2126">Documents</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11.5px;color:#68727A">{{ van.docsMeta }}</span><div style="{{ van.cDocs }}"><dc-import name="Icon" hint-size="16px,16px" iconname="chevronDown" size="16" color="#8B9197" sw="2"></dc-import></div></div>
               <sc-if value="{{ van.oDocs }}" hint-placeholder-val="{{ false }}">
                 <div>
-                  <sc-for list="{{ van.docs }}" as="d" hint-placeholder-count="3"><div style="border-bottom:1px solid #F1F2F3;padding:11px 14px;display:flex;align-items:center;gap:10px;min-height:46px"><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:500;font-size:14px;color:#1B2126">{{ d.name }}</div><div style="font-family:'IBM Plex Mono';font-size:12px;color:#616B73">{{ d.date }}</div></div><sc-if value="{{ d.hasBadge }}" hint-placeholder-val="{{ false }}"><div style="padding:5px 8px;border-radius:6px;background:{{ d.badgeBg }}"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;color:{{ d.badgeColor }}">{{ d.badgeTxt }}</span></div></sc-if><dc-import name="Icon" hint-size="15px,15px" iconname="chevronRight" size="15" color="#8B9197" sw="2"></dc-import></div></sc-for>
-                  <div onClick="{{ van.onExport }}" style="cursor:pointer;background:#FAFBFC;padding:12px 14px;min-height:46px;display:flex;align-items:center;justify-content:center;gap:7px"><dc-import name="Icon" hint-size="16px,16px" iconname="plus" size="16" color="#1B4D7A" sw="2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#1B4D7A">Add document</span></div>
+                  <sc-for list="{{ van.docs }}" as="d" hint-placeholder-count="3"><div onClick="{{ d.onPress }}" style="cursor:pointer;border-bottom:1px solid #F1F2F3;padding:11px 14px;display:flex;align-items:center;gap:10px;min-height:46px"><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:500;font-size:14px;color:#1B2126">{{ d.name }}</div><div style="font-family:'IBM Plex Mono';font-size:12px;color:#616B73">{{ d.date }}</div></div><sc-if value="{{ d.hasBadge }}" hint-placeholder-val="{{ false }}"><div style="padding:5px 8px;border-radius:6px;background:{{ d.badgeBg }}"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;color:{{ d.badgeColor }}">{{ d.badgeTxt }}</span></div></sc-if><dc-import name="Icon" hint-size="15px,15px" iconname="chevronRight" size="15" color="#8B9197" sw="2"></dc-import></div></sc-for>
+                  <div onClick="{{ van.onAddDoc }}" style="cursor:pointer;background:#FAFBFC;padding:12px 14px;min-height:46px;display:flex;align-items:center;justify-content:center;gap:7px"><dc-import name="Icon" hint-size="16px,16px" iconname="plus" size="16" color="#1B4D7A" sw="2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:#1B4D7A">Add document</span></div>
                 </div>
               </sc-if>
             </div>
@@ -580,10 +589,28 @@
             <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:8px">App</div>
             <div onClick="{{ settings.onConfig }}" style="cursor:pointer;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px;min-height:64px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 2px rgba(27,33,38,.05)"><dc-import name="Icon" hint-size="22px,22px" iconname="listCheck" size="22" color="#1B4D7A" sw="1.7"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:16px;color:#1B2126">Depot configuration</span><dc-import name="Icon" hint-size="16px,16px" iconname="chevronRight" size="16" color="#8B9197" sw="2"></dc-import></div>
             <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:8px">Backup</div>
-            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
-              <div onClick="{{ settings.onBackup }}" style="cursor:pointer;padding:0 14px;min-height:58px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F1F2F3"><dc-import name="Icon" hint-size="21px,21px" iconname="download" size="21" color="#1B4D7A" sw="1.7"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15.5px;color:#1B2126">Save a backup</span></div>
-              <div onClick="{{ settings.onRestore }}" style="cursor:pointer;padding:0 14px;min-height:58px;display:flex;align-items:center;gap:12px"><dc-import name="Icon" hint-size="21px,21px" iconname="upload" size="21" color="#1B4D7A" sw="1.7"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15.5px;color:#1B2126">Restore from a backup</span></div>
-            </div>
+            <sc-if value="{{ settings.restoreOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1.5px dashed #A03428;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">Backup on this device</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#A03428">Replaces everything</span></div>
+                <span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Saved {{ settings.savedAt }}</span>
+                <div style="display:flex;gap:10px">
+                  <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:24px;color:#1B2126">{{ settings.mVans }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73;margin-top:3px">Vehicles</span></div>
+                  <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:24px;color:#1B2126">{{ settings.mChecks }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73;margin-top:3px">Checks</span></div>
+                  <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:24px;color:#1B2126">{{ settings.mDefects }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73;margin-top:3px">Defects</span></div>
+                </div>
+                <span style="font-family:'Fustat';font-size:14px;line-height:20px;color:#58626A">Restoring puts this backup in place of everything on this phone — every vehicle, person, check and defect. What is here now is gone unless you save a backup of it first.</span>
+                <div style="display:flex;gap:10px">
+                  <div onClick="{{ settings.onCancelRestore }}" style="cursor:pointer;flex:1;min-height:52px;border-radius:16px;border:1px solid #E7EBEE;background:#fff;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:500;font-size:16px;color:#616B73">Cancel</span></div>
+                  <div onClick="{{ settings.onConfirmRestore }}" style="cursor:pointer;flex:2;min-height:52px;border-radius:16px;background:#A03428;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:500;font-size:16px;color:#fff">Replace everything</span></div>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ settings.restoreClosed }}" hint-placeholder-val="{{ true }}">
+              <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+                <div onClick="{{ settings.onBackup }}" style="cursor:pointer;padding:0 14px;min-height:58px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #F1F2F3"><dc-import name="Icon" hint-size="21px,21px" iconname="download" size="21" color="#1B4D7A" sw="1.7"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15.5px;color:#1B2126">Save a backup</span></div>
+                <div onClick="{{ settings.onRestore }}" style="cursor:pointer;padding:0 14px;min-height:58px;display:flex;align-items:center;gap:12px"><dc-import name="Icon" hint-size="21px,21px" iconname="upload" size="21" color="#1B4D7A" sw="1.7"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15.5px;color:#1B2126">Restore from a backup</span></div>
+              </div>
+            </sc-if>
             <div style="font-family:'Fustat';font-size:13px;line-height:19px;color:#616B73">{{ settings.note }}</div>
             <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:8px">About</div>
             <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
@@ -598,18 +625,37 @@
         <!-- CONFIG -->
         <sc-if value="{{ isConfig }}" hint-placeholder-val="{{ false }}">
           <div style="padding:16px;padding-bottom:32px;display:flex;flex-direction:column;gap:12px">
-            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126">Depot configuration</span><div style="min-height:44px;padding:0 14px;display:flex;align-items:center;gap:6px;border-radius:999px;border:1px solid #1B4D7A;background:#fff"><dc-import name="Icon" hint-size="14px,14px" iconname="pen" size="14" color="#1B4D7A" sw="1.9"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13.5px;color:#1B4D7A">Edit</span></div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126">Depot configuration</span><div onClick="{{ config.onToggleEdit }}" style="cursor:pointer;min-height:44px;padding:0 14px;display:flex;align-items:center;gap:6px;border-radius:999px;border:1px solid #1B4D7A;background:{{ config.editBg }}"><dc-import name="Icon" hint-size="14px,14px" iconname="{{ config.editIcon }}" size="14" color="{{ config.editFg }}" sw="1.9"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13.5px;color:{{ config.editFg }}">{{ config.editLabel }}</span></div></div>
+            <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
+              <div onClick="{{ config.onToggleDepot }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ config.depotChev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">Depot &amp; access</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">{{ config.depotSummary }}</span></div>
+              <sc-if value="{{ config.depotOpen }}" hint-placeholder-val="{{ true }}">
+                <div style="border-top:1px solid #F1F2F3;padding:14px;display:flex;flex-direction:column;gap:14px">
+                  <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73">Depot name</span><input value="{{ config.depotName }}" onInput="{{ config.onDepotName }}" placeholder="Depot name" style="border:1px solid #D3D9DD;border-radius:11px;min-height:44px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126;background:#fff;outline:none"></div>
+                  <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73">Location</span><input value="{{ config.depotAddr }}" onInput="{{ config.onDepotAddr }}" placeholder="Street address" style="border:1px solid #D3D9DD;border-radius:11px;min-height:44px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126;background:#fff;outline:none"></div>
+                  <div style="height:1px;background:#F1F2F3"></div>
+                  <div style="display:flex;align-items:flex-start;gap:12px"><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126">Location-gated checks</div><div style="font-family:'Fustat';font-size:12.5px;line-height:17px;color:#68727A">Block a full inspection unless the phone is inside the depot geofence.</div></div><div onClick="{{ config.onToggleLocGate }}" style="cursor:pointer;width:46px;height:27px;border-radius:999px;position:relative;flex-shrink:0;margin-top:2px;{{ config.locTrack }}"><div style="position:absolute;top:3px;width:21px;height:21px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(27,33,38,.25);{{ config.locKnob }}"></div></div></div>
+                  <sc-if value="{{ config.locGate }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;align-items:center;gap:10px;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:8px 12px;min-height:56px"><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73">Geofence radius</span><input value="{{ config.geoRadius }}" onInput="{{ config.onGeoRadius }}" inputmode="numeric" maxlength="4" style="width:64px;text-align:center;border:1px solid #D3D9DD;border-radius:11px;min-height:44px;padding:0 6px;font-family:'IBM Plex Mono';font-weight:500;font-size:15px;color:#1B4D7A;background:#fff;outline:none"><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:13px;color:#68727A">m</span></div>
+                  </sc-if>
+                  <div style="height:1px;background:#F1F2F3"></div>
+                  <div style="display:flex;align-items:flex-start;gap:12px"><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126">Device binding</div><div style="font-family:'Fustat';font-size:12.5px;line-height:17px;color:#68727A">First sign-in binds the app to that phone. Managers and admins are exempt.</div></div><div onClick="{{ config.onToggleBinding }}" style="cursor:pointer;width:46px;height:27px;border-radius:999px;position:relative;flex-shrink:0;margin-top:2px;{{ config.bindTrack }}"><div style="position:absolute;top:3px;width:21px;height:21px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(27,33,38,.25);{{ config.bindKnob }}"></div></div></div>
+                  <sc-if value="{{ config.binding }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73">One-time access code</span><div style="display:flex;gap:8px"><div style="flex:1;min-width:0;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:11px;min-height:44px;display:flex;align-items:center;padding:0 14px"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:17px;letter-spacing:2px;color:#1B4D7A">{{ config.accessCode }}</span></div><div onClick="{{ config.onRegenCode }}" style="cursor:pointer;min-height:44px;padding:0 16px;border-radius:11px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid #1B4D7A;background:#fff"><dc-import name="Icon" hint-size="14px,14px" iconname="refresh" size="14" color="#1B4D7A" sw="1.9"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:13.5px;color:#1B4D7A">New</span></div></div></div>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </div>
             <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
               <div onClick="{{ config.onToggleDraw }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ config.drawChev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">Draw rules</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">4 rules</span></div>
               <sc-if value="{{ config.drawOpen }}" hint-placeholder-val="{{ false }}">
                 <div style="border-top:1px solid #F1F2F3;padding:14px;display:flex;flex-direction:column;gap:8px">
                   <div style="display:flex;gap:8px">
-                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Exclude if checked within (days)</span><span style="font-family:'Fustat';font-weight:500;font-size:16px;color:#1B4D7A">{{ config.excludeDays }}</span></div>
-                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Force any vehicle past (days)</span><span style="font-family:'Fustat';font-weight:500;font-size:16px;color:#1B4D7A">{{ config.forceDays }}</span></div>
+                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Exclude if checked within (days)</span><input value="{{ config.excludeDays }}" onInput="{{ config.onExcludeDays }}" inputmode="numeric" maxlength="3" style="width:100%;border:1px solid #D3D9DD;border-radius:9px;min-height:40px;padding:0 10px;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B4D7A;background:#fff;outline:none;margin-top:4px"></div>
+                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Force any vehicle past (days)</span><input value="{{ config.forceDays }}" onInput="{{ config.onForceDays }}" inputmode="numeric" maxlength="3" style="width:100%;border:1px solid #D3D9DD;border-radius:9px;min-height:40px;padding:0 10px;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B4D7A;background:#fff;outline:none;margin-top:4px"></div>
                   </div>
                   <div style="display:flex;gap:8px">
-                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Re-rolls per check</span><span style="font-family:'Fustat';font-weight:500;font-size:16px;color:#1B4D7A">{{ config.rerolls }}</span></div>
-                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Target per week (checks)</span><span style="font-family:'Fustat';font-weight:500;font-size:16px;color:#1B4D7A">{{ config.target }}</span></div>
+                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Re-rolls per check</span><input value="{{ config.rerolls }}" onInput="{{ config.onRerolls }}" inputmode="numeric" maxlength="1" style="width:100%;border:1px solid #D3D9DD;border-radius:9px;min-height:40px;padding:0 10px;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B4D7A;background:#fff;outline:none;margin-top:4px"></div>
+                    <div style="flex:1;background:#F6F7F8;border:1px solid #E7EBEE;border-radius:12px;padding:6px 12px;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:2px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;line-height:16px;color:#616B73">Target per week (checks)</span><input value="{{ config.target }}" onInput="{{ config.onTarget }}" inputmode="numeric" maxlength="3" style="width:100%;border:1px solid #D3D9DD;border-radius:9px;min-height:40px;padding:0 10px;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B4D7A;background:#fff;outline:none;margin-top:4px"></div>
                   </div>
                 </div>
               </sc-if>
@@ -618,7 +664,11 @@
               <div onClick="{{ config.onTogglePhotos }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ config.photosChev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">Check photos</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">{{ config.angleCount }}</span></div>
               <sc-if value="{{ config.photosOpen }}" hint-placeholder-val="{{ false }}">
                 <div style="border-top:1px solid #F1F2F3">
-                  <sc-for list="{{ config.angles }}" as="a" hint-placeholder-count="6"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="width:24px;height:24px;border-radius:7px;background:#EEF1F3;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#616B73">{{ a.n }}</span></div><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ a.name }}</span></div></sc-for>
+                  <sc-for list="{{ config.angles }}" as="a" hint-placeholder-count="6"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="width:24px;height:24px;border-radius:7px;background:#EEF1F3;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#616B73">{{ a.n }}</span></div><span style="flex:1;min-width:0;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ a.name }}</span><sc-if value="{{ config.edit }}" hint-placeholder-val="{{ false }}"><div onClick="{{ a.onRemove }}" style="cursor:pointer;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#FBEEEC"><dc-import name="Icon" hint-size="15px,15px" iconname="trash" size="15" color="#A03428" sw="1.9"></dc-import></div></sc-if></div></sc-for>
+                  <sc-if value="{{ config.edit }}" hint-placeholder-val="{{ false }}"><div style="padding:12px 14px;display:flex;gap:8px;background:#FAFBFC">
+                    <input value="{{ config.newAngle }}" onInput="{{ config.onNewAngle }}" placeholder="Add a photo angle…" style="flex:1;min-width:0;border:1px solid #D3D9DD;border-radius:11px;min-height:44px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126;background:#fff;outline:none">
+                    <div onClick="{{ config.onAddAngle }}" style="cursor:pointer;min-height:44px;padding:0 16px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#1B4D7A"><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:#fff">Add</span></div>
+                  </div></sc-if>
                 </div>
               </sc-if>
             </div>
@@ -626,12 +676,12 @@
               <div onClick="{{ config.onToggleDocTypes }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ config.docTypesChev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">Document types</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">{{ config.docTypesCount }}</span></div>
               <sc-if value="{{ config.docTypesOpen }}" hint-placeholder-val="{{ false }}">
                 <div style="border-top:1px solid #F1F2F3">
-                  <sc-for list="{{ config.docTypes }}" as="d" hint-placeholder-count="4"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="width:24px;height:24px;border-radius:7px;background:#EEF1F3;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#616B73">{{ d.n }}</span></div><span style="flex:1;min-width:0;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ d.name }}</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11.5px;color:#68727A">{{ d.files }}</span><div onClick="{{ d.onRemove }}" style="cursor:pointer;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#FBEEEC"><dc-import name="Icon" hint-size="15px,15px" iconname="trash" size="15" color="#A03428" sw="1.9"></dc-import></div></div></sc-for>
-                  <div style="padding:12px 14px;display:flex;gap:8px;background:#FAFBFC">
+                  <sc-for list="{{ config.docTypes }}" as="d" hint-placeholder-count="4"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="width:24px;height:24px;border-radius:7px;background:#EEF1F3;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#616B73">{{ d.n }}</span></div><span style="flex:1;min-width:0;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ d.name }}</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11.5px;color:#68727A">{{ d.files }}</span><sc-if value="{{ config.edit }}" hint-placeholder-val="{{ false }}"><div onClick="{{ d.onRemove }}" style="cursor:pointer;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#FBEEEC"><dc-import name="Icon" hint-size="15px,15px" iconname="trash" size="15" color="#A03428" sw="1.9"></dc-import></div></sc-if></div></sc-for>
+                  <sc-if value="{{ config.edit }}" hint-placeholder-val="{{ false }}"><div style="padding:12px 14px;display:flex;gap:8px;background:#FAFBFC">
                     <input value="{{ config.newDocName }}" onInput="{{ config.onNewDocName }}" placeholder="Add a document type…" style="flex:1;min-width:0;border:1px solid #D3D9DD;border-radius:11px;min-height:44px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126;background:#fff;outline:none">
                     <input value="{{ config.newDocFiles }}" onInput="{{ config.onNewDocFiles }}" inputmode="numeric" maxlength="2" style="width:50px;text-align:center;border:1px solid #D3D9DD;border-radius:11px;min-height:44px;padding:0 6px;font-family:'IBM Plex Mono';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none">
                     <div onClick="{{ config.onAddDocType }}" style="cursor:pointer;min-height:44px;padding:0 16px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#1B4D7A"><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:#fff">Add</span></div>
-                  </div>
+                  </div></sc-if>
                 </div>
               </sc-if>
             </div>
@@ -640,11 +690,11 @@
               <div onClick="{{ config.onToggleUses }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ config.usesChev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">Vehicle use</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">{{ config.usesCount }}</span></div>
               <sc-if value="{{ config.usesOpen }}" hint-placeholder-val="{{ false }}">
                 <div style="border-top:1px solid #F1F2F3">
-                  <sc-for list="{{ config.uses }}" as="u" hint-placeholder-count="2"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="width:24px;height:24px;border-radius:7px;background:#EEF1F3;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#616B73">{{ u.n }}</span></div><span style="flex:1;min-width:0;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ u.name }}</span><div onClick="{{ u.onRemove }}" style="cursor:pointer;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#FBEEEC"><dc-import name="Icon" hint-size="15px,15px" iconname="trash" size="15" color="#A03428" sw="1.9"></dc-import></div></div></sc-for>
-                  <div style="padding:12px 14px;display:flex;gap:8px;background:#FAFBFC">
+                  <sc-for list="{{ config.uses }}" as="u" hint-placeholder-count="2"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="width:24px;height:24px;border-radius:7px;background:#EEF1F3;display:flex;align-items:center;justify-content:center"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:#616B73">{{ u.n }}</span></div><span style="flex:1;min-width:0;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ u.name }}</span><sc-if value="{{ config.edit }}" hint-placeholder-val="{{ false }}"><div onClick="{{ u.onRemove }}" style="cursor:pointer;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#FBEEEC"><dc-import name="Icon" hint-size="15px,15px" iconname="trash" size="15" color="#A03428" sw="1.9"></dc-import></div></sc-if></div></sc-for>
+                  <sc-if value="{{ config.edit }}" hint-placeholder-val="{{ false }}"><div style="padding:12px 14px;display:flex;gap:8px;background:#FAFBFC">
                     <input value="{{ config.newUse }}" onInput="{{ config.onNewUse }}" placeholder="Add a use type… (e.g. PRV, BUS)" style="flex:1;min-width:0;border:1px solid #D3D9DD;border-radius:11px;min-height:44px;padding:0 13px;font-family:'Fustat';font-weight:600;font-size:14.5px;letter-spacing:.4px;color:#1B2126;background:#fff;outline:none">
                     <div onClick="{{ config.onAddUse }}" style="cursor:pointer;min-height:44px;padding:0 16px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#1B4D7A"><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:#fff">Add</span></div>
-                  </div>
+                  </div></sc-if>
                 </div>
               </sc-if>
             </div>
@@ -657,7 +707,7 @@
                 <div onClick="{{ g.onToggle }}" style="cursor:pointer;padding:12px 14px;min-height:60px;display:flex;align-items:center;gap:10px"><dc-import name="Icon" hint-size="15px,15px" iconname="{{ g.chev }}" size="15" color="#8B9197" sw="2"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">{{ g.role }}</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">{{ g.count }}</span></div>
                 <sc-if value="{{ g.open }}" hint-placeholder-val="{{ false }}">
                   <div style="border-top:1px solid #F1F2F3">
-                    <sc-for list="{{ g.caps }}" as="c" hint-placeholder-count="3"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ c.name }}</div><div style="font-family:'Fustat';font-size:12.5px;line-height:17px;color:#68727A">{{ c.desc }}</div></div><div style="width:38px;height:22px;border-radius:999px;background:#1B4D7A;position:relative"><div style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:999px;background:#fff"></div></div></div></sc-for>
+                    <sc-for list="{{ g.caps }}" as="c" hint-placeholder-count="3"><div style="padding:10px 14px;min-height:56px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">{{ c.name }}</div><div style="font-family:'Fustat';font-size:12.5px;line-height:17px;color:#68727A">{{ c.desc }}</div></div><div onClick="{{ c.onToggle }}" style="cursor:pointer;width:38px;height:22px;border-radius:999px;position:relative;flex-shrink:0;{{ c.track }}"><div style="position:absolute;top:2px;width:18px;height:18px;border-radius:999px;background:#fff;{{ c.knob }}"></div></div></div></sc-for>
                   </div>
                 </sc-if>
               </div>
@@ -679,13 +729,15 @@
             </div>
             <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(27,33,38,.05)">
               <sc-for list="{{ people.rows }}" as="p" hint-placeholder-count="5">
-                <div onClick="{{ p.onPress }}" style="cursor:pointer;min-height:66px;padding:0 14px;display:flex;align-items:center;gap:12px;{{ p.rowBorder }}">
-                  <div style="width:40px;height:40px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:14px;{{ p.avStyle }};color:{{ p.avColor }}">{{ p.ini }}</div>
-                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
-                    <div style="display:flex;align-items:center;gap:7px"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">{{ p.name }}</span><sc-if value="{{ p.you }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:9.5px;color:#1B4D7A;background:#E9F0F6;padding:3px 5px;border-radius:5px">YOU</span></sc-if></div>
-                    <div style="display:flex;align-items:center;gap:6px"><div style="width:7px;height:7px;border-radius:999px;background:{{ p.dotColor }}"></div><span style="font-family:'Fustat';font-size:12.5px;color:#616B73">{{ p.status }}</span></div>
+                <div style="display:flex;align-items:center;{{ p.rowBorder }}">
+                  <div onClick="{{ p.onPress }}" style="cursor:pointer;flex:1;min-width:0;min-height:66px;padding:0 4px 0 14px;display:flex;align-items:center;gap:12px">
+                    <div style="width:40px;height:40px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:14px;{{ p.avStyle }};color:{{ p.avColor }}">{{ p.ini }}</div>
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                      <div style="display:flex;align-items:center;gap:7px"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#1B2126">{{ p.name }}</span><sc-if value="{{ p.you }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:9.5px;color:#1B4D7A;background:#E9F0F6;padding:3px 5px;border-radius:5px">YOU</span></sc-if></div>
+                      <div style="display:flex;align-items:center;gap:7px"><div style="width:7px;height:7px;border-radius:999px;background:{{ p.dotColor }}"></div><span style="font-family:'Fustat';font-weight:500;font-size:12.5px;color:#616B73">{{ p.status }}</span><span style="font-family:'Fustat';font-size:12.5px;color:#C6D2DC">/</span><span style="font-family:'Fustat';font-weight:700;font-size:12.5px;color:{{ p.chipColor }}">{{ p.chipTxt }}</span></div>
+                    </div>
                   </div>
-                  <div style="padding:5px 9px;border-radius:999px;{{ p.chipStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:10.5px;color:{{ p.chipColor }}">{{ p.chipTxt }}</span></div>
+                  <sc-if value="{{ p.showDots }}" hint-placeholder-val="{{ false }}"><div onClick="{{ p.onManage }}" style="cursor:pointer;width:44px;height:66px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="18px,18px" iconname="dots" size="18" color="#68727A" sw="2"></dc-import></div></sc-if>
                 </div>
               </sc-for>
             </div>
@@ -699,27 +751,41 @@
               <div style="width:76px;height:76px;border-radius:999px;background:#1B4D7A;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:700;font-size:26px;color:#fff;letter-spacing:.5px">{{ profile.ini }}</span></div>
               <span style="font-family:'Fustat';font-weight:700;font-size:23px;color:#1B2126;letter-spacing:-.4px">{{ profile.name }}</span>
               <div style="padding:5px 12px;border-radius:999px;background:#E9F0F6"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#1B4D7A">{{ profile.roleLabel }}</span></div>
-              <sc-if value="{{ profile.suspended }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:#FBF3E7"><dc-import name="Icon" hint-size="13px,13px" iconname="lock" size="13" color="#8A6116" sw="1.9"></dc-import><span style="font-family:'Fustat';font-weight:500;font-size:12.5px;color:#8A6116">Suspended — cannot sign in</span></div></sc-if>
+              <sc-if value="{{ profile.suspended }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:#FBF3E7"><dc-import name="Icon" hint-size="18px,18px" iconname="lock" size="18" color="#8A6116" sw="2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#8A6116">Suspended</span></div></sc-if>
+              <sc-if value="{{ profile.canManage }}" hint-placeholder-val="{{ false }}"><div onClick="{{ profile.onManage }}" style="cursor:pointer;margin-top:2px;min-height:44px;padding:0 18px;display:flex;align-items:center;gap:8px;border-radius:999px;border:1px solid #1B4D7A;background:#fff"><dc-import name="Icon" hint-size="16px,16px" iconname="gear" size="16" color="#1B4D7A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:14px;color:#1B4D7A">Manage</span></div></sc-if>
             </div>
             <sc-if value="{{ profile.showTiles }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex;gap:10px">
-                <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:24px;color:#1B2126">{{ profile.month }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#1B4D7A;margin-top:3px">This month</span></div>
-                <div style="flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:24px;color:#1B2126">{{ profile.week }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#1B4D7A;margin-top:3px">This week</span></div>
+                <div onClick="{{ profile.onMonth }}" style="cursor:pointer;flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:24px;color:#1B2126">{{ profile.month }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#1B4D7A;margin-top:3px">This month</span></div>
+                <div onClick="{{ profile.onWeek }}" style="cursor:pointer;flex:1;background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(27,33,38,.05)"><span style="font-family:'Fustat';font-weight:600;font-size:24px;color:#1B2126">{{ profile.week }}</span><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#1B4D7A;margin-top:3px">This week</span></div>
               </div>
             </sc-if>
             <div style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73;padding-top:6px">Details</div>
             <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:0 14px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
-              <div style="min-height:48px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><span style="flex:1;font-family:'Fustat';font-size:14.5px;color:#58626A">Role</span><span style="font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126">{{ profile.roleLabel }}</span></div>
+              <sc-if value="{{ profile.editable }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:12px 0 14px;border-bottom:1px solid #F1F2F3;display:flex;flex-direction:column;gap:10px">
+                  <span style="font-family:'Fustat';font-size:14.5px;color:#58626A">Role</span>
+                  <div style="display:flex;gap:8px">
+                    <div onClick="{{ profile.onSegInsp }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid {{ profile.baseInspBorder }};background:{{ profile.baseInspBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ profile.baseInspColor }}">Inspector</span></div>
+                    <div onClick="{{ profile.onSegMgr }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid {{ profile.baseMgrBorder }};background:{{ profile.baseMgrBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ profile.baseMgrColor }}">Manager</span></div>
+                  </div>
+                  <sc-if value="{{ profile.canGrantAdmin }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;align-items:center;gap:10px;min-height:44px"><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:14.5px;color:{{ profile.adminLabelColor }}">System admin access</span><div onClick="{{ profile.onToggleAdmin }}" style="cursor:pointer;width:46px;height:27px;border-radius:999px;position:relative;flex-shrink:0;{{ profile.adminTrack }}"><div style="position:absolute;top:3px;width:21px;height:21px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(27,33,38,.25);{{ profile.adminKnob }}"></div></div></div>
+                  </sc-if>
+                  <div onClick="{{ profile.onToggleCaps }}" style="cursor:pointer;display:flex;align-items:center;gap:8px;min-height:32px"><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:13px;color:#1B4D7A">View permission</span><div style="{{ profile.capsChev }}"><dc-import name="Icon" hint-size="15px,15px" iconname="chevronDown" size="15" color="#1B4D7A" sw="2"></dc-import></div></div>
+                  <sc-if value="{{ profile.capsOpen }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ profile.caps }}" as="c" hint-placeholder-count="3"><div style="padding:5px 11px;border-radius:999px;background:#E9F0F6"><span style="font-family:'Fustat';font-weight:500;font-size:13px;color:#1B4D7A">{{ c.name }}</span></div></sc-for></div></sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{ profile.readOnly }}" hint-placeholder-val="{{ true }}">
+                <div style="border-bottom:1px solid #F1F2F3">
+                  <div onClick="{{ profile.onToggleRole }}" style="cursor:pointer;min-height:48px;display:flex;align-items:center;gap:10px"><span style="flex:1;font-family:'Fustat';font-size:14.5px;color:#58626A">Role</span><span style="font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126">{{ profile.roleLabel }}</span><div style="{{ profile.roleChev }}"><dc-import name="Icon" hint-size="15px,15px" iconname="chevronDown" size="15" color="#8B9197" sw="2"></dc-import></div></div>
+                  <sc-if value="{{ profile.roleOpen }}" hint-placeholder-val="{{ false }}"><div style="padding-bottom:14px;display:flex;flex-direction:column;gap:8px"><span style="font-family:'Fustat';font-size:12.5px;color:#616B73">View permission</span><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ profile.caps }}" as="c" hint-placeholder-count="3"><div style="padding:5px 11px;border-radius:999px;background:#E9F0F6"><span style="font-family:'Fustat';font-weight:500;font-size:13px;color:#1B4D7A">{{ c.name }}</span></div></sc-for></div></div></sc-if>
+                </div>
+              </sc-if>
               <div style="min-height:48px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #F1F2F3"><span style="flex:1;font-family:'Fustat';font-size:14.5px;color:#58626A">Last active</span><span style="font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126">Today · 08:12</span></div>
               <div style="min-height:48px;display:flex;align-items:center;gap:10px"><span style="flex:1;font-family:'Fustat';font-size:14.5px;color:#58626A">Member since</span><span style="font-family:'Fustat';font-weight:500;font-size:14.5px;color:#1B2126">{{ profile.since }}</span></div>
             </div>
-            <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Assigned vehicles</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11px;color:#68727A">{{ profile.vansCount }}</span></div>
-            <sc-if value="{{ profile.hasVans }}" hint-placeholder-val="{{ true }}">
-              <div style="background:#fff;border:1px solid #E7EBEE;border-radius:16px;padding:0 14px;box-shadow:0 1px 2px rgba(27,33,38,.05)">
-                <sc-for list="{{ profile.vans }}" as="v" hint-placeholder-count="2"><div onClick="{{ v.onPress }}" style="cursor:pointer;padding:12px 0;display:flex;align-items:center;gap:12px;{{ v.rowBorder }}"><div style="width:38px;height:38px;border-radius:10px;background:#E9F0F6;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="20px,20px" iconname="truck" size="20" color="#1B4D7A" sw="1.6"></dc-import></div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:600;font-size:15px;color:#1B2126;letter-spacing:.3px">{{ v.plate }}</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ v.sub }}</div></div><div style="padding:5px 8px;border-radius:6px;background:{{ v.pillBg }}"><span style="font-family:'IBM Plex Mono';font-weight:700;font-size:10px;color:{{ v.pillColor }}">{{ v.pill }}</span></div><dc-import name="Icon" hint-size="15px,15px" iconname="chevronRight" size="15" color="#8B9197" sw="2"></dc-import></div></sc-for>
-              </div>
-            </sc-if>
-            <sc-if value="{{ profile.noVans }}" hint-placeholder-val="{{ false }}"><div style="background:#FBFBFA;border:1px dashed #D3D9DD;border-radius:16px;padding:16px"><span style="font-family:'Fustat';font-size:13.5px;line-height:20px;color:#616B73">No vehicle currently assigned.</span></div></sc-if>
+
           </div>
         </sc-if>
 
@@ -811,7 +877,7 @@
 
       <!-- toast -->
       <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
-        <div style="position:absolute;left:0;right:0;bottom:104px;display:flex;justify-content:center;z-index:80;pointer-events:none">
+        <div style="position:absolute;left:0;right:0;top:16px;display:flex;justify-content:center;z-index:80;pointer-events:none;animation:toastIn .3s ease-out">
           <div style="background:#1B2126;padding:11px 16px;border-radius:20px;max-width:88%"><span style="font-family:'Fustat';font-weight:500;font-size:13.5px;color:#fff;text-align:center">{{ toast }}</span></div>
         </div>
       </sc-if>
@@ -858,9 +924,17 @@
           <div style="position:relative;background:#fff;border-top-left-radius:22px;border-top-right-radius:22px;padding:8px 16px 30px;display:flex;flex-direction:column;gap:16px">
             <div style="align-self:center;width:36px;height:5px;border-radius:3px;background:#D3D9DD"></div>
             <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="min-width:0"><div style="font-family:'IBM Plex Mono';font-weight:700;font-size:15px;letter-spacing:1.2px;color:#58626A">{{ driverSheet.plate }}</div><div style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126">Confirm driver to start</div></div><div onClick="{{ driverSheet.onClose }}" style="cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="x" size="16" color="#58626A" sw="2.2"></dc-import></div></div>
-            <div style="display:flex;align-items:center;gap:12px;background:#F6F9FC;border:1px solid #E3EBF2;border-radius:16px;padding:12px"><div style="width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:15px;background:{{ driverSheet.avBg }};color:{{ driverSheet.avColor }}">{{ driverSheet.ini }}</div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:700;font-size:17px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ driverSheet.shownName }}</div><div style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73;margin-top:2px">{{ driverSheet.meta }}</div></div></div>
-            <sc-if value="{{ driverSheet.showField }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Someone else driving it?</span><div style="position:relative;display:flex;align-items:center"><div style="position:absolute;left:13px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="18px,18px" iconname="search" size="18" color="#68727A" sw="1.7"></dc-import></div><input value="{{ driverSheet.reassignVal }}" onInput="{{ driverSheet.onReassign }}" placeholder="Search a different driver" style="width:100%;border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px 0 40px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div></div>
+            <sc-if value="{{ driverSheet.isSpare }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:12px;background:#F6F9FC;border:1px solid #E3EBF2;border-radius:16px;padding:12px"><div style="width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:15px;background:{{ driverSheet.avBg }};color:{{ driverSheet.avColor }}">{{ driverSheet.ini }}</div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:700;font-size:17px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ driverSheet.shownName }}</div><div style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73;margin-top:2px">{{ driverSheet.meta }}</div></div></div>
+            </sc-if>
+            <sc-if value="{{ driverSheet.isCard }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;gap:12px;background:#F6F9FC;border:1px solid #E3EBF2;border-radius:16px;padding:12px"><div style="width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-family:'Fustat';font-weight:700;font-size:15px;background:{{ driverSheet.avBg }};color:{{ driverSheet.avColor }}">{{ driverSheet.ini }}</div><div style="flex:1;min-width:0"><div style="font-family:'Fustat';font-weight:700;font-size:17px;color:#1B2126;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ driverSheet.shownName }}</div><div style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73;margin-top:2px">{{ driverSheet.meta }}</div></div><div onClick="{{ driverSheet.onChange }}" aria-label="Change driver" style="cursor:pointer;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:transparent"><dc-import name="Icon" hint-size="16px,16px" iconname="pen" size="16" color="#1B4D7A" sw="1.8"></dc-import></div></div>
+            </sc-if>
+            <sc-if value="{{ driverSheet.isField }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#616B73">Someone else driving it?</span>
+                <div style="position:relative;display:flex;align-items:center"><div style="position:absolute;left:13px;z-index:1;pointer-events:none"><dc-import name="Icon" hint-size="18px,18px" iconname="search" size="18" color="#68727A" sw="1.7"></dc-import></div><input value="{{ driverSheet.reassignVal }}" onInput="{{ driverSheet.onReassign }}" placeholder="Search a different driver" style="width:100%;border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 42px 0 40px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"><sc-if value="{{ driverSheet.hasClear }}" hint-placeholder-val="{{ false }}"><div onClick="{{ driverSheet.onClear }}" style="cursor:pointer;position:absolute;right:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="x" size="16" color="#68727A" sw="2"></dc-import></div></sc-if></div>
+              </div>
             </sc-if>
             <div onClick="{{ driverSheet.onToggleSpare }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;min-height:44px"><div style="width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;{{ driverSheet.checkboxStyle }}"><sc-if value="{{ driverSheet.noDriver }}" hint-placeholder-val="{{ false }}"><dc-import name="Icon" hint-size="14px,14px" iconname="check" size="14" color="#fff" sw="3"></dc-import></sc-if></div><span style="font-family:'Fustat';font-weight:500;font-size:14px;color:#1B2126">Vehicle not in use (spare)</span></div>
             <div onClick="{{ driverSheet.onConfirm }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;{{ driverSheet.confirmStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:{{ driverSheet.confirmColor }}">{{ driverSheet.confirmLabel }}</span></div>
@@ -876,9 +950,126 @@
             <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="flex:1"><div style="font-family:'Fustat';font-weight:700;font-size:17px;color:#A03428">Record a defect</div><div style="font-family:'Fustat';font-size:12.5px;color:#616B73">{{ failSheet.text }}</div></div><div onClick="{{ failSheet.onClose }}" style="cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="x" size="16" color="#58626A" sw="2.2"></dc-import></div></div>
             <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">What is wrong</span><textarea onInput="{{ failSheet.onDesc }}" placeholder="Describe the fault" style="border:1px solid #D3D9DD;border-radius:12px;min-height:62px;padding:10px 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none;resize:none">{{ failSheet.desc }}</textarea></div>
             <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Severity</span><div style="display:flex;gap:8px"><sc-for list="{{ failSheet.sevs }}" as="s" hint-placeholder-count="3"><div onClick="{{ s.onPress }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;{{ s.style }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ s.color }}">{{ s.label }}</span></div></sc-for></div></div>
-            <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Due date (optional)</span><input value="{{ failSheet.due }}" onInput="{{ failSheet.onDue }}" placeholder="e.g. 30 Aug 2026" style="border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div>
+            <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Due date (optional)</span><input value="{{ failSheet.due }}" onInput="{{ failSheet.onDue }}" type="date" style="width:100%;box-sizing:border-box;border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div>
             <div onClick="{{ failSheet.onSave }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-top:2px;{{ failSheet.saveStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:{{ failSheet.saveColor }}">Save defect &amp; fail item</span></div>
           </div>
+        </div>
+      </sc-if>
+
+      <!-- AVATAR MENU -->
+      <sc-if value="{{ avatarMenuOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:80">
+          <div onClick="{{ onCloseAvatar }}" style="position:absolute;inset:0"></div>
+          <div style="position:absolute;top:52px;right:12px;background:#fff;border:1px solid #E7EBEE;border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(27,33,38,.18);min-width:184px">
+            <div onClick="{{ onProfileMenu }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:0 14px;min-height:50px;border-bottom:1px solid #F1F2F3"><dc-import name="Icon" hint-size="18px,18px" iconname="person" size="18" color="#1B4D7A" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126">Profile</span></div>
+            <div onClick="{{ onSignOutMenu }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:0 14px;min-height:50px"><dc-import name="Icon" hint-size="18px,18px" iconname="lock" size="18" color="#A03428" sw="1.8"></dc-import><span style="font-family:'Fustat';font-weight:500;font-size:15px;color:#A03428">Sign out</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- PEOPLE FAB -->
+      <sc-if value="{{ peopleFab }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ people.onAdd }}" style="cursor:pointer;position:absolute;right:16px;bottom:82px;z-index:45;width:56px;height:56px;border-radius:999px;background:#1B4D7A;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(27,33,38,.32)"><dc-import name="Icon" hint-size="24px,24px" iconname="plus" size="24" color="#fff" sw="2.4"></dc-import></div>
+      </sc-if>
+
+      <!-- PEOPLE SHEET -->
+      <sc-if value="{{ peopleSheetOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:60;background:rgba(27,33,38,.4);display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ peopleSheetVM.onClose }}" style="position:absolute;inset:0"></div>
+          <div style="position:relative;background:#fff;border-top-left-radius:22px;border-top-right-radius:22px;padding:8px 18px 26px;display:flex;flex-direction:column;gap:14px">
+            <div style="align-self:center;width:38px;height:4px;border-radius:999px;background:#EEF1F3;margin-bottom:2px"></div>
+            <sc-if value="{{ peopleSheetVM.isAdd }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font-family:'Fustat';font-weight:700;font-size:19px;color:#1B2126">Add a person</span><div onClick="{{ peopleSheetVM.onClose }}" style="cursor:pointer;width:34px;height:34px;border-radius:999px;background:#F1F2F3;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="15px,15px" iconname="x" size="15" color="#58626A" sw="2.2"></dc-import></div></div>
+                <div style="display:flex;flex-direction:column;gap:7px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#616B73">Full name</span><input value="{{ peopleSheetVM.newVal }}" onInput="{{ peopleSheetVM.onNew }}" placeholder="e.g. Sam Rivera" style="border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div>
+                <div style="display:flex;flex-direction:column;gap:7px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#616B73">Role</span><div style="display:flex;gap:8px"><div onClick="{{ peopleSheetVM.onInsp }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid {{ peopleSheetVM.inspBorder }};background:{{ peopleSheetVM.inspBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ peopleSheetVM.inspColor }}">Inspector</span></div><div onClick="{{ peopleSheetVM.onMgr }}" style="cursor:pointer;flex:1;min-height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;border:1px solid {{ peopleSheetVM.mgrBorder }};background:{{ peopleSheetVM.mgrBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:13px;color:{{ peopleSheetVM.mgrColor }}">Manager</span></div></div></div>
+                <div onClick="{{ peopleSheetVM.onAdd }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;{{ peopleSheetVM.addStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:{{ peopleSheetVM.addColor }}">Add to depot</span></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ peopleSheetVM.isManage }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:2px">
+                  <div style="width:60px;height:60px;border-radius:999px;background:#1B4D7A;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:700;font-size:20px;color:#fff;letter-spacing:.4px">{{ peopleSheetVM.ini }}</span></div>
+                  <span style="font-family:'Fustat';font-weight:700;font-size:20px;color:#1B2126">{{ peopleSheetVM.name }}</span>
+                  <div style="padding:4px 12px;border-radius:999px;background:#E9F0F6"><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#1B4D7A">{{ peopleSheetVM.chipLabel }}</span></div>
+                  <sc-if value="{{ peopleSheetVM.suspended }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:#FBF3E7"><dc-import name="Icon" hint-size="18px,18px" iconname="lock" size="18" color="#8A6116" sw="2"></dc-import><span style="font-family:'Fustat';font-weight:600;font-size:12.5px;color:#8A6116">Suspended</span></div></sc-if>
+                </div>
+                <sc-if value="{{ peopleSheetVM.canEditRole }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#68727A">Role</span>
+                    <div style="display:flex;gap:8px">
+                      <div onClick="{{ peopleSheetVM.onRoleInsp }}" style="cursor:pointer;flex:1;min-height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;border:1px solid {{ peopleSheetVM.baseInspBorder }};background:{{ peopleSheetVM.baseInspBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:14.5px;color:{{ peopleSheetVM.baseInspColor }}">Inspector</span></div>
+                      <div onClick="{{ peopleSheetVM.onRoleMgr }}" style="cursor:pointer;flex:1;min-height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;border:1px solid {{ peopleSheetVM.baseMgrBorder }};background:{{ peopleSheetVM.baseMgrBg }}"><span style="font-family:'Fustat';font-weight:600;font-size:14.5px;color:{{ peopleSheetVM.baseMgrColor }}">Manager</span></div>
+                    </div>
+                    <sc-if value="{{ peopleSheetVM.canGrantAdmin }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 14px;border:1px solid #E7EBEE;border-radius:13px;background:#FAFBFC"><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15px;color:{{ peopleSheetVM.adminLabelColor }}">System admin access</span><div onClick="{{ peopleSheetVM.onToggleAdmin }}" style="cursor:pointer;width:46px;height:27px;border-radius:999px;position:relative;flex-shrink:0;{{ peopleSheetVM.adminTrack }}"><div style="position:absolute;top:3px;width:21px;height:21px;border-radius:999px;background:#fff;box-shadow:0 1px 2px rgba(27,33,38,.25);{{ peopleSheetVM.adminKnob }}"></div></div></div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+                <div style="height:1px;background:#F1F2F3"></div>
+                <div onClick="{{ peopleSheetVM.onSuspend }}" style="cursor:pointer;min-height:56px;border-radius:14px;border:1px solid #E7EBEE;background:#fff;display:flex;align-items:center;gap:12px;padding:0 16px"><dc-import name="Icon" hint-size="19px,19px" iconname="lock" size="19" color="#8A6116" sw="1.8"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:15.5px;color:#8A6116">{{ peopleSheetVM.suspendLabel }}</span></div>
+                <sc-if value="{{ peopleSheetVM.notSelf }}" hint-placeholder-val="{{ true }}"><div onClick="{{ peopleSheetVM.onDelete }}" style="cursor:pointer;min-height:56px;border-radius:14px;background:{{ peopleSheetVM.deleteBg }};display:flex;align-items:center;gap:12px;padding:0 16px"><dc-import name="Icon" hint-size="19px,19px" iconname="trash" size="19" color="{{ peopleSheetVM.deleteColor }}" sw="1.9"></dc-import><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:15.5px;color:{{ peopleSheetVM.deleteColor }}">{{ peopleSheetVM.deleteLabel }}</span></div></sc-if>
+                <sc-if value="{{ peopleSheetVM.self }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Fustat';font-size:12.5px;color:#68727A;text-align:center">You can't delete your own account</span></sc-if>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- FACTORY RESET MODAL -->
+      <sc-if value="{{ resetOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:75;background:rgba(27,33,38,.34);display:flex;align-items:center;justify-content:center;padding:22px">
+          <div onClick="{{ reset.onClose }}" style="position:absolute;inset:0"></div>
+          <div style="position:relative;width:100%;max-width:340px;background:#fff;border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 14px 40px rgba(27,33,38,.34)">
+            <div onClick="{{ reset.onClose }}" style="cursor:pointer;position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="18px,18px" iconname="x" size="18" color="#616B73" sw="2"></dc-import></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+              <div style="width:48px;height:48px;border-radius:999px;background:#FBEEEC;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="24px,24px" iconname="alert" size="24" color="#A03428" sw="1.8"></dc-import></div>
+              <span style="font-family:'Fustat';font-weight:700;font-size:19px;color:#1B2126;text-align:center">Factory reset?</span>
+              <span style="font-family:'Fustat';font-size:14px;line-height:21px;color:#58626A;text-align:center">This removes every vehicle, person, check and defect on this phone and restores the checklist template. It cannot be undone.</span>
+              <span style="font-family:'Fustat';font-size:14px;line-height:21px;color:#58626A;text-align:center">{{ reset.metaLine }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px"><span style="font-family:'Fustat';font-weight:500;font-size:12px;color:#616B73">Reason (required)</span><input value="{{ reset.reason }}" onInput="{{ reset.onReason }}" placeholder="Why are you erasing this depot?" style="min-height:46px;border:1px solid #E7EBEE;border-radius:12px;padding:0 12px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div>
+            <div onClick="{{ reset.onConfirm }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;{{ reset.confirmStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:{{ reset.confirmColor }}">Reset depot</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ADD DOCUMENT SHEET -->
+      <sc-if value="{{ docSheetOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:66;background:rgba(27,33,38,.4);display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ docSheet.onClose }}" style="position:absolute;inset:0"></div>
+          <div style="position:relative;background:#fff;border-top-left-radius:22px;border-top-right-radius:22px;padding:8px 16px 26px;display:flex;flex-direction:column;gap:14px;max-height:88%;overflow-y:auto">
+            <div style="align-self:center;width:36px;height:5px;border-radius:3px;background:#D3D9DD"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-family:'IBM Plex Mono';font-weight:700;font-size:15px;letter-spacing:1.2px;color:#58626A">{{ docSheet.plate }}</div><div style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126">{{ docSheet.title }}</div></div><div onClick="{{ docSheet.onClose }}" style="cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="x" size="16" color="#58626A" sw="2.2"></dc-import></div></div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Type</span>
+              <div onClick="{{ docSheet.onTogglePicker }}" style="cursor:pointer;border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;display:flex;align-items:center;gap:10px;background:#fff"><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15px;color:{{ docSheet.typeColor }}">{{ docSheet.name }}</span><div style="{{ docSheet.pickChev }}"><dc-import name="Icon" hint-size="16px,16px" iconname="chevronDown" size="16" color="#8B9197" sw="2"></dc-import></div></div>
+              <sc-if value="{{ docSheet.pickerOpen }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ docSheet.types }}" as="t" hint-placeholder-count="4"><div onClick="{{ t.onPick }}" style="cursor:pointer;min-height:48px;border-radius:12px;padding:0 13px;display:flex;align-items:center;gap:10px;{{ t.style }}"><span style="flex:1;font-family:'Fustat';font-weight:600;font-size:15px;color:{{ t.color }}">{{ t.name }}</span><span style="font-family:'IBM Plex Mono';font-weight:500;font-size:11.5px;color:#68727A">{{ t.files }}</span></div></sc-for>
+                </div>
+              </sc-if>
+            </div>
+            <sc-if value="{{ docSheet.showFiles }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Files</span><span style="font-family:'IBM Plex Mono';font-weight:600;font-size:12px;color:{{ docSheet.progressColor }}">{{ docSheet.progress }}</span></div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <sc-for list="{{ docSheet.files }}" as="f" hint-placeholder-count="1"><div style="position:relative;width:64px;height:64px;border-radius:12px;background:#EEF1F3;border:1px solid #E7EBEE;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="20px,20px" iconname="file" size="20" color="#68727A" sw="1.6"></dc-import><div onClick="{{ f.onRemove }}" style="cursor:pointer;position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:999px;background:#A03428;display:flex;align-items:center;justify-content:center;border:2px solid #fff"><dc-import name="Icon" hint-size="11px,11px" iconname="x" size="11" color="#fff" sw="2.6"></dc-import></div></div></sc-for>
+                  <sc-if value="{{ docSheet.canAttach }}" hint-placeholder-val="{{ true }}"><div onClick="{{ docSheet.onAttach }}" style="cursor:pointer;width:64px;height:64px;border-radius:12px;border:1px dashed #1B4D7A;background:#F6F9FC;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><dc-import name="Icon" hint-size="18px,18px" iconname="plus" size="18" color="#1B4D7A" sw="2"></dc-import></div></sc-if>
+                </div>
+              </div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Expiry date (optional)</span><input value="{{ docSheet.date }}" onInput="{{ docSheet.onDate }}" type="date" style="width:100%;box-sizing:border-box;border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div>
+            <div onClick="{{ docSheet.onSave }}" style="cursor:pointer;min-height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;{{ docSheet.saveStyle }}"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:{{ docSheet.saveColor }}">Save document</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- PROFILE SAVE BAR -->
+      <sc-if value="{{ profileDirty }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:0;right:0;bottom:70px;z-index:45;background:#fff;border-top:1px solid #E7EBEE;padding:12px 16px 14px;display:flex;gap:10px;box-shadow:0 -6px 14px rgba(27,33,38,.12)">
+          <div onClick="{{ profile.onDiscard }}" style="cursor:pointer;flex:1;min-height:50px;border-radius:14px;border:1px solid #E7EBEE;background:#fff;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:500;font-size:15.5px;color:#616B73">Discard</span></div>
+          <div onClick="{{ profile.onSave }}" style="cursor:pointer;flex:2;min-height:50px;border-radius:14px;background:#1B4D7A;display:flex;align-items:center;justify-content:center"><span style="font-family:'Fustat';font-weight:600;font-size:16px;color:#fff">Save changes</span></div>
         </div>
       </sc-if>
 
@@ -889,8 +1080,8 @@
           <div style="position:relative;background:#fff;border-top-left-radius:22px;border-top-right-radius:22px;padding:8px 16px 24px;display:flex;flex-direction:column;gap:14px;max-height:88%">
             <div style="align-self:center;width:36px;height:5px;border-radius:3px;background:#D3D9DD"></div>
             <div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="min-width:0"><div style="font-family:'IBM Plex Mono';font-weight:700;font-size:15px;letter-spacing:1.2px;color:#58626A">{{ editSheet.plate }}</div><div style="font-family:'Fustat';font-weight:700;font-size:18px;color:#1B2126">Edit details</div></div><div onClick="{{ editSheet.onCancel }}" style="cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center"><dc-import name="Icon" hint-size="16px,16px" iconname="x" size="16" color="#58626A" sw="2.2"></dc-import></div></div>
-            <div style="display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-bottom:2px">
-              <sc-for list="{{ editSheet.fields }}" as="f" hint-placeholder-count="7"><div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">{{ f.label }}</span><input value="{{ f.val }}" onInput="{{ f.onInput }}" inputmode="{{ f.kb }}" placeholder="{{ f.ph }}" style="border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div></sc-for>
+            <div style="display:flex;flex-direction:column;gap:12px;overflow-y:auto;overflow-x:hidden;padding-bottom:8px">
+              <sc-for list="{{ editSheet.fields }}" as="f" hint-placeholder-count="7"><div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">{{ f.label }}</span><input value="{{ f.val }}" onInput="{{ f.onInput }}" inputmode="{{ f.kb }}" placeholder="{{ f.ph }}" style="width:100%;box-sizing:border-box;border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;font-family:'Fustat';font-weight:500;font-size:15px;color:#1B2126;background:#fff;outline:none"></div></sc-for>
               <div style="display:flex;flex-direction:column;gap:6px">
                 <span style="font-family:'Fustat';font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:#616B73">Use</span>
                 <div onClick="{{ editSheet.onToggleUse }}" style="cursor:pointer;border:1px solid #D3D9DD;border-radius:12px;min-height:48px;padding:0 13px;display:flex;align-items:center;gap:10px;background:#fff"><span style="flex:1;font-family:'Fustat';font-weight:500;font-size:15px;color:{{ editSheet.useColor }}">{{ editSheet.use }}</span><div style="{{ editSheet.useChev }}"><dc-import name="Icon" hint-size="16px,16px" iconname="chevronDown" size="16" color="#8B9197" sw="2"></dc-import></div></div>
@@ -953,6 +1144,7 @@ const CHECKLIST = {version:4, sections:[
   {id:'safe',name:'Safety Equipment',items:[{id:'safe1',text:'Warning Triangles'},{id:'safe2',text:'Fire Extinguishers'},{id:'safe3',text:'Spill Kit'},{id:'safe4',text:'Fluoro Vest, Gloves, Hard Hat'},{id:'safe5',text:'First Aid Kit'}]},
   {id:'reg',name:'Registration',items:[{id:'reg1',text:'Registration documents current and available'}]},
 ]};
+const DRIVER_POOL=['Aisha Khan','Aisha Rahman','Ben Wang','Darren Cole','Elena Petrov','Gary Fletcher','Hannah Blake','James Whelan','Leah Mensah','Marcus Boateng','Michael Pak','Nina Kowalski','Owen Pearce','Phuog Lam','Priya Shah','Sean Riley','Sofia Marín','Tien Nguyen','Tomasz Wójcik'];
 function initials(name){const p=(name||'').trim().split(/\s+/);return ((p[0]||'')[0]||'').toUpperCase()+((p[1]||'')[0]||'').toUpperCase();}
 function seedPeople(){return [
   {name:'Tien Nguyen',role:'Manager',ini:'TN',suspended:false,since:'March 2024'},
@@ -1045,7 +1237,7 @@ function plural(n,one,many){return n+' '+(n===1?one:(many||one+'s'));}
 function greeting(){const h=new Date().getHours();if(h<12)return 'Good morning';if(h<18)return 'Good afternoon';return 'Good evening';}
 
 const CHILD_OF={check:'checkhome',van:'vans',settings:'more',config:'more',people:'more',profile:'more',help:'more',report:'checkhome'};
-const HEADER_TITLES={checkhome:'Dashboard',faults:'Defects',vans:'Fleet',more:'More',check:'Full Inspection',settings:'Settings',config:'Depot configuration',people:'People',help:'How to & help',report:'Weekly report'};
+const HEADER_TITLES={checkhome:'Dashboard',faults:'Defects',vans:'Fleet',more:'More',check:'Full Inspection',settings:'Settings',config:'Depot configuration',people:'Personnel Management',help:'How to & help',report:'Weekly report'};
 const BACK_TO={van:'vans',settings:'more',config:'settings',people:'more',profile:'people',help:'more',report:'checkhome',check:'vans'};
 
 class Component extends DCLogic {
@@ -1062,12 +1254,21 @@ class Component extends DCLogic {
       // draw
       drawOpen:false, drawSettled:false, drawPlate:null, drawSpinPlate:'', drawRerolls:0, rerolls:2,
       // driver sheet + check
-      driverSheet:null, checkVan:null, checkStep:'photos', checkNoKeyholder:false, checkDriver:'',
+      driverSheet:null, checkVan:null, checkStep:'photos', checkNoKeyholder:false, checkDriver:'', driverEditing:false,
       checkPhotos:{}, checkResults:{}, checkDefects:{}, failSheet:null, checkSigned:false, checkOdo:'',
       docTypesData:[{name:'Roadworthy',files:1},{name:'Registration',files:1},{name:'CTP',files:1},{name:'Insurance',files:1}],
       useTypes:['PRV','BUS'],
+      photoAngles:['Front','Rear','Nearside','Offside','Dashboard / odometer','Interior / load area'], newAngle:'',
       docTypesOpen:false, usesOpen:false, newDocName:'', newDocFiles:'1', newUse:'', editSheet:null,
+      backupMeta:null, restoreOpen:false, resetModal:false, resetReason:'',
+      peopleSheet:null, peopleNew:'', peopleNewRole:'Inspector', peopleDelArm:false,
+      draftRole:null, profRoleOpen:false, profCapsOpen:false,
+      docSheetOpen:false, docPlate:'', docName:'', docDate:'', docFiles:[], docPickerOpen:false, docEditIdx:null,
+      avatarMenuOpen:false,
       depotName:'Chullora CPDC',
+      depotAddr:'88 Rookwood Rd, Chullora NSW 2190',
+      geofenceRadius:'150', locationGate:true, deviceBinding:true, accessCode:'4Q7-2K9', depotOpen:true,
+      cfgEdit:false, lastBackup:null,
       peopleFilter:'all',
       helpOpen:'',
       configGroups:seedCapGroups(), groupOpen:'', viewPerson:null,
@@ -1128,11 +1329,13 @@ class Component extends DCLogic {
   // ---- check flow ----
   startCheck(plate){
     const v=this.vanById(plate); const drv=(v&&v.driver&&v.driver!=='Unassigned')?v.driver:'';
-    this.setState({checkVan:plate,checkStep:'photos',driverSheet:plate,checkNoKeyholder:false,checkDriver:drv,checkPhotos:{},checkResults:{},checkDefects:{},failSheet:null,checkSigned:false,checkOdo:'',drawOpen:false,drawSettled:false});
+    this.setState({checkVan:plate,checkStep:'photos',driverSheet:plate,checkNoKeyholder:false,checkDriver:'',driverEditing:!drv,checkPhotos:{},checkResults:{},checkDefects:{},failSheet:null,checkSigned:false,checkOdo:'',drawOpen:false,drawSettled:false});
   }
   closeDriverSheet(){ this.setState({driverSheet:null}); }
   toggleNoKeyholder(){ this.setState((s)=>({checkNoKeyholder:!s.checkNoKeyholder,checkDriver:s.checkNoKeyholder?s.checkDriver:''})); }
   onChkDriver(v){ this.setState({checkDriver:v}); }
+  openDriverEdit(){ this.setState({driverEditing:true}); }
+  clearDriverField(){ const v=this.vanById(this.state.checkVan); const onFile=v&&v.driver&&v.driver!=='Unassigned'; this.setState({checkDriver:'',driverEditing:onFile?false:true}); }
   confirmDriverStart(){
     const st=this.state; let name=(st.checkDriver||'').trim();
     if(!name&&!st.checkNoKeyholder){ const v=this.vanById(st.checkVan); const onFile=v&&v.driver&&v.driver!=='Unassigned'?v.driver:''; if(onFile){this.setState({checkDriver:onFile});name=onFile;} }
@@ -1158,6 +1361,64 @@ class Component extends DCLogic {
   onNewUse(v){ this.setState({newUse:(v||'').toUpperCase()}); }
   addUse(){ const st=this.state; const name=(st.newUse||'').trim(); if(!name)return this.say('Type a use before adding it.'); if(st.useTypes.some((u)=>u.toLowerCase()===name.toLowerCase()))return this.say('“'+name+'” is already in the list.'); this.setState((s)=>({useTypes:[...s.useTypes,name],newUse:''})); }
   removeUse(name){ this.setState((s)=>({useTypes:s.useTypes.filter((u)=>u!==name)})); }
+  toggleDepot(){ this.setState((s)=>({depotOpen:!s.depotOpen})); }
+  onDepotName(v){ this.setState({depotName:v}); }
+  onDepotAddr(v){ this.setState({depotAddr:v}); }
+  onGeoRadius(v){ this.setState({geofenceRadius:(v||'').replace(/[^0-9]/g,'').slice(0,4)}); }
+  toggleLocationGate(){ this.setState((s)=>({locationGate:!s.locationGate}),()=>this.say(this.state.locationGate?'Location-gated checks on.':'Location gate off — checks allowed anywhere.')); }
+  toggleDeviceBinding(){ this.setState((s)=>({deviceBinding:!s.deviceBinding}),()=>this.say(this.state.deviceBinding?'Device binding on — new sign-ins bind to their phone.':'Device binding off.')); }
+  regenCode(){ const cs='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; const p=(n)=>Array.from({length:n},()=>cs[Math.floor(Math.random()*cs.length)]).join(''); this.setState({accessCode:p(3)+'-'+p(3)},()=>this.say('New one-time access code generated.')); }
+  onNewAngle(v){ this.setState({newAngle:v}); }
+  addAngle(){ const st=this.state; const name=(st.newAngle||'').trim(); if(!name)return this.say('Name the photo angle first.'); if(st.photoAngles.some((a)=>a.toLowerCase()===name.toLowerCase()))return this.say('“'+name+'” is already a required angle.'); this.setState((s)=>({photoAngles:[...s.photoAngles,name],newAngle:''})); }
+  removeAngle(name){ const st=this.state; if(st.photoAngles.length<=1)return this.say('Keep at least one required photo angle.'); this.setState((s)=>({photoAngles:s.photoAngles.filter((a)=>a!==name)})); }
+  toggleCap(role,capName){ this.setState((s)=>({configGroups:s.configGroups.map((g)=>g.role!==role?g:{...g,caps:g.caps.map((c)=>c.name!==capName?c:{...c,on:c.on===false})})}),()=>this.say('Capability updated — role permissions saved.')); }
+  toggleCfgEdit(){ this.setState((s)=>({cfgEdit:!s.cfgEdit})); }
+  onExcludeDays(v){ this.setState({excludeDays:(v||'').replace(/[^0-9]/g,'').slice(0,3)}); }
+  onForceDays(v){ this.setState({forceDays:(v||'').replace(/[^0-9]/g,'').slice(0,3)}); }
+  onRerolls(v){ const n=(v||'').replace(/[^0-9]/g,'').slice(0,1); this.setState({rerolls:n===''?0:parseInt(n,10)}); }
+  onTarget(v){ this.setState({target:(v||'').replace(/[^0-9]/g,'').slice(0,3)}); }
+  download(name,text){ try{ const blob=new Blob([text],{type:'text/plain'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500); return true; }catch(e){ return false; } }
+  exportVan(){ const v=this.vanById(this.state.vanId); if(!v)return; const lines=['Vehicle report — '+v.plate,v.model+' · Bay '+v.bay,'Odometer: '+(v.odo!=null?fmtNum(v.odo)+' km':'—'),'Driver: '+(v.driver&&v.driver!=='Unassigned'?v.driver:'Unassigned'),'Last checked: '+(v.last==null?'never':v.last===0?'today':v.last+' days ago'),'','Open defects:',...(v.jobs.length?v.jobs.map((j)=>'  - '+j):['  none']),'','Documents:',...v.docs.map((d)=>'  - '+d.name+': '+fmtDate(d.date))]; if(this.download(v.plate.replace(/\s+/g,'')+'-report.txt',lines.join('\n')))this.say('Vehicle report downloaded.'); else this.say('Could not export on this device.'); }
+  exportReport(){ const st=this.state; const fleet=st.fleet; const openDefects=fleet.reduce((n,v)=>n+v.jobs.length,0); const target=parseInt(st.target,10)||12; const weekChecks=st.approved.filter((a)=>a.week).length+st.queue.length; const blocked=fleet.filter((v)=>v.blocked).length; const lines=['Weekly depot report','Week of 18–24 Aug 2026 · '+st.depotName,'','Coverage: '+weekChecks+' of '+target+' target checks','Open defects: '+openDefects,'Vehicles needing attention: '+blocked,'Fleet size: '+fleet.length]; if(this.download('weekly-depot-report.txt',lines.join('\n')))this.say('Report downloaded.'); else this.say('Could not export on this device.'); }
+  removeVehicle(){ const plate=this.state.vanId; if(!plate)return; this.setState((s)=>({fleet:s.fleet.filter((v)=>v.plate!==plate),queue:s.queue.filter((q)=>q.plate!==plate),approved:s.approved.filter((a)=>a.plate!==plate),returned:s.returned.filter((r)=>r.plate!==plate),screen:'vans',vanId:null}),()=>this.say('Vehicle removed from the depot.')); }
+  doBackup(){ try{ const s=this.state; const snap={fleet:s.fleet,people:s.people,queue:s.queue,approved:s.approved,returned:s.returned,docTypesData:s.docTypesData,useTypes:s.useTypes,photoAngles:s.photoAngles,configGroups:s.configGroups,excludeDays:s.excludeDays,forceDays:s.forceDays,rerolls:s.rerolls,target:s.target,depotName:s.depotName,depotAddr:s.depotAddr,geofenceRadius:s.geofenceRadius,locationGate:s.locationGate,deviceBinding:s.deviceBinding,accessCode:s.accessCode}; const rec={savedAt:new Date().toLocaleString(),data:snap}; localStorage.setItem('spotcheck_backup',JSON.stringify(rec)); this.setState({backupMeta:this.metaOf(rec)}); this.say('Backup saved on this device.'); }catch(e){ this.say('Could not save a backup.'); } }
+  metaOf(rec){ const d=(rec&&rec.data)||{}; const fleet=d.fleet||[]; return {savedAt:(rec&&rec.savedAt)||'\u2014',vans:fleet.length,checks:((d.approved||[]).length+(d.queue||[]).length),defects:fleet.reduce((t,v)=>t+((v.jobs||[]).length),0)}; }
+  openRestore(){ try{ const raw=localStorage.getItem('spotcheck_backup'); if(!raw)return this.say('No backup on this device yet.'); const rec=JSON.parse(raw); if(!rec||!rec.data)return this.say('That backup is unreadable.'); this.setState({restoreOpen:true,backupMeta:this.metaOf(rec)}); }catch(e){ this.say('Could not read the backup.'); } }
+  cancelRestore(){ this.setState({restoreOpen:false}); }
+  confirmRestore(){ try{ const raw=localStorage.getItem('spotcheck_backup'); const rec=raw?JSON.parse(raw):null; if(!rec||!rec.data){ this.setState({restoreOpen:false}); return this.say('That backup is unreadable.'); } this.setState({...rec.data,restoreOpen:false,screen:'settings',vanId:null},()=>this.say('Restored from the backup of '+rec.savedAt+'.')); }catch(e){ this.setState({restoreOpen:false}); this.say('Could not restore.'); } }
+  openResetModal(){ this.setState({resetModal:true,resetReason:''}); }
+  closeResetModal(){ this.setState({resetModal:false,resetReason:''}); }
+  onResetReason(v){ this.setState({resetReason:v}); }
+  doReset(){ if(!(this.state.resetReason||'').trim())return this.say('Say why you are emptying the depot.'); const fleet=genVans(); this.setState({fleet,people:seedPeople(),queue:seedQueue(fleet),approved:seedApproved(fleet),returned:[],docTypesData:[{name:'Roadworthy',files:1},{name:'Registration',files:1},{name:'CTP',files:1},{name:'Insurance',files:1}],useTypes:['PRV','BUS'],photoAngles:['Front','Rear','Nearside','Offside','Dashboard / odometer','Interior / load area'],configGroups:seedCapGroups(),excludeDays:'7',forceDays:'30',rerolls:2,target:'12',depotName:'Chullora CPDC',depotAddr:'88 Rookwood Rd, Chullora NSW 2190',geofenceRadius:'150',locationGate:true,deviceBinding:true,accessCode:'4Q7-2K9',cfgEdit:false,resetModal:false,resetReason:'',viewPerson:null,draftRole:null,peopleSheet:null,peopleFilter:'all',screen:'more'},()=>this.say('Depot emptied \u2014 back to the template it shipped with.')); }
+  openAddPerson(){ this.setState({peopleSheet:{mode:'add',name:''},peopleNew:'',peopleNewRole:'Inspector'}); }
+  openManagePerson(name){ this.setState({peopleSheet:{mode:'manage',name},peopleDelArm:false}); }
+  closePeopleSheet(){ this.setState({peopleSheet:null,peopleNew:'',peopleDelArm:false}); }
+  armDelete(name){ if(this.state.peopleDelArm)return this.deletePerson(name); this.setState({peopleDelArm:true},()=>this.say('Tap delete again to confirm.')); }
+  onPeopleNew(v){ this.setState({peopleNew:v}); }
+  setNewRole(r){ this.setState({peopleNewRole:r}); }
+  addPerson(){ const st=this.state; const name=(st.peopleNew||'').trim(); if(!name)return this.say('Enter a name.'); if(st.people.some((p)=>p.name.toLowerCase()===name.toLowerCase()))return this.say('That person is already on the depot.'); const role=st.peopleNewRole||'Inspector'; this.setState((s)=>({people:[...s.people,{name,role,ini:initials(name),suspended:false,since:'August 2026'}],peopleSheet:null,peopleNew:''}),()=>this.say(name+' added as '+(role==='Manager'?'a Manager':'an Inspector')+'.')); }
+  toggleSuspend(name){ let now=false; this.setState((s)=>({people:s.people.map((p)=>{ if(p.name!==name)return p; now=!p.suspended; return {...p,suspended:now}; }),peopleSheet:null,peopleDelArm:false}),()=>this.say(now?name+" suspended \u2014 they can't sign in.":name+' reinstated.')); }
+  deletePerson(name){ if(name===this.resolvedPerson())return this.say("You can't delete your own account."); this.setState((s)=>({people:s.people.filter((p)=>p.name!==name),peopleSheet:null,viewPerson:s.viewPerson===name?null:s.viewPerson,screen:s.viewPerson===name?'people':s.screen}),()=>this.say(name+' removed from the depot.')); }
+  setPersonRole(name,base){ this.setState((s)=>({people:s.people.map((p)=>p.name===name?{...p,role:base}:p),peopleDelArm:false}),()=>this.say(name+' is now '+this.roleLabel(base)+'.')); }
+  togglePersonAdmin(name){ this.setState((s)=>({people:s.people.map((p)=>p.name===name?{...p,role:p.role==='Admin'?'Manager':'Admin'}:p),peopleDelArm:false}),()=>this.say(this.roleOf(name)==='Admin'?(name+' now has system admin access.'):(name+' — system admin access removed.'))); }
+  setDraftRole(r){ this.setState({draftRole:r,profRoleOpen:false}); }
+  effRoleP(){ const name=this.state.viewPerson||this.resolvedPerson(); const committed=this.roleOf(name); return this.state.draftRole!==null?this.state.draftRole:committed; }
+  toggleGrantAdmin(){ const eff=this.effRoleP(); this.setState({draftRole:eff==='Admin'?'Manager':'Admin'}); }
+  toggleProfRole(){ this.setState((s)=>({profRoleOpen:!s.profRoleOpen})); }
+  toggleProfCaps(){ this.setState((s)=>({profCapsOpen:!s.profCapsOpen})); }
+  discardRole(){ this.setState({draftRole:null,profRoleOpen:false}); }
+  saveRole(){ const name=this.state.viewPerson||this.resolvedPerson(); const role=this.state.draftRole; if(role===null)return; this.setState((s)=>({people:s.people.map((p)=>p.name===name?{...p,role}:p),draftRole:null,profRoleOpen:false}),()=>this.say(name+' is now '+this.roleLabel(role)+'.')); }
+  roleLabel(role){ return role==='Admin'?'Manager +':role; }
+  docTypeFilesFor(name){ const t=this.state.docTypesData.find((d)=>d.name.toLowerCase()===String(name||'').trim().toLowerCase()); return t?t.files:0; }
+  openDocSheet(plate){ this.setState({docSheetOpen:true,docPlate:plate,docName:'',docDate:'',docFiles:[],docPickerOpen:true,docEditIdx:null}); }
+  openDocEdit(plate,idx){ const v=this.vanById(plate); const d=v&&v.docs[idx]; if(!d)return; const n=typeof d.files==='number'?d.files:(Array.isArray(d.files)?d.files.length:0); const files=Array.from({length:n},(_,k)=>({id:'ex-'+idx+'-'+k})); this.setState({docSheetOpen:true,docPlate:plate,docName:d.name||'',docDate:d.date||'',docFiles:files,docPickerOpen:false,docEditIdx:idx}); }
+  closeDocSheet(){ this.setState({docSheetOpen:false,docPickerOpen:false}); }
+  toggleDocPicker(){ this.setState((s)=>({docPickerOpen:!s.docPickerOpen})); }
+  pickDocType(name){ this.setState({docName:name,docPickerOpen:false,docFiles:[]}); }
+  onDocDate(v){ this.setState({docDate:v}); }
+  attachDocFile(){ this.setState((s)=>({docFiles:[...s.docFiles,{id:Date.now()+':'+Math.random()}]})); }
+  removeDocFile(id){ this.setState((s)=>({docFiles:s.docFiles.filter((f)=>f.id!==id)})); }
+  saveDoc(){ const st=this.state; const name=(st.docName||'').trim(); if(!name)return this.say('Pick a document type first.'); const required=this.docTypeFilesFor(name); if(st.docFiles.length<required)return this.say(name+' needs '+required+(required===1?' file':' files')+' - '+st.docFiles.length+' attached.'); const plate=st.docPlate; const date=(st.docDate||'').trim(); const idx=st.docEditIdx; const who=this.resolvedPerson(); this.setState((s)=>({fleet:s.fleet.map((v)=>{ if(v.plate!==plate)return v; const doc={name,date,files:st.docFiles.length,soon:false,expired:false,dueDays:null}; const docs=idx==null?[...v.docs,doc]:v.docs.map((d,i)=>i===idx?doc:d); return {...v,docs,log:[{when:TODAY,who,what:(idx==null?'Document added - ':'Document updated - ')+name,kind:'doc'},...(v.log||[])]}; }),docSheetOpen:false,docPickerOpen:false,docEditIdx:null}),()=>this.say(idx==null?'Document added.':'Document saved.')); }
   openEditSheet(){ const v=this.vanById(this.state.vanId)||this.state.fleet[0]; if(!v)return; this.setState({editSheet:{plate:v.plate,year:v.year==null?'':String(v.year),fuel:v.fuel||'',inservice:v.inservice||'',vin:v.vin||'',color:v.color||'',gvm:v.gvm==null||v.gvm===''?'':String(v.gvm),tare:v.tare==null||v.tare===''?'':String(v.tare),use:v.use||'',usePickerOpen:false}}); }
   editSet(patch){ this.setState((s)=>({editSheet:{...s.editSheet,...patch}})); }
   toggleUsePicker(){ this.setState((s)=>({editSheet:{...s.editSheet,usePickerOpen:!s.editSheet.usePickerOpen}})); }
@@ -1191,10 +1452,13 @@ class Component extends DCLogic {
   // ---- help ----
   toggleHelp(id){ this.setState((s)=>({helpOpen:s.helpOpen===id?'':id})); }
   setPeopleFilter(f){ this.setState({peopleFilter:f}); }
-  openPerson(name){ this.setState({screen:'profile',viewPerson:name}); }
+  toggleAvatarMenu(){ this.setState((s)=>({avatarMenuOpen:!s.avatarMenuOpen})); }
+  closeAvatarMenu(){ this.setState({avatarMenuOpen:false}); }
+  profileFromMenu(){ this.setState({avatarMenuOpen:false}); this.openPerson(this.resolvedPerson()); }
+  openPerson(name){ this.setState({screen:'profile',viewPerson:name,draftRole:null,profRoleOpen:false,profCapsOpen:false,peopleSheet:null}); }
   toggleGroup(role){ this.setState((s)=>({groupOpen:s.groupOpen===role?'':role})); }
   roster(){ return this.state.people.filter((p)=>this.roleOf(p.name)!=='Admin'); }
-  peopleList(){ const r=this.roster(); const mgrs=r.filter((p)=>this.roleOf(p.name)!=='Inspector'); const insps=r.filter((p)=>this.roleOf(p.name)==='Inspector'); const all=[...mgrs,...insps]; const f=this.state.peopleFilter; return f==='all'?all:all.filter((p)=>{const rr=this.roleOf(p.name);return (rr==='Admin'?'Manager':rr)===f;}); }
+  peopleList(){ const r=this.state.people; const mgrs=r.filter((p)=>this.roleOf(p.name)!=='Inspector'); const insps=r.filter((p)=>this.roleOf(p.name)==='Inspector'); const all=[...mgrs,...insps]; const f=this.state.peopleFilter; return f==='all'?all:all.filter((p)=>{const rr=this.roleOf(p.name);return (rr==='Admin'?'Manager':rr)===f;}); }
 
   // ============ render ============
   renderVals(){
@@ -1230,7 +1494,8 @@ class Component extends DCLogic {
       header,
       bodyBg:'#FFFFFF',
       onBack:()=>this.navBack(),
-      onAvatar:()=>this.signOut(),
+      onAvatar:()=>this.toggleAvatarMenu(),
+      avatarMenuOpen:!st.signedOut&&st.avatarMenuOpen, onCloseAvatar:()=>this.closeAvatarMenu(), onProfileMenu:()=>this.profileFromMenu(), onSignOutMenu:()=>{ this.closeAvatarMenu(); this.signOut(); },
       showNav:screen!=='check'&&!st.signedOut,
       isGate:st.signedOut, gate:this._gate(),
       tabs,
@@ -1254,6 +1519,11 @@ class Component extends DCLogic {
       editSheetOpen:!!st.editSheet, editSheet:this._editSheet(),
       isMore:screen==='more', isSettings:screen==='settings', isConfig:screen==='config', isPeople:screen==='people', isProfile:screen==='profile', isHelp:screen==='help', isReport:screen==='report',
       more:this._more(), settings:this._settings(), config:this._config(), people:this._people(), profile:this._profile(), help:this._help(), report:this._report(),
+      peopleFab:screen==='people'&&this.isManager()&&!st.signedOut,
+      peopleSheetOpen:!!st.peopleSheet, peopleSheetVM:this._peopleSheet(),
+      resetOpen:st.resetModal, reset:this._resetModal(),
+      docSheetOpen:st.docSheetOpen, docSheet:this._docSheet(),
+      profileDirty:screen==='profile'&&st.draftRole!==null&&st.draftRole!==this.roleOf(st.viewPerson||this.resolvedPerson()),
     };
     return out;
   }
@@ -1355,7 +1625,7 @@ class Component extends DCLogic {
       jobs:v.jobs.map((j)=>({text:j,onFix:()=>this.markFixed(v.plate,j)})),
       details:[['Year',v.year||'—'],['Fuel',v.fuel||'—'],['In service',v.inservice||'—'],['Colour',v.color||'—'],['Use',v.use||'—'],['GVM',v.gvm?fmtNum(v.gvm)+' kg':'—'],['Tare',v.tare?fmtNum(v.tare)+' kg':'—'],['VIN',v.vin||'—']].map(([k,val],i,arr)=>({k,val,last:i===arr.length-1})),
       docsMeta:plural(v.docs.length,'doc'),
-      docs:v.docs.map((d)=>{ const dd=typeof d.dueDays==='number'?d.dueDays:null; const isExp=d.expired||(dd!==null&&dd<0); const isSoon=!isExp&&d.soon&&dd!==null; const urgent=isSoon&&dd<=7; return {name:d.name,date:fmtDate(d.date),hasDate:!!(d.date&&String(d.date).trim()),hasBadge:isExp||isSoon,badgeBg:isExp?C.danger:urgent?C.dangerBg:C.amberBg,badgeColor:isExp?'#fff':urgent?C.danger:C.amber,badgeTxt:isExp?('overdue '+Math.abs(dd)+'d'):(dd+'d left')}; }),
+      docs:v.docs.map((d,di)=>{ const dd=typeof d.dueDays==='number'?d.dueDays:null; const isExp=d.expired||(dd!==null&&dd<0); const isSoon=!isExp&&d.soon&&dd!==null; const urgent=isSoon&&dd<=7; return {name:d.name,date:fmtDate(d.date),hasDate:!!(d.date&&String(d.date).trim()),hasBadge:isExp||isSoon,badgeBg:isExp?C.danger:urgent?C.dangerBg:C.amberBg,badgeColor:isExp?'#fff':urgent?C.danger:C.amber,badgeTxt:isExp?('overdue '+Math.abs(dd)+'d'):(dd+'d left'),onPress:()=>this.openDocEdit(v.plate,di)}; }),
       histMeta:plural((v.history||[]).length,'check'),
       history:(v.history||[]).map((h,hi)=>{ const id=v.plate+hi; const open=st.timelineOpen===id; const fault=h.result==='Fault found'; return {date:h.date,by:h.by+' · '+plural(h.photos||0,'photo'),result:fault?'Defect found':h.result,resultColor:fault?C.danger:C.green,open,chevStyle:open?'transform:rotate(180deg)':'',photos:Array.from({length:h.photos||0}).map(()=>({})),onToggle:()=>this.toggleTimeline(id)}; }),
       logMeta:plural(log.length,'event')+' · audit',
@@ -1366,14 +1636,15 @@ class Component extends DCLogic {
       tDetails:()=>this.toggleVanCard('details'), tDocs:()=>this.toggleVanCard('docs'), tHist:()=>this.toggleVanCard('hist'), tLog:()=>this.toggleVanCard('log'),
       cDetails:cardOpen('details')?'transform:rotate(180deg)':'', cDocs:cardOpen('docs')?'transform:rotate(180deg)':'', cHist:cardOpen('hist')?'transform:rotate(180deg)':'', cLog:cardOpen('log')?'transform:rotate(180deg)':'',
       detailsHeadBorder:cardOpen('details')?'border-bottom:1px solid #F1F2F3':'',
-      onExport:()=>this.say('Export coming soon — PDF is on the way.'),
+      onExport:()=>this.exportVan(),
+      onAddDoc:()=>this.openDocSheet(this.state.vanId),
       onEditDetails:()=>this.openEditSheet(),
-      onRemove:()=>this.say('Remove needs a confirm — wired in the live app.'),
+      onRemove:()=>this.removeVehicle(),
     };
   }
   _check(){
     const st=this.state; const plate=st.checkVan; const step=st.checkStep;
-    const ANGLES=['Front','Rear','Nearside','Offside','Dashboard / odometer','Interior / load area'];
+    const ANGLES=st.photoAngles;
     const taken=ANGLES.filter((a)=>st.checkPhotos[a]).length;
     const items=this.liveItems();
     const doneCount=items.filter((it)=>st.checkResults[it.id]).length;
@@ -1424,19 +1695,74 @@ class Component extends DCLogic {
     const st=this.state; const plate=st.driverSheet; const v=this.vanById(plate);
     const onFile=v&&v.driver&&v.driver!=='Unassigned'?v.driver:null;
     const noDriver=st.checkNoKeyholder; const typed=(st.checkDriver||'').trim();
-    const shownName=noDriver?'No driver':(typed||onFile||'Not on file');
     const changed=!noDriver&&!!typed&&typed!==onFile;
+    const editing=!noDriver&&(st.driverEditing||changed);
+    const selectedName=typed||onFile||'';
+    const shownName=noDriver?'No driver':(selectedName||'Not on file');
     const canConfirm=noDriver||!!typed||!!onFile;
     return {
-      plate:plate||'', shownName, ini:initials(shownName), noDriver,
+      plate:plate||'',
+      isSpare:noDriver, isCard:!noDriver&&!editing, isField:editing,
+      ini:initials(shownName), shownName, noDriver,
       meta:noDriver?'Spare / yard vehicle':changed?'Different driver':onFile?'Driver on file':'No driver on file yet',
       avBg:noDriver?C.chipBlue:C.primary, avColor:noDriver?C.muted2:'#fff',
-      showField:!noDriver&&(!onFile||changed), reassignVal:st.checkDriver, onReassign:(e)=>this.onChkDriver(e.target.value),
+      onChange:()=>this.openDriverEdit(),
+      reassignVal:st.checkDriver, onReassign:(e)=>this.onChkDriver(e.target.value),
+      hasClear:!!typed||!!onFile, onClear:()=>this.clearDriverField(),
       checkboxStyle:noDriver?'background:#1B4D7A;border:1.6px solid #1B4D7A':'background:#fff;border:1.6px solid #D3D9DD',
       confirmLabel:noDriver?'Random Check':'Confirm', confirmStyle:canConfirm?'background:#1B4D7A':'background:#F1F2F3', confirmColor:canConfirm?'#fff':'#58626A',
       onToggleSpare:()=>this.toggleNoKeyholder(),
       onConfirm:()=>noDriver?this.skipAsSpare():this.confirmDriverStart(), onClose:()=>this.closeDriverSheet(),
     };
+  }
+  _peopleSheet(){
+    const st=this.state; const sh=st.peopleSheet; if(!sh)return {};
+    if(sh.mode==='add'){
+      const ready=!!(st.peopleNew||'').trim();
+      return {isAdd:true,isManage:false,newVal:st.peopleNew,onNew:(e)=>this.onPeopleNew(e.target.value),
+        inspBg:st.peopleNewRole==='Inspector'?'#1B4D7A':'#fff', inspBorder:st.peopleNewRole==='Inspector'?'#1B4D7A':'#E7EBEE', inspColor:st.peopleNewRole==='Inspector'?'#fff':'#58626A',
+        mgrBg:st.peopleNewRole==='Manager'?'#1B4D7A':'#fff', mgrBorder:st.peopleNewRole==='Manager'?'#1B4D7A':'#E7EBEE', mgrColor:st.peopleNewRole==='Manager'?'#fff':'#58626A',
+        onInsp:()=>this.setNewRole('Inspector'), onMgr:()=>this.setNewRole('Manager'),
+        ready, addStyle:ready?'background:#1B4D7A':'background:#F1F2F3', addColor:ready?'#fff':'#58626A',
+        onAdd:()=>this.addPerson(), onClose:()=>this.closePeopleSheet()};
+    }
+    const name=sh.name; const person=st.people.find((p)=>p.name===name)||{name,suspended:false}; const self=name===this.resolvedPerson();
+    const eff=this.roleOf(name); const isAdminRole=eff==='Admin'; const base=isAdminRole?'Manager':eff;
+    const canEditRole=this.isAdmin()&&!self;
+    return {isAdd:false,isManage:true,name,self,notSelf:!self,
+      ini:initials(name), chipLabel:this.roleLabel(eff), suspended:!!person.suspended,
+      canEditRole, roleLabel:this.roleLabel(eff),
+      baseInspBg:base==='Inspector'?'#1B4D7A':'#fff', baseInspBorder:base==='Inspector'?'#1B4D7A':'#E7EBEE', baseInspColor:base==='Inspector'?'#fff':'#58626A',
+      baseMgrBg:base==='Manager'?'#1B4D7A':'#fff', baseMgrBorder:base==='Manager'?'#1B4D7A':'#E7EBEE', baseMgrColor:base==='Manager'?'#fff':'#58626A',
+      onRoleInsp:()=>this.setPersonRole(name,'Inspector'), onRoleMgr:()=>this.setPersonRole(name,'Manager'),
+      canGrantAdmin:canEditRole&&base==='Manager', adminOn:isAdminRole, onToggleAdmin:()=>this.togglePersonAdmin(name),
+      adminTrack:isAdminRole?'background:#1B4D7A':'background:#CBD2D8', adminKnob:isAdminRole?'right:3px':'left:3px', adminLabelColor:isAdminRole?'#1B2126':'#58626A',
+      suspendLabel:person.suspended?('Reinstate '+name):('Suspend '+name),
+      delArmed:st.peopleDelArm, deleteLabel:st.peopleDelArm?('Tap again to delete '+name):'Delete from depot', deleteBg:st.peopleDelArm?'#A03428':'#FBEEEC', deleteColor:st.peopleDelArm?'#fff':'#A03428',
+      onSuspend:()=>this.toggleSuspend(name), onDelete:()=>this.armDelete(name), onClose:()=>this.closePeopleSheet()};
+  }
+  _resetModal(){
+    const st=this.state; const meta=st.backupMeta; const ready=!!(st.resetReason||'').trim();
+    return {reason:st.resetReason,onReason:(e)=>this.onResetReason(e.target.value),ready,
+      metaLine:meta?('The backup saved '+meta.savedAt+' stays on this phone.'):'No backup has been saved, so there is no copy of this depot anywhere else.',
+      confirmStyle:ready?'background:#A03428':'background:#F1F2F3', confirmColor:ready?'#fff':'#58626A',
+      onConfirm:()=>this.doReset(), onClose:()=>this.closeResetModal()};
+  }
+  _docSheet(){
+    const st=this.state; if(!st.docSheetOpen)return {};
+    const name=st.docName; const required=this.docTypeFilesFor(name); const added=st.docFiles.length;
+    const hasType=!!name; const canSave=hasType&&added>=required;
+    return {plate:st.docPlate, name:name||'Select a type', hasType, typeColor:name?'#1B2126':'#8B9197', title:st.docEditIdx==null?'Add document':'Edit document',
+      pickerOpen:st.docPickerOpen, pickChev:st.docPickerOpen?'transform:rotate(180deg)':'',
+      types:st.docTypesData.map((d)=>({name:d.name,files:plural(d.files,'file'),on:d.name===name,style:d.name===name?'background:#F6F9FC;border:1px solid #1B4D7A':'background:#fff;border:1px solid #D3D9DD',color:d.name===name?C.primary:C.muted2,onPick:()=>this.pickDocType(d.name)})),
+      onTogglePicker:()=>this.toggleDocPicker(),
+      required, added, progress:added+' of '+required+' added', complete:added>=required&&required>0, progressColor:(added>=required&&required>0)?'#397B43':'#616B73',
+      showFiles:hasType&&required>0,
+      files:st.docFiles.map((f)=>({id:f.id,onRemove:()=>this.removeDocFile(f.id)})),
+      canAttach:hasType&&added<required, onAttach:()=>this.attachDocFile(),
+      date:st.docDate, onDate:(e)=>this.onDocDate(e.target.value),
+      canSave, saveStyle:canSave?'background:#1B4D7A':'background:#F1F2F3', saveColor:canSave?'#fff':'#58626A',
+      onSave:()=>this.saveDoc(), onClose:()=>this.closeDocSheet()};
   }
   _failSheetVM(){
     const fs=this.state.failSheet; if(!fs)return {};
@@ -1478,6 +1804,7 @@ class Component extends DCLogic {
       isPick:st.gatePhase==='pick', isPin:st.gatePhase==='pin',
       pickQuery:st.pickQuery, onQuery:(e)=>this.onPickQuery(e.target.value), hasResults:!!q,
       results:results.map((p)=>{ const c=av(p.role); return {name:p.name,role:p.role,ini:p.ini||initials(p.name),avBg:c.bg,avColor:c.fg,onPress:()=>this.choosePerson(p.name)}; }),
+      showStaff:!q, staff:st.people.filter((p)=>!p.suspended).map((p)=>{ const c=av(p.role); return {name:p.name,role:this.roleLabel(p.role),ini:p.ini||initials(p.name),avBg:c.bg,avColor:c.fg,onPress:()=>this.enter(p.name)}; }),
       noMatch:!!q&&results.length===0,
       onAdmin:()=>this.gateAdmin(),
       pinName:name, pinRole:prole, pinIni:pini,
@@ -1494,7 +1821,7 @@ class Component extends DCLogic {
     const sections=[];
     if(admin){ sections.push({label:'Management',rows:[
       {icon:'listCheck',title:'Templates',sub:'',soon:true},
-      {icon:'users',title:'People',sub:peopleSub,soon:false,onPress:()=>this.go('people')},
+      {icon:'users',title:'Personnel Management',sub:peopleSub,soon:false,onPress:()=>this.go('people')},
     ]}); }
     sections.push({label:'Fleet',rows:[{icon:'truck',title:'Fleet',sub:this.state.fleet.length+' vehicles',soon:false,onPress:()=>this.go('vans')}]});
     if(this.isManager())sections.push({label:'Reporting',rows:[{icon:'chart',title:'Weekly depot report',sub:'Coverage, defects, expiring docs',soon:false,isNew:true,onPress:()=>this.go('report')}]});
@@ -1504,25 +1831,39 @@ class Component extends DCLogic {
     return {sections};
   }
   _settings(){
+    const st=this.state; const meta=st.backupMeta;
     return {
       depotName:this.state.depotName,
       onConfig:()=>this.go('config'),
-      onBackup:()=>this.say('Backup saved on this device.'),
-      onRestore:()=>this.say('No backup on this device yet.'),
-      note:'No backup saved yet.',
+      onBackup:()=>this.doBackup(),
+      onRestore:()=>this.openRestore(),
+      restoreOpen:st.restoreOpen&&!!meta, restoreClosed:!(st.restoreOpen&&!!meta),
+      savedAt:meta?meta.savedAt:'', mVans:meta?meta.vans:0, mChecks:meta?meta.checks:0, mDefects:meta?meta.defects:0,
+      onCancelRestore:()=>this.cancelRestore(), onConfirmRestore:()=>this.confirmRestore(),
+      note:meta?('Last backup saved '+meta.savedAt+' — '+meta.vans+' vehicles, '+meta.checks+' checks.'):'No backup saved yet.',
       build:'v30', checklist:'v'+CHECKLIST.version,
-      onReset:()=>this.say('Factory reset needs a confirm — wired in the live app.'),
+      onReset:()=>this.openResetModal(),
     };
   }
   _config(){
     const st=this.state;
-    const ANGLES=['Front','Rear','Nearside','Offside','Dashboard / odometer','Interior / load area'];
     return {
       excludeDays:st.excludeDays, forceDays:st.forceDays, rerolls:String(st.rerolls), target:st.target,
+      edit:st.cfgEdit, editLabel:st.cfgEdit?'Done':'Edit', editIcon:st.cfgEdit?'check':'pen', editBg:st.cfgEdit?'#1B4D7A':'#fff', editFg:st.cfgEdit?'#fff':'#1B4D7A', onToggleEdit:()=>this.toggleCfgEdit(),
+      onExcludeDays:(e)=>this.onExcludeDays(e.target.value), onForceDays:(e)=>this.onForceDays(e.target.value), onRerolls:(e)=>this.onRerolls(e.target.value), onTarget:(e)=>this.onTarget(e.target.value),
+      depotOpen:st.depotOpen, depotChev:st.depotOpen?'chevronDown':'chevronRight', onToggleDepot:()=>this.toggleDepot(),
+      depotName:st.depotName, onDepotName:(e)=>this.onDepotName(e.target.value),
+      depotAddr:st.depotAddr, onDepotAddr:(e)=>this.onDepotAddr(e.target.value),
+      geoRadius:st.geofenceRadius, onGeoRadius:(e)=>this.onGeoRadius(e.target.value),
+      locGate:st.locationGate, locTrack:st.locationGate?'background:#1B4D7A':'background:#CBD2D8', locKnob:st.locationGate?'right:3px':'left:3px', onToggleLocGate:()=>this.toggleLocationGate(),
+      binding:st.deviceBinding, bindTrack:st.deviceBinding?'background:#1B4D7A':'background:#CBD2D8', bindKnob:st.deviceBinding?'right:3px':'left:3px', onToggleBinding:()=>this.toggleDeviceBinding(),
+      accessCode:st.accessCode, onRegenCode:()=>this.regenCode(),
+      depotSummary:st.locationGate?'Geofenced':'Open site',
       drawOpen:st.drawRulesOpen, drawChev:st.drawRulesOpen?'chevronDown':'chevronRight', onToggleDraw:()=>this.setState((s)=>({drawRulesOpen:!s.drawRulesOpen})),
       photosOpen:st.photosOpen, photosChev:st.photosOpen?'chevronDown':'chevronRight', onTogglePhotos:()=>this.setState((s)=>({photosOpen:!s.photosOpen})),
       rolesOpen:st.rolesOpen, rolesChev:st.rolesOpen?'chevronDown':'chevronRight', onToggleRoles:()=>this.setState((s)=>({rolesOpen:!s.rolesOpen})),
-      angles:ANGLES.map((a,i)=>({n:i+1,name:a})), angleCount:plural(ANGLES.length,'angle','angles'),
+      angles:st.photoAngles.map((a,i)=>({n:i+1,name:a,onRemove:()=>this.removeAngle(a)})), angleCount:plural(st.photoAngles.length,'angle','angles'),
+      newAngle:st.newAngle, onNewAngle:(e)=>this.onNewAngle(e.target.value), onAddAngle:()=>this.addAngle(),
       docTypesOpen:st.docTypesOpen, docTypesChev:st.docTypesOpen?'chevronDown':'chevronRight', onToggleDocTypes:()=>this.toggleDocTypes(),
       docTypesCount:plural(st.docTypesData.length,'type'),
       docTypes:st.docTypesData.map((d,i)=>({n:i+1,name:d.name,files:plural(d.files,'file'),onRemove:()=>this.removeDocType(d.name)})),
@@ -1531,12 +1872,12 @@ class Component extends DCLogic {
       usesCount:plural(st.useTypes.length,'type'),
       uses:st.useTypes.map((u,i)=>({n:i+1,name:u,onRemove:()=>this.removeUse(u)})),
       newUse:st.newUse, onNewUse:(e)=>this.onNewUse(e.target.value), onAddUse:()=>this.addUse(),
-      groups:st.configGroups.map((g)=>{ const open=st.groupOpen===g.role; const onC=g.caps.length; return {role:this.roleLabel(g.role),open,chev:open?'chevronDown':'chevronRight',count:onC+' of '+g.caps.length,onToggle:()=>this.toggleGroup(g.role),caps:g.caps.map((c)=>({name:c.name,desc:c.desc,seed:c.seed}))}; }),
+      groups:st.configGroups.map((g)=>{ const open=st.groupOpen===g.role; const onC=g.caps.filter((c)=>c.on!==false).length; return {role:this.roleLabel(g.role),open,chev:open?'chevronDown':'chevronRight',count:onC+' of '+g.caps.length,onToggle:()=>this.toggleGroup(g.role),caps:g.caps.map((c)=>{ const on=c.on!==false; return {name:c.name,desc:c.desc,seed:c.seed,on,track:on?'background:#1B4D7A':'background:#CBD2D8',knob:on?'right:2px;left:auto':'left:2px;right:auto',onToggle:()=>this.toggleCap(g.role,c.name)}; })}; }),
     };
   }
   _people(){
     const st=this.state; const me=this.resolvedPerson(); const canManage=this.isManager();
-    const roster=this.roster(); const suspended=roster.filter((p)=>p.suspended).length;
+    const roster=this.state.people; const suspended=roster.filter((p)=>p.suspended).length;
     const rows=this.peopleList();
     return {
       sub:plural(roster.length,'person','people')+' · '+(suspended?plural(suspended,'suspended','suspended'):'all active'),
@@ -1544,30 +1885,54 @@ class Component extends DCLogic {
       mgrBorder:st.peopleFilter==='Manager'?C.primary:C.border, mgrBg:st.peopleFilter==='Manager'?C.primary:'#fff', mgrColor:st.peopleFilter==='Manager'?'#fff':C.muted2,
       inspBorder:st.peopleFilter==='Inspector'?C.primary:C.border, inspBg:st.peopleFilter==='Inspector'?C.primary:'#fff', inspColor:st.peopleFilter==='Inspector'?'#fff':C.muted2,
       onAll:()=>this.setPeopleFilter('all'), onMgr:()=>this.setPeopleFilter('Manager'), onInsp:()=>this.setPeopleFilter('Inspector'),
+      allSeg:st.peopleFilter==='all'?'background:#fff;box-shadow:0 1px 2px rgba(27,33,38,.08)':'background:transparent', allSegC:st.peopleFilter==='all'?'#1B2126':'#68727A',
+      mgrSeg:st.peopleFilter==='Manager'?'background:#fff;box-shadow:0 1px 2px rgba(27,33,38,.08)':'background:transparent', mgrSegC:st.peopleFilter==='Manager'?'#1B2126':'#68727A',
+      inspSeg:st.peopleFilter==='Inspector'?'background:#fff;box-shadow:0 1px 2px rgba(27,33,38,.08)':'background:transparent', inspSegC:st.peopleFilter==='Inspector'?'#1B2126':'#68727A',
       canManage,
       rows:rows.map((p,i)=>{ const eff=this.roleOf(p.name); const mgr=eff==='Manager'||eff==='Admin'; const susp=!!p.suspended; const you=p.name===me; return {
         name:p.name, ini:p.ini, you, last:i===rows.length-1, rowBorder:i===rows.length-1?'':'border-bottom:1px solid #F1F2F3',
         avStyle:susp?'background:#EEF1F3':mgr?'background:#1B4D7A':'background:#E9F0F6', avColor:susp?'#68727A':mgr?'#fff':'#1B4D7A',
         dotColor:susp?'#8A6116':'#1B4D7A', status:susp?'Suspended':'Active',
         chipStyle:mgr?'background:#E9F0F6':'background:#F1F2F3', chipColor:susp?'#8A6116':mgr?'#1B4D7A':'#58626A', chipTxt:susp?'Suspended':this.roleLabel(eff),
+        showDots:canManage, onManage:()=>this.openManagePerson(p.name),
         onPress:()=>{ if(you||canManage)this.openPerson(p.name); else this.say('Only a manager can open another person.'); },
       }; }),
+      onAdd:()=>this.openAddPerson(),
     };
   }
   _profile(){
     const st=this.state; const name=st.viewPerson||this.resolvedPerson();
     const rec=this.state.people.find((p)=>p.name===name)||{name,role:this.roleOf(name),ini:initials(name),suspended:false,since:'—'};
-    const eff=this.roleOf(name); const isAdminRole=eff==='Admin';
+    const committed=this.roleOf(name);
+    const eff=st.draftRole!==null?st.draftRole:committed;
+    const isAdminRole=eff==='Admin';
+    const baseRole=isAdminRole?'Manager':eff;
+    const me=this.resolvedPerson();
+    const editable=false;
+    const canGrantAdmin=false;
+    const canManage=this.isManager()&&name!==me;
+    const dirty=st.draftRole!==null&&st.draftRole!==committed;
     const p=PEOPLE[name]||{month:0,week:0,defects:0};
     const vans=this.state.fleet.filter((v)=>v.driver===name);
-    const caps=this.state.configGroups.filter((g)=>{const order=['Inspector','Manager','Admin'];return order.indexOf(g.role)<=order.indexOf(eff==='Admin'?'Admin':eff);}).flatMap((g)=>g.caps.map((c)=>c.name));
+    const order=['Inspector','Manager','Admin'];
+    const caps=this.state.configGroups.filter((g)=>order.indexOf(g.role)<=order.indexOf(eff)).flatMap((g)=>g.caps.filter((c)=>c.on!==false).map((c)=>c.name));
     return {
       name:rec.name, ini:rec.ini, roleLabel:this.roleLabel(eff), suspended:!!rec.suspended,
-      showTiles:!isAdminRole, month:p.month, week:p.week,
-      since:rec.since||'—',
+      showTiles:!isAdminRole, month:p.month, week:p.week, since:rec.since||'—',
+      editable, readOnly:!editable,
+      baseInspBg:baseRole==='Inspector'?'#1B4D7A':'#fff', baseInspBorder:baseRole==='Inspector'?'#1B4D7A':'#E7EBEE', baseInspColor:baseRole==='Inspector'?'#fff':'#58626A',
+      baseMgrBg:baseRole==='Manager'?'#1B4D7A':'#fff', baseMgrBorder:baseRole==='Manager'?'#1B4D7A':'#E7EBEE', baseMgrColor:baseRole==='Manager'?'#fff':'#58626A',
+      onSegInsp:()=>this.setDraftRole('Inspector'), onSegMgr:()=>this.setDraftRole('Manager'),
+      canGrantAdmin, adminOn:isAdminRole, onToggleAdmin:()=>this.toggleGrantAdmin(),
+      adminTrack:isAdminRole?'background:#1B4D7A':'background:#CBD2D8', adminKnob:isAdminRole?'right:3px':'left:3px', adminLabelColor:isAdminRole?'#1B2126':'#58626A',
+      capsOpen:st.profCapsOpen, onToggleCaps:()=>this.toggleProfCaps(), capsChev:st.profCapsOpen?'transform:rotate(180deg)':'',
+      roleOpen:st.profRoleOpen, onToggleRole:()=>this.toggleProfRole(), roleChev:st.profRoleOpen?'transform:rotate(180deg)':'',
+      caps:caps.map((c)=>({name:c})), hasCaps:caps.length>0,
+      dirty, onDiscard:()=>this.discardRole(), onSave:()=>this.saveRole(),
+      canManage, onManage:()=>this.openManagePerson(name),
+      onMonth:()=>{ this.setApprovedPeriod('month'); this.go('approved'); }, onWeek:()=>{ this.setApprovedPeriod('week'); this.go('approved'); },
       hasVans:vans.length>0, noVans:vans.length===0, vansCount:vans.length===0?'none':plural(vans.length,'vehicle'),
       vans:vans.map((v,i)=>{ const key=this.statOf(v); const stat=STATUS[key]; const pill=key==='blocked'?'attention':key==='jobs'?plural(v.jobs.length,'def','def'):key==='overdue'?'overdue':'ok'; return {plate:v.plate,sub:v.model+' · '+(v.driverSince?'driver since '+fmtDate(v.driverSince):'current driver'),pill,pillBg:stat.bg,pillColor:stat.c,last:i===vans.length-1,rowBorder:i===vans.length-1?'':'border-bottom:1px solid #F1F2F3',onPress:()=>this.goVan(v.plate)}; }),
-      caps:caps.map((c)=>({name:c})),
     };
   }
   _help(){
@@ -1601,7 +1966,7 @@ class Component extends DCLogic {
     const agingMax=Math.max(1,b1,b2,b3);
     return {
       periodTitle:'Week of 18–24 Aug 2026', depot:st.depotName,
-      onExport:()=>this.say('Report export (.xlsx / PDF) — coming soon.'),
+      onExport:()=>this.exportReport(),
       coverageN:weekChecks, coverageTarget:'of '+target+' target', coveragePct:coveragePct+'%',
       coverageBad:weekChecks<target, coverageColor:weekChecks>=target?C.green:C.primary,
       coverageNote:weekChecks>=target?'On target this week':((target-weekChecks)+' short of target'),

@@ -23,7 +23,8 @@ const BACKUP_KEY = 'spotcheck:backup:v2';
 // State that survives a reload. Transient UI (gate/draw/check) is not persisted.
 const PERSIST_KEYS = ['depotName', 'excludeDays', 'forceDays', 'rerolls', 'target',
   'fleet', 'people', 'queue', 'approved', 'returned', 'photoAngles', 'clVersion',
-  'configGroups', 'capOff', 'docTypes', 'vehicleUses'];
+  'configGroups', 'capOff', 'docTypes', 'vehicleUses',
+  'depotAddr', 'geofenceRadius', 'locationGate', 'deviceBinding', 'accessCode'];
 
 const DEFAULT_ANGLES = ['Front', 'Rear', 'Nearside', 'Offside', 'Dashboard / odometer', 'Interior / load area'];
 const DEFAULT_RULES = { excludeDays: '7', forceDays: '30', rerolls: '2', target: '12' };
@@ -81,6 +82,10 @@ class Store {
       sendBackNote: '',
       // --- depot config ---
       depotName: 'Chullora CPDC',
+      // Depot & access (Config → top card)
+      depotAddr: '88 Rookwood Rd, Chullora NSW 2190',
+      geofenceRadius: '150', locationGate: true, deviceBinding: true, accessCode: '4Q7-2K9',
+      depotOpen: true,          // Depot & access accordion (open on load)
       ...DEFAULT_RULES,
       configGroups: seedCapGroups(),
       capOff: {},               // { 'Role Cap name': true } — switched-off capabilities
@@ -687,6 +692,15 @@ class Store {
     this.saveState();
     this.say('Depot name saved.');
   }
+  setDepotAddr(v) { this.setState({ depotAddr: v }, () => this.saveState()); }
+  setGeofence(v) { this.setState({ geofenceRadius: (v || '').replace(/[^0-9]/g, '').slice(0, 4) }, () => this.saveState()); }
+  toggleLocationGate() { this.setState((s) => ({ locationGate: !s.locationGate }), () => this.saveState()); }
+  toggleDeviceBinding() { this.setState((s) => ({ deviceBinding: !s.deviceBinding }), () => this.saveState()); }
+  regenAccessCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no I/O/0/1 — avoids read-back mistakes
+    const seg = (n) => Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    this.setState({ accessCode: seg(3) + '-' + seg(3) }, () => { this.saveState(); this.say('New access code generated.'); });
+  }
 
   // A backup is a second slot in device storage, not a file on disk — nothing here can
   // reach a downloads folder without a file-system dependency.
@@ -739,6 +753,8 @@ class Store {
     const fleet = genVans();
     this.setState({
       depotName: 'Chullora CPDC',
+      depotAddr: '88 Rookwood Rd, Chullora NSW 2190',
+      geofenceRadius: '150', locationGate: true, deviceBinding: true, accessCode: '4Q7-2K9',
       ...DEFAULT_RULES,
       fleet,
       people: seedPeople(),

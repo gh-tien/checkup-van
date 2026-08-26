@@ -32,6 +32,87 @@ export default function ConfigScreen() {
         onPress={() => s.tapOpen()}
         style={{ gap: 12 }}
       >
+        {/* Depot & access */}
+        <Section title="Depot &amp; access" count="" open={st.depotOpen} onToggle={() => s.toggleCfg('depotOpen')}>
+          <View style={styles.depotBody}>
+            <View style={styles.dField}>
+              <Text style={styles.fieldCap}>Depot name</Text>
+              <TextInput
+                value={st.depotName}
+                onChangeText={(v) => s.setDepot(v)}
+                onBlur={() => s.commitDepot()}
+                maxLength={40}
+                accessibilityLabel="Depot name"
+                style={styles.dInput}
+              />
+            </View>
+            <View style={styles.dField}>
+              <Text style={styles.fieldCap}>Location</Text>
+              <TextInput
+                value={st.depotAddr}
+                onChangeText={(v) => s.setDepotAddr(v)}
+                placeholder="Street, suburb, state"
+                placeholderTextColor={C.muted3}
+                accessibilityLabel="Depot location"
+                style={styles.dInput}
+              />
+            </View>
+
+            <View style={styles.toggleRow}>
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text style={styles.toggleLabel}>Location-gated checks</Text>
+                <Text style={styles.toggleSub}>A check can only start within range of the depot.</Text>
+              </View>
+              <Switch
+                value={st.locationGate}
+                onValueChange={() => s.toggleLocationGate()}
+                trackColor={{ false: C.border3, true: C.primary }}
+                thumbColor="#fff"
+                accessibilityLabel="Location-gated checks"
+              />
+            </View>
+            {st.locationGate && (
+              <View style={styles.dField}>
+                <Text style={styles.fieldCap}>Geofence radius (m)</Text>
+                <TextInput
+                  value={st.geofenceRadius}
+                  onChangeText={(v) => s.setGeofence(v)}
+                  keyboardType="number-pad"
+                  maxLength={4}
+                  accessibilityLabel="Geofence radius in metres"
+                  style={styles.dInput}
+                />
+              </View>
+            )}
+
+            <View style={styles.toggleRow}>
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <Text style={styles.toggleLabel}>Device binding</Text>
+                <Text style={styles.toggleSub}>A new device needs the one-time code to sign in.</Text>
+              </View>
+              <Switch
+                value={st.deviceBinding}
+                onValueChange={() => s.toggleDeviceBinding()}
+                trackColor={{ false: C.border3, true: C.primary }}
+                thumbColor="#fff"
+                accessibilityLabel="Device binding"
+              />
+            </View>
+            {st.deviceBinding && (
+              <View style={styles.codeRow}>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={styles.fieldCap}>Access code</Text>
+                  <Text style={styles.codeVal}>{st.accessCode}</Text>
+                </View>
+                <Pressable onPress={() => s.regenAccessCode()} accessibilityRole="button" accessibilityLabel="Generate a new access code" style={styles.codeBtn}>
+                  <Icon name="refresh" size={15} color={C.primary} width={1.8} />
+                  <Text style={styles.codeBtnTxt}>New</Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
+        </Section>
+
         {/* Draw rules */}
         <Section title="Draw rules" count={plural(4, 'rule', 'rules')} open={st.drawRulesOpen} onToggle={() => s.toggleCfg('drawRulesOpen')}>
           <View style={styles.drawBody}>
@@ -58,24 +139,30 @@ export default function ConfigScreen() {
             <View key={a} style={[styles.angleRow, styles.hairline]}>
               <View style={styles.num}><Text style={styles.numTxt}>{i + 1}</Text></View>
               <Text style={styles.angleName} numberOfLines={1}>{a}</Text>
-              <IconBtn name="arrowUp" label={'Move ' + a + ' up'} disabled={i === 0} onPress={() => s.moveAngle(i, -1)} />
-              <IconBtn name="arrowDown" label={'Move ' + a + ' down'} disabled={i === st.photoAngles.length - 1} onPress={() => s.moveAngle(i, 1)} />
-              <IconBtn name="trash" label={'Remove ' + a} color={C.danger} onPress={() => s.removeAngle(i)} />
+              {st.showAddValue && (
+                <>
+                  <IconBtn name="arrowUp" label={'Move ' + a + ' up'} disabled={i === 0} onPress={() => s.moveAngle(i, -1)} />
+                  <IconBtn name="arrowDown" label={'Move ' + a + ' down'} disabled={i === st.photoAngles.length - 1} onPress={() => s.moveAngle(i, 1)} />
+                  <IconBtn name="trash" label={'Remove ' + a} color={C.danger} onPress={() => s.removeAngle(i)} />
+                </>
+              )}
             </View>
           ))}
-          <View style={styles.addRow}>
-            <TextInput
-              value={st.angleNew}
-              onChangeText={(v) => s.onAngleNew(v)}
-              placeholder="Add an angle…"
-              placeholderTextColor={C.muted3}
-              accessibilityLabel="New angle"
-              style={styles.addInput}
-            />
-            <Pressable onPress={() => s.addAngle()} accessibilityRole="button" style={styles.addBtn}>
-              <Text style={styles.addBtnTxt}>Add</Text>
-            </Pressable>
-          </View>
+          {st.showAddValue && (
+            <View style={styles.addRow}>
+              <TextInput
+                value={st.angleNew}
+                onChangeText={(v) => s.onAngleNew(v)}
+                placeholder="Add an angle…"
+                placeholderTextColor={C.muted3}
+                accessibilityLabel="New angle"
+                style={styles.addInput}
+              />
+              <Pressable onPress={() => s.addAngle()} accessibilityRole="button" style={styles.addBtn}>
+                <Text style={styles.addBtnTxt}>Add</Text>
+              </Pressable>
+            </View>
+          )}
         </Section>
 
         {/* Document types */}
@@ -84,33 +171,39 @@ export default function ConfigScreen() {
             <View key={d.name} style={[styles.angleRow, styles.hairline]}>
               <Text style={styles.angleName} numberOfLines={1}>{d.name}</Text>
               <Text style={styles.count}>{plural(d.files, 'file', 'files')}</Text>
-              <IconBtn name="trash" label={'Remove ' + d.name} color={C.danger} onPress={() => s.removeDocType(i)} />
+              {st.showAddValue && (
+                <IconBtn name="trash" label={'Remove ' + d.name} color={C.danger} onPress={() => s.removeDocType(i)} />
+              )}
             </View>
           ))}
-          <View style={styles.addRow}>
-            <TextInput
-              value={st.docTypeNew}
-              onChangeText={(v) => s.onDocTypeNew(v)}
-              placeholder="Add a document type…"
-              placeholderTextColor={C.muted3}
-              accessibilityLabel="New document type"
-              style={styles.addInput}
-            />
-            <TextInput
-              value={st.docTypeFiles}
-              onChangeText={(v) => s.onDocTypeFiles(v)}
-              keyboardType="number-pad"
-              maxLength={2}
-              placeholder="1"
-              placeholderTextColor={C.muted3}
-              accessibilityLabel="Files required"
-              style={styles.filesInput}
-            />
-            <Pressable onPress={() => s.addDocType()} accessibilityRole="button" style={styles.addBtn}>
-              <Text style={styles.addBtnTxt}>Add</Text>
-            </Pressable>
-          </View>
-          <Text style={styles.hintIn}>Name is required. The number is how many files that type expects on upload.</Text>
+          {st.showAddValue && (
+            <>
+              <View style={styles.addRow}>
+                <TextInput
+                  value={st.docTypeNew}
+                  onChangeText={(v) => s.onDocTypeNew(v)}
+                  placeholder="Add a document type…"
+                  placeholderTextColor={C.muted3}
+                  accessibilityLabel="New document type"
+                  style={styles.addInput}
+                />
+                <TextInput
+                  value={st.docTypeFiles}
+                  onChangeText={(v) => s.onDocTypeFiles(v)}
+                  keyboardType="number-pad"
+                  maxLength={2}
+                  placeholder="1"
+                  placeholderTextColor={C.muted3}
+                  accessibilityLabel="Files required"
+                  style={styles.filesInput}
+                />
+                <Pressable onPress={() => s.addDocType()} accessibilityRole="button" style={styles.addBtn}>
+                  <Text style={styles.addBtnTxt}>Add</Text>
+                </Pressable>
+              </View>
+              <Text style={styles.hintIn}>Name is required. The number is how many files that type expects on upload.</Text>
+            </>
+          )}
         </Section>
 
         {/* Vehicle use */}
@@ -118,23 +211,27 @@ export default function ConfigScreen() {
           {st.vehicleUses.map((u, i) => (
             <View key={u} style={[styles.angleRow, styles.hairline]}>
               <Text style={styles.angleName} numberOfLines={1}>{u}</Text>
-              <IconBtn name="trash" label={'Remove ' + u} color={C.danger} onPress={() => s.removeUse(i)} />
+              {st.showAddValue && (
+                <IconBtn name="trash" label={'Remove ' + u} color={C.danger} onPress={() => s.removeUse(i)} />
+              )}
             </View>
           ))}
-          <View style={styles.addRow}>
-            <TextInput
-              value={st.useNew}
-              onChangeText={(v) => s.onUseNew(v)}
-              placeholder="Add a use type… (e.g. PRV, BUS)"
-              placeholderTextColor={C.muted3}
-              autoCapitalize="characters"
-              accessibilityLabel="New use type"
-              style={styles.addInput}
-            />
-            <Pressable onPress={() => s.addUse()} accessibilityRole="button" style={styles.addBtn}>
-              <Text style={styles.addBtnTxt}>Add</Text>
-            </Pressable>
-          </View>
+          {st.showAddValue && (
+            <View style={styles.addRow}>
+              <TextInput
+                value={st.useNew}
+                onChangeText={(v) => s.onUseNew(v)}
+                placeholder="Add a use type… (e.g. PRV, BUS)"
+                placeholderTextColor={C.muted3}
+                autoCapitalize="characters"
+                accessibilityLabel="New use type"
+                style={styles.addInput}
+              />
+              <Pressable onPress={() => s.addUse()} accessibilityRole="button" style={styles.addBtn}>
+                <Text style={styles.addBtnTxt}>Add</Text>
+              </Pressable>
+            </View>
+          )}
         </Section>
 
         <Text style={[styles.label, { paddingTop: 10 }]}>Fleet setup</Text>
@@ -323,6 +420,26 @@ const styles = StyleSheet.create({
   },
   sectionOpen: { borderTopWidth: 1, borderTopColor: C.hair },
   drawBody: { padding: 12, gap: 8 },
+  depotBody: { padding: 12, gap: 12 },
+  dField: {
+    backgroundColor: C.card, borderWidth: 1, borderColor: C.border3, borderRadius: 12,
+    paddingHorizontal: 12, paddingVertical: 6, minHeight: 56, justifyContent: 'center', gap: 2,
+  },
+  dInput: { fontFamily: F.sansMed, fontSize: 15.5, color: C.ink, padding: 0, minHeight: 24 },
+  toggleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },
+  toggleLabel: { fontFamily: F.sansMed, fontSize: 14.5, color: C.ink },
+  toggleSub: { fontFamily: F.sans, fontSize: 12.5, lineHeight: 17, color: C.muted3, marginTop: 1 },
+  codeRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: C.card, borderWidth: 1, borderColor: C.border3, borderRadius: 12,
+    paddingHorizontal: 12, paddingVertical: 8, minHeight: 56,
+  },
+  codeVal: { fontFamily: F.monoBold, fontSize: 17, letterSpacing: 1, color: C.primary, marginTop: 2 },
+  codeBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 40, paddingHorizontal: 14,
+    borderRadius: 999, borderWidth: 1, borderColor: C.primary, backgroundColor: C.card,
+  },
+  codeBtnTxt: { fontFamily: F.sansSemi, fontSize: 13.5, color: C.primary },
   nestedGroup: { borderTopWidth: 1, borderTopColor: C.hair },
   hairline: { borderBottomWidth: 1, borderBottomColor: C.hair },
 
